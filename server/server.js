@@ -17,6 +17,7 @@ const allowedOrigins = [
   'http://localhost:5173',
   process.env.CLIENT_URL,
   'https://srijan-2026-one.vercel.app',
+  "https://srijan-2026-one.vercel.app"
 ].filter(Boolean);
 
 app.use(
