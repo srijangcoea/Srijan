@@ -5,6 +5,7 @@ import cors from 'cors';
 import { connectDB, checkDBConnection } from './config/db.js';
 import eventRoutes from './routes/eventRoutes.js';
 import registrationRoutes from './routes/registrationRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
 import { notFoundHandler, errorHandler } from './middleware/errorMiddleware.js';
 
 const app = express();
@@ -47,6 +48,7 @@ app.get('/api/health', (req, res) => {
 // API Routes
 app.use('/api/events', eventRoutes);
 app.use('/api/registrations', registrationRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Error Handling Middlewares
 app.use(notFoundHandler);

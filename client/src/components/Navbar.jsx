@@ -1,8 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, ArrowRight } from 'lucide-react';
+import { Menu, X, Zap, User } from 'lucide-react';
 import sMarkImg from '../assets/srijan-s-mark.png';
 
+/**
+ * High-Tech Cyber Navbar for Srijan 2026
+ * Styled precisely to the cyber-command telemetry design.
+ * Features:
+ * - Geometric S emblem in glowing corner-dot badge
+ * - "SRIJAN v26.0" title with "ETAS • E&TC DEPT" subtext
+ * - Cleaned nav links (sponsors and telemetry status tab removed)
+ * - Active pill indicator for current route
+ * - Electric cyan "⚡ REGISTER NOW" action button
+ * - Circular profile/admin user action
+ * - Fully responsive with animated mobile drawer
+ */
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -21,10 +33,10 @@ export default function Navbar() {
   }, [location]);
 
   const navLinks = [
-    { name: 'Home', path: '/' },
-    { name: 'Events', path: '/events' },
-    { name: 'Register', path: '/register' },
-    { name: 'About', path: '/about' },
+    { name: 'HOME', path: '/' },
+    { name: 'EVENTS', path: '/events' },
+    { name: 'SCHEDULE', path: '/events' },
+    { name: 'ABOUT', path: '/about' },
   ];
 
   const isActive = (path) => {
@@ -36,108 +48,151 @@ export default function Navbar() {
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled
-          ? 'bg-space-950/90 backdrop-blur-md border-b border-white/10 shadow-lg shadow-black/40 py-3'
-          : 'bg-transparent py-4 sm:py-5 border-b border-transparent'
+          ? 'bg-[#030a14]/95 backdrop-blur-xl border-b border-[#22e5ff]/20 shadow-[0_4px_30px_rgba(0,0,0,0.8)] py-2.5 sm:py-3'
+          : 'bg-[#030a14]/80 backdrop-blur-md border-b border-[#22e5ff]/15 py-3 sm:py-4'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
-          {/* Brand Identity / Logo */}
+          
+          {/* LEFT: S Emblem Badge + Brand Identity */}
           <Link
             to="/"
-            className="flex items-center gap-3 group focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 rounded-lg p-1"
+            className="flex items-center gap-3 group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#22e5ff] rounded-xl p-1 select-none"
             aria-label="Srijan Home"
           >
-            <div className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-lg overflow-hidden border border-amber-500/30 group-hover:border-amber-400 transition-colors shadow-sm shadow-amber-500/10 flex-shrink-0 bg-space-900">
+            {/* Logo Box with Top-Right Glowing Cyan Dot */}
+            <div className="relative w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-[#081522] border border-[#22e5ff]/40 p-2 flex items-center justify-center shadow-[0_0_15px_rgba(34,229,255,0.25)] group-hover:border-[#22e5ff] group-hover:shadow-[0_0_20px_rgba(34,229,255,0.45)] transition-all flex-shrink-0">
+              {/* Corner Cyan Status Light Dot */}
+              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#22e5ff] shadow-[0_0_8px_#22e5ff] border-2 border-[#030a14]" />
+              
               <img
                 src={sMarkImg}
-                alt="Srijan S Emblem"
-                className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300"
+                alt="Srijan S Logo"
+                className="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(255,180,0,0.6)] group-hover:scale-105 transition-transform"
               />
             </div>
+
+            {/* Typography: SRIJAN v26.0 + ETAS • E&TC DEPT */}
             <div className="flex flex-col">
-              <span className="font-display font-extrabold tracking-wider text-xl sm:text-2xl text-white group-hover:text-amber-300 transition-colors">
-                SRIJAN
-              </span>
-              <span className="text-[10px] tracking-[0.2em] uppercase font-mono text-amber-400/80 -mt-1">
-                TOGETHER, WE CREATE
+              <div className="flex items-center gap-2">
+                <span className="font-mono font-extrabold tracking-wider text-lg sm:text-xl text-white group-hover:text-[#22e5ff] transition-colors leading-none">
+                  SRIJAN
+                </span>
+                <span className="text-[10px] font-mono font-bold text-[#ffb400] bg-[#0c1f2e] border border-[#ffb400]/40 px-1.5 py-0.5 rounded tracking-wide shadow-[0_0_8px_rgba(255,180,0,0.2)]">
+                  v26.0
+                </span>
+              </div>
+              <span className="text-[9px] sm:text-[10px] tracking-[0.22em] font-mono text-[#93a4b8] uppercase mt-1 group-hover:text-[#c4d3e2] transition-colors">
+                ETAS • E&amp;TC DEPT
               </span>
             </div>
           </Link>
 
-          {/* Desktop Navigation Links */}
-          <nav className="hidden md:flex items-center gap-8" aria-label="Main Navigation">
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                to={link.path}
-                className={`text-sm font-medium transition-all duration-200 relative py-1 focus:outline-none focus-visible:text-amber-300 ${
-                  isActive(link.path)
-                    ? 'text-amber-400 font-semibold'
-                    : 'text-slate-300 hover:text-white'
-                }`}
-              >
-                {link.name}
-                {isActive(link.path) && (
-                  <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-amber-500 to-orange-500 rounded-full animate-pulse-subtle" />
-                )}
-              </Link>
-            ))}
+          {/* CENTER: Navigation Links (Sponsors & Status tab removed per request) */}
+          <nav className="hidden md:flex items-center gap-2 lg:gap-3" aria-label="Main Navigation">
+            {navLinks.map((link) => {
+              const active = isActive(link.path);
+              return (
+                <Link
+                  key={link.name}
+                  to={link.path}
+                  className={`px-4 py-2 rounded-xl text-xs lg:text-[13px] font-mono font-bold tracking-wider transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#22e5ff] ${
+                    active
+                      ? 'bg-[#0d2335] text-white border border-[#22e5ff]/50 shadow-[0_0_15px_rgba(34,229,255,0.2)]'
+                      : 'text-[#93a4b8] hover:text-white hover:bg-[#0c1d2c]/60 border border-transparent'
+                  }`}
+                >
+                  {link.name}
+                </Link>
+              );
+            })}
           </nav>
 
-          {/* Action CTA Button */}
-          <div className="hidden md:flex items-center gap-3">
+          {/* RIGHT: REGISTER NOW Button + User Profile Icon */}
+          <div className="hidden sm:flex items-center gap-3">
+            {/* Electric Cyan CTA Button */}
             <Link
-              to="/events"
-              className="relative group inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold text-white bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-400 hover:to-orange-500 shadow-md shadow-orange-500/20 hover:shadow-orange-500/40 transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-space-950"
+              to="/register"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-mono font-bold text-xs sm:text-sm text-[#00131c] bg-[#22e5ff] hover:bg-[#52eeff] shadow-[0_0_24px_rgba(34,229,255,0.6)] hover:shadow-[0_0_35px_rgba(34,229,255,0.85)] transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0 tracking-wider focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#22e5ff]"
             >
-              <span>Explore Events</span>
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              <Zap className="w-4 h-4 fill-current" />
+              <span>REGISTER NOW</span>
+            </Link>
+
+            {/* Circular Profile Icon Button (links to admin/profile) */}
+            <Link
+              to="/admin"
+              aria-label="Admin / User Profile"
+              className="w-10 h-10 rounded-full bg-[#0a1c2b] border border-[#22e5ff]/40 text-[#22e5ff] hover:text-white hover:border-[#22e5ff] hover:bg-[#0e273d] hover:shadow-[0_0_15px_rgba(34,229,255,0.35)] flex items-center justify-center transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#22e5ff]"
+              title="Admin & Dashboard"
+            >
+              <User className="w-4 h-4" />
             </Link>
           </div>
 
-          {/* Mobile Hamburger Button */}
-          <div className="flex md:hidden items-center">
+          {/* MOBILE: Hamburger Menu Button */}
+          <div className="flex md:hidden items-center gap-2">
+            <Link
+              to="/register"
+              className="px-3 py-1.5 rounded-lg font-mono font-bold text-xs text-[#00131c] bg-[#22e5ff] shadow-[0_0_12px_rgba(34,229,255,0.5)] flex items-center gap-1 sm:hidden"
+            >
+              <Zap className="w-3.5 h-3.5 fill-current" />
+              <span>REGISTER</span>
+            </Link>
+
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="p-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 border border-white/10 focus:outline-none focus:ring-2 focus:ring-amber-400"
+              className="p-2 rounded-xl text-[#22e5ff] hover:text-white bg-[#0a1c2b] border border-[#22e5ff]/30 focus:outline-none focus:ring-2 focus:ring-[#22e5ff]"
               aria-label={isOpen ? 'Close menu' : 'Open menu'}
               aria-expanded={isOpen}
             >
-              {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
+
         </div>
       </div>
 
-      {/* Mobile Drawer Menu */}
+      {/* MOBILE DRAWER MENU */}
       <div
         className={`md:hidden transition-all duration-300 ease-in-out overflow-hidden ${
-          isOpen ? 'max-h-96 opacity-100 border-b border-white/10 bg-space-950/98 backdrop-blur-2xl' : 'max-h-0 opacity-0'
+          isOpen ? 'max-h-96 opacity-100 border-b border-[#22e5ff]/30 bg-[#030a14]/98 backdrop-blur-2xl' : 'max-h-0 opacity-0'
         }`}
       >
-        <div className="px-5 pt-4 pb-6 space-y-3">
-          {navLinks.map((link) => (
-            <Link
-              key={link.name}
-              to={link.path}
-              className={`block px-3 py-2.5 rounded-lg text-base font-medium transition-colors ${
-                isActive(link.path)
-                  ? 'text-amber-400 bg-amber-500/10 border border-amber-500/20 font-semibold'
-                  : 'text-slate-300 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              {link.name}
-            </Link>
-          ))}
+        <div className="px-5 pt-3 pb-6 space-y-2">
+          {navLinks.map((link) => {
+            const active = isActive(link.path);
+            return (
+              <Link
+                key={link.name}
+                to={link.path}
+                className={`block px-4 py-2.5 rounded-xl font-mono text-xs font-bold tracking-wider transition-colors ${
+                  active
+                    ? 'text-white bg-[#0d2335] border border-[#22e5ff]/50 shadow-[0_0_12px_rgba(34,229,255,0.2)]'
+                    : 'text-[#93a4b8] hover:text-white hover:bg-[#0c1d2c]/60'
+                }`}
+              >
+                {link.name}
+              </Link>
+            );
+          })}
 
-          <div className="pt-2">
+          <div className="pt-2 flex items-center gap-3">
             <Link
-              to="/events"
-              className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-lg text-sm font-semibold text-white bg-gradient-to-r from-amber-500 to-orange-500 shadow-md shadow-orange-500/25"
+              to="/register"
+              className="flex-1 inline-flex items-center justify-center gap-2 py-3 rounded-xl font-mono font-bold text-xs text-[#00131c] bg-[#22e5ff] shadow-[0_0_20px_rgba(34,229,255,0.5)] tracking-wider"
             >
-              <span>Explore Events</span>
-              <ArrowRight className="w-4 h-4" />
+              <Zap className="w-4 h-4 fill-current" />
+              <span>REGISTER NOW</span>
+            </Link>
+
+            <Link
+              to="/admin"
+              className="p-3 rounded-xl bg-[#0a1c2b] border border-[#22e5ff]/40 text-[#22e5ff] hover:text-white flex items-center justify-center"
+              aria-label="Admin Portal"
+            >
+              <User className="w-4 h-4" />
             </Link>
           </div>
         </div>

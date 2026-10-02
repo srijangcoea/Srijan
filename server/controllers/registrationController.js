@@ -17,8 +17,9 @@ const validatePerson = (p, role = 'Participant') => {
   if (!cleanPhone || !PHONE_REGEX.test(cleanPhone)) {
     throw new Error(`Valid 10-digit Indian mobile number required for ${role.toLowerCase()}.`);
   }
-  if (!p.college?.trim()) throw new Error(`${role} college name is required.`);
-  if (!p.branch?.trim()) throw new Error(`${role} branch is required.`);
+  if (!p.college?.trim()) p.college = 'Government College of Engineering, Amravati';
+  if (!p.branch?.trim() && p.department?.trim()) p.branch = p.department;
+  if (!p.branch?.trim()) throw new Error(`${role} department is required.`);
   if (!p.year?.trim()) throw new Error(`${role} year of study is required.`);
 };
 
@@ -35,14 +36,10 @@ export const createRegistration = async (req, res, next) => {
       });
     }
 
-    const { eventId, registrationType, participant, teamName, teamLeader, members, termsAccepted } = req.body;
+    const { eventId, registrationType, participant, teamName, teamLeader, members, termsAccepted = true } = req.body;
 
     if (!eventId) {
       return res.status(400).json({ success: false, message: 'Event ID is required.' });
-    }
-
-    if (!termsAccepted) {
-      return res.status(400).json({ success: false, message: 'You must accept the terms and guidelines.' });
     }
 
     // Find Event definition (DB or fallback seed)

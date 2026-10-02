@@ -1,133 +1,750 @@
-import React, { useState } from 'react';
-import IndividualRegistrationForm from './IndividualRegistrationForm';
-import TeamRegistrationForm from './TeamRegistrationForm';
-import RegistrationSuccess from './RegistrationSuccess';
-import { submitRegistration } from '../services/api';
-import { AlertCircle } from 'lucide-react';
+import React from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  Terminal, 
+  Layers, 
+  User, 
+  Mail, 
+  Phone, 
+  GraduationCap, 
+  Zap, 
+  CheckCircle2, 
+  AlertTriangle, 
+  Copy, 
+  Check, 
+  RotateCcw,
+  Sparkles,
+  ShieldAlert,
+  Radio
+} from 'lucide-react';
+import { useRegistration } from '../hooks/useRegistration';
+import MemberFields from './MemberFields';
 
-export default function RegistrationForm({ event, eventsList, onSelectEvent }) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(null);
-  const [completedRegistration, setCompletedRegistration] = useState(null);
+const DEPARTMENTS = [
+  'Electronics & Telecommunication Engineering',
+  'Computer Science & Engineering',
+  'Information Technology',
+  'Electrical Engineering',
+  'Mechanical Engineering',
+  'Civil Engineering',
+  'Instrumentation Engineering',
+  'Applied Science / Other',
+];
 
-  if (!event) return null;
+const YEAR_OPTIONS = [
+  { label: 'FY', value: 'FY' },
+  { label: 'SY', value: 'SY' },
+  { label: 'TY', value: 'TY' },
+  { label: 'FINAL Y', value: 'Final Y' },
+];
 
-  const handleSubmit = async (payload) => {
-    setIsSubmitting(true);
-    setErrorMessage(null);
+/**
+ * Common Registration Portal Component
+ * Recreates the Cybernetic Telemetry aesthetic from input_file_0.png.
+ */
+export default function RegistrationForm({ eventsList = [] }) {
+  const {
+    selectedEvent,
+    isTeamEvent,
+    minSlots,
+    maxSlots,
+    teamSize,
+    isSubmitting,
+    errorToast,
+    setErrorToast,
+    successData,
+    handleSelectEvent,
+    handleTeamSizeChange,
+    onSubmit,
+    handleRegisterAnother,
+    register,
+    setValue,
+    watch,
+    errors,
+  } = useRegistration(eventsList);
 
-    try {
-      const response = await submitRegistration(payload);
-      if (response.success && response.data) {
-        setCompletedRegistration(response.data);
-      } else {
-        throw new Error(response.message || 'Registration could not be completed.');
-      }
-    } catch (err) {
-      setErrorMessage(err.message || 'Something went wrong while processing your registration.');
-    } finally {
-      setIsSubmitting(false);
-    }
+  const [copied, setCopied] = React.useState(false);
+
+  // Watch key inputs for live telemetry monitor readout
+  const watchedTeamName = watch('teamName');
+  const watchedLeaderName = watch('leader.name');
+  const currentLeaderYear = watch('leader.year');
+
+  const copyRegistrationId = (id) => {
+    navigator.clipboard.writeText(id);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2500);
   };
 
-  // If successfully registered, show the Success View
-  if (completedRegistration) {
+  // ============================================================================
+  // SUCCESS CONFIRMATION STATE
+  // ============================================================================
+  if (successData) {
+    const isTeam = successData.registrationType === 'team';
     return (
-      <RegistrationSuccess
-        registration={completedRegistration}
-      />
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5 }}
+        className="max-w-4xl mx-auto rounded-3xl bg-[#06101c]/95 border border-[#22e5ff]/40 p-6 sm:p-10 md:p-12 backdrop-blur-2xl shadow-[0_0_50px_rgba(34,229,255,0.2)] text-[#e8f1f8] relative overflow-hidden"
+      >
+        {/* Top ambient highlight */}
+        <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-[#22e5ff] to-transparent" />
+
+        {/* Confirmation Header */}
+        <div className="text-center space-y-3 pb-8 border-b border-[#22e5ff]/20">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[#22e5ff]/15 border border-[#22e5ff]/40 text-[#22e5ff] shadow-[0_0_25px_rgba(34,229,255,0.4)]">
+            <CheckCircle2 className="w-8 h-8" />
+          </div>
+
+          <div className="font-mono text-xs tracking-widest text-[#22e5ff] uppercase">
+            TRANSMISSION VERIFIED // ENROLLMENT SECURED
+          </div>
+
+          <h2 className="text-3xl sm:text-4xl font-mono font-black text-white tracking-tight uppercase">
+            REGISTRATION CONFIRMED
+          </h2>
+
+          <p className="text-slate-400 text-sm max-w-lg mx-auto font-mono">
+            Candidate telemetry received and indexed in the Srijan 2026 technical roster.
+          </p>
+        </div>
+
+        {/* Credentials / ID Strip */}
+        <div className="py-8 space-y-6">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-5 rounded-2xl bg-[#091726] border border-[#22e5ff]/30">
+            <div>
+              <span className="text-[10px] font-mono tracking-widest text-[#93a4b8] uppercase block">
+                OFFICIAL REGISTRATION IDENTIFIER
+              </span>
+              <span className="text-2xl sm:text-3xl font-mono font-extrabold text-[#22e5ff] tracking-wider">
+                {successData.registrationId}
+              </span>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => copyRegistrationId(successData.registrationId)}
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-mono text-xs font-bold text-white bg-[#0f283d] hover:bg-[#153855] border border-[#22e5ff]/30 transition-all"
+            >
+              {copied ? (
+                <>
+                  <Check className="w-4 h-4 text-emerald-400" />
+                  <span className="text-emerald-400">COPIED TO CLIPBOARD</span>
+                </>
+              ) : (
+                <>
+                  <Copy className="w-4 h-4 text-[#22e5ff]" />
+                  <span>COPY ID</span>
+                </>
+              )}
+            </button>
+          </div>
+
+          {/* Event & Team Roster Summary */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
+            <div className="p-4 rounded-xl bg-[#071320] border border-white/10 space-y-1">
+              <span className="text-[#93a4b8] block">TARGET SCHEMATIC</span>
+              <span className="text-white font-bold text-sm">
+                {successData.eventName} ({successData.eventCode})
+              </span>
+            </div>
+
+            <div className="p-4 rounded-xl bg-[#071320] border border-white/10 space-y-1">
+              <span className="text-[#93a4b8] block">MODALITY &amp; SQUAD</span>
+              <span className="text-[#ffb400] font-bold text-sm">
+                {isTeam ? `TEAM: ${successData.teamName}` : 'SOLO CANDIDATE'}
+              </span>
+            </div>
+          </div>
+
+          {/* Member Roster List */}
+          <div className="p-5 rounded-2xl bg-[#071320] border border-white/10 space-y-3">
+            <div className="flex items-center justify-between font-mono text-[11px] text-[#93a4b8] border-b border-white/10 pb-2">
+              <span>ENROLLED OPERATORS</span>
+              <span>{isTeam ? `${successData.teamSize} UNITS` : '1 UNIT'}</span>
+            </div>
+
+            <div className="space-y-2">
+              {/* Leader */}
+              <div className="flex items-center justify-between p-3 rounded-lg bg-[#091829] text-xs">
+                <div className="flex items-center gap-2">
+                  <span className="px-1.5 py-0.5 rounded bg-[#22e5ff]/15 text-[#22e5ff] font-mono text-[10px] font-bold">
+                    LEAD
+                  </span>
+                  <span className="font-bold text-white">{successData.leader.name}</span>
+                </div>
+                <span className="text-slate-400 font-mono text-[11px] hidden sm:inline">
+                  {successData.leader.email} · {successData.leader.department} ({successData.leader.year})
+                </span>
+              </div>
+
+              {/* Members */}
+              {successData.members?.map((m, idx) => (
+                <div key={idx} className="flex items-center justify-between p-3 rounded-lg bg-[#081522] text-xs">
+                  <div className="flex items-center gap-2">
+                    <span className="px-1.5 py-0.5 rounded bg-[#ffb400]/15 text-[#ffb400] font-mono text-[10px] font-bold">
+                      OP #{idx + 2}
+                    </span>
+                    <span className="text-slate-200">{m.name}</span>
+                  </div>
+                  <span className="text-slate-400 font-mono text-[11px] hidden sm:inline">
+                    {m.email} · {m.department} ({m.year})
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Action Button */}
+        <div className="pt-4 flex justify-center">
+          <button
+            type="button"
+            onClick={handleRegisterAnother}
+            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl font-mono font-bold text-xs sm:text-sm text-[#00131c] bg-[#22e5ff] hover:bg-[#52eeff] shadow-[0_0_20px_rgba(34,229,255,0.6)] transition-all"
+          >
+            <RotateCcw className="w-4 h-4" />
+            <span>REGISTER FOR ANOTHER EVENT</span>
+          </button>
+        </div>
+      </motion.div>
     );
   }
 
-  const isTeamEvent = event.registrationType === 'team';
-
+  // ============================================================================
+  // REGISTRATION FORM MAIN VIEWPORT
+  // ============================================================================
   return (
-    <div className="max-w-3xl mx-auto">
-      {/* Event Header Banner Card */}
-      <div className="relative rounded-3xl bg-space-900/80 border border-white/10 p-6 sm:p-8 backdrop-blur-xl shadow-xl mb-8 overflow-hidden">
-        <div className="absolute top-0 right-0 w-60 h-60 bg-amber-500/5 rounded-bl-full pointer-events-none" />
+    <div className="w-full text-[#e8f1f8] font-sans">
+      {/* 1. PORTAL HEADER */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#22e5ff]/20 pb-5 mb-8">
+        <div>
+          <h1 className="font-mono font-black text-2xl sm:text-3xl md:text-4xl text-white tracking-tight uppercase flex items-center gap-3">
+            <span>COMMON REGISTRATION PORTAL</span>
+          </h1>
+          <p className="text-[11px] sm:text-xs font-mono text-[#93a4b8] tracking-wider mt-1 flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-[#ffb400]" />
+            <span>SECURE TRANSMISSION // SRIJAN 2026 CANDIDATE ENROLLMENT PIPELINE</span>
+          </p>
+        </div>
 
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative z-10">
-          <div>
-            <div className="flex flex-wrap items-center gap-2 mb-2">
-              <span className="font-mono text-xs font-bold tracking-widest text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded border border-amber-500/20">
-                EVENT {event.number}
-              </span>
-              <span className="text-xs font-mono uppercase tracking-wider text-slate-300 bg-white/5 px-2.5 py-0.5 rounded border border-white/10">
-                {event.category}
-              </span>
-              <span
-                className={`text-xs font-mono uppercase tracking-wider px-2.5 py-0.5 rounded border ${
-                  isTeamEvent
-                    ? 'bg-orange-500/10 text-orange-300 border-orange-500/20'
-                    : 'bg-cyan-500/10 text-cyan-300 border-cyan-500/20'
-                }`}
-              >
-                {isTeamEvent
-                  ? `Team Event (${event.minTeamSize || 2}–${event.maxTeamSize || 4} Members)`
-                  : 'Individual Participation'}
-              </span>
-            </div>
-
-            <h1 className="text-2xl sm:text-3xl font-display font-extrabold text-white">
-              Register for {event.name}
-            </h1>
-            {event.tagline && (
-              <p className="text-xs sm:text-sm font-mono text-amber-400/80 mt-1">
-                {event.tagline}
-              </p>
-            )}
-          </div>
-
-          {/* Event Switcher Dropdown */}
-          {eventsList && eventsList.length > 1 && (
-            <div className="sm:self-start">
-              <label className="block text-[11px] font-mono text-slate-400 mb-1">
-                Switch Event:
-              </label>
-              <select
-                value={event.id}
-                onChange={(e) => onSelectEvent(e.target.value)}
-                className="w-full sm:w-auto px-3 py-1.5 rounded-lg bg-space-950 border border-white/10 text-xs font-medium text-slate-200 focus:outline-none focus:border-amber-500 cursor-pointer"
-              >
-                {eventsList.map((evt) => (
-                  <option key={evt.id} value={evt.id} className="bg-space-950">
-                    [{evt.number}] {evt.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
+        {/* Step Indicator Badges */}
+        <div className="flex items-center gap-2 font-mono text-[11px] text-[#93a4b8]">
+          <span className="px-2.5 py-1 rounded bg-[#0d2235] text-[#22e5ff] border border-[#22e5ff]/40 font-bold">
+            01 SPEC
+          </span>
+          <span>→</span>
+          <span className="px-2.5 py-1 rounded bg-[#091522] border border-white/10">
+            02 DOSSIER
+          </span>
+          <span>→</span>
+          <span className="px-2.5 py-1 rounded bg-[#091522] border border-white/10">
+            03 DISPATCH
+          </span>
         </div>
       </div>
 
-      {/* Error Alert Box */}
-      {errorMessage && (
-        <div className="mb-6 p-4 rounded-2xl bg-red-500/10 border border-red-500/30 text-red-300 text-sm flex items-start gap-3 animate-fade-in">
-          <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5 text-red-400" />
-          <div className="space-y-1">
-            <p className="font-semibold text-red-200">Registration Notice</p>
-            <p className="text-xs sm:text-sm leading-relaxed">{errorMessage}</p>
+      {/* ERROR TOAST BANNER */}
+      {errorToast && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-8 p-4 rounded-xl bg-rose-950/80 border border-rose-500/50 text-rose-200 text-xs sm:text-sm font-mono flex items-center justify-between gap-3 shadow-lg shadow-rose-950/40"
+        >
+          <div className="flex items-center gap-2.5">
+            <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
+            <span>{errorToast}</span>
           </div>
-        </div>
+          <button
+            type="button"
+            onClick={() => setErrorToast(null)}
+            className="text-xs text-rose-300 hover:text-white underline font-mono"
+          >
+            DISMISS
+          </button>
+        </motion.div>
       )}
 
-      {/* Main Registration Card */}
-      <div className="rounded-3xl bg-space-900/80 border border-white/10 p-6 sm:p-10 backdrop-blur-xl shadow-xl">
-        {isTeamEvent ? (
-          <TeamRegistrationForm
-            event={event}
-            onSubmit={handleSubmit}
-            isSubmitting={isSubmitting}
-          />
-        ) : (
-          <IndividualRegistrationForm
-            event={event}
-            onSubmit={handleSubmit}
-            isSubmitting={isSubmitting}
-          />
-        )}
-      </div>
+      {/* FORM WRAPPER */}
+      <form onSubmit={onSubmit}>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          
+          {/* ================================================================== */}
+          {/* LEFT COLUMN: SECTIONS 01, 02, 03 (lg: 8 cols) */}
+          {/* ================================================================== */}
+          <div className="lg:col-span-8 space-y-8">
+            
+            {/* ---------------------------------------------------------------- */}
+            {/* SECTION 01: EVENT SPECIFICATION MATRIX */}
+            {/* ---------------------------------------------------------------- */}
+            <div className="rounded-2xl bg-[#06101c]/90 border border-[#22e5ff]/25 p-5 sm:p-7 backdrop-blur-xl shadow-lg relative overflow-hidden">
+              <div className="flex items-center justify-between border-b border-[#22e5ff]/15 pb-3.5 mb-5 font-mono text-xs">
+                <div className="flex items-center gap-2 text-[#22e5ff] font-bold">
+                  <Terminal className="w-4 h-4" />
+                  <span>01 // EVENT SPECIFICATION MATRIX</span>
+                </div>
+                <span className="text-[11px] text-[#ffb400] font-bold tracking-widest hidden sm:inline">
+                  CONFIG_BUS_READY
+                </span>
+              </div>
+
+              {/* 6 Event Selection Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mb-6">
+                {eventsList.map((evt, idx) => {
+                  const isSelected = selectedEvent?.id === evt.id;
+                  const isTeam = (evt.maxTeamSize || 1) > 1;
+
+                  return (
+                    <button
+                      key={evt.id}
+                      type="button"
+                      onClick={() => handleSelectEvent(evt)}
+                      className={`p-3.5 rounded-xl border text-left transition-all relative overflow-hidden group ${
+                        isSelected
+                          ? 'bg-[#0d2538] border-[#22e5ff] shadow-[0_0_15px_rgba(34,229,255,0.25)]'
+                          : 'bg-[#091522] border-white/10 hover:border-[#22e5ff]/40 hover:bg-[#0c1c2b]'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-2 font-mono text-[10px]">
+                        <span className={isSelected ? 'text-[#ffb400] font-bold' : 'text-[#93a4b8]'}>
+                          ETAS-0{idx + 1}
+                        </span>
+                        <span
+                          className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${
+                            isTeam
+                              ? 'bg-[#22e5ff]/15 text-[#22e5ff] border border-[#22e5ff]/30'
+                              : 'bg-white/10 text-slate-300'
+                          }`}
+                        >
+                          {isTeam ? `TEAM [${evt.minTeamSize}-${evt.maxTeamSize}]` : 'SOLO [1]'}
+                        </span>
+                      </div>
+
+                      <div className="font-bold text-white text-xs sm:text-sm tracking-wide group-hover:text-[#22e5ff] transition-colors truncate">
+                        {evt.name.toUpperCase()}
+                      </div>
+                      <div className="text-[10px] font-mono text-slate-500 mt-0.5">
+                        CODE: SRJ-{evt.code}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Active Channel Telemetry Banner */}
+              <div className="p-3 rounded-xl bg-[#091726] border border-[#22e5ff]/20 font-mono text-[11px] flex flex-wrap items-center justify-between gap-2 mb-6">
+                <div>
+                  <span className="text-[#93a4b8]">ACTIVE CHANNEL: </span>
+                  <span className="text-[#22e5ff] font-bold">
+                    {selectedEvent?.name?.toUpperCase()} (SRJ-{selectedEvent?.code})
+                  </span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-[#93a4b8]">
+                    MODALITY:{' '}
+                    <span className="text-[#ffb400] font-bold">
+                      {isTeamEvent ? 'TEAM SQUAD' : 'SOLO OPERATOR'}
+                    </span>
+                  </span>
+                  <span className="text-[#93a4b8]">
+                    CAPACITY:{' '}
+                    <span className="text-white font-bold">
+                      {isTeamEvent ? `${minSlots}-${maxSlots} OPERATORS` : '1 OPERATOR'}
+                    </span>
+                  </span>
+                </div>
+              </div>
+
+              {/* Team Event Exclusive Options (Callsign & Size selector) */}
+              {isTeamEvent && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  className="space-y-4 pt-2 border-t border-[#22e5ff]/15"
+                >
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {/* Team Callsign */}
+                    <div>
+                      <label className="block text-[11px] font-mono tracking-wider text-[#93a4b8] uppercase mb-1.5">
+                        Team Callsign / Squad Name <span className="text-[#22e5ff]">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="e.g. CyberVanguard-0x1"
+                        {...register('teamName')}
+                        className={`w-full px-3.5 py-2.5 rounded-xl bg-[#091522] border text-xs sm:text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:ring-1 transition-all ${
+                          errors.teamName
+                            ? 'border-rose-500/80 focus:ring-rose-500 bg-rose-950/10'
+                            : 'border-[#22e5ff]/25 focus:border-[#22e5ff] focus:ring-[#22e5ff]'
+                        }`}
+                      />
+                      {errors.teamName && (
+                        <p className="mt-1 text-[11px] font-mono text-rose-400">
+                          {errors.teamName.message}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Team Size Selector (Driven strictly by minTeamSize & maxTeamSize) */}
+                    <div>
+                      <label className="block text-[11px] font-mono tracking-wider text-[#93a4b8] uppercase mb-1.5">
+                        Team Size (Slots) <span className="text-[#22e5ff]">*</span>
+                      </label>
+                      <div className="flex items-center gap-2">
+                        {Array.from(
+                          { length: maxSlots - minSlots + 1 },
+                          (_, idx) => minSlots + idx
+                        ).map((size) => {
+                          const isSelected = teamSize === size;
+                          return (
+                            <button
+                              key={size}
+                              type="button"
+                              onClick={() => handleTeamSizeChange(size)}
+                              className={`flex-1 py-2.5 rounded-xl font-mono text-xs font-bold border transition-all ${
+                                isSelected
+                                  ? 'bg-[#22e5ff] text-[#00131c] border-[#22e5ff] shadow-[0_0_15px_rgba(34,229,255,0.4)]'
+                                  : 'bg-[#091522] text-[#93a4b8] border-[#22e5ff]/20 hover:text-white hover:border-[#22e5ff]/50'
+                              }`}
+                            >
+                              {size}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </div>
+
+            {/* ---------------------------------------------------------------- */}
+            {/* SECTION 02: SQUAD LEADER / PARTICIPANT DOSSIER */}
+            {/* ---------------------------------------------------------------- */}
+            <div className="rounded-2xl bg-[#06101c]/90 border border-[#22e5ff]/25 p-5 sm:p-7 backdrop-blur-xl shadow-lg relative overflow-hidden">
+              <div className="flex items-center justify-between border-b border-[#22e5ff]/15 pb-3.5 mb-5 font-mono text-xs">
+                <div className="flex items-center gap-2 text-[#22e5ff] font-bold">
+                  <User className="w-4 h-4" />
+                  <span>
+                    02 // {isTeamEvent ? 'SQUAD LEADER DOSSIER' : 'PARTICIPANT DOSSIER'}
+                  </span>
+                </div>
+                <span className="text-[11px] text-[#ffb400] font-bold tracking-widest hidden sm:inline">
+                  HOST_CTX: LEAD_PRIMARY
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                {/* Full Name */}
+                <div>
+                  <label className="block text-[11px] font-mono tracking-wider text-[#93a4b8] uppercase mb-1.5">
+                    Full Name (First &amp; Last) <span className="text-[#22e5ff]">*</span>
+                  </label>
+                  <div className="relative">
+                    <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#93a4b8]" />
+                    <input
+                      type="text"
+                      placeholder="Alex J. Mercer"
+                      {...register('leader.name')}
+                      className={`w-full pl-10 pr-3 py-2.5 rounded-xl bg-[#091522] border text-xs sm:text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:ring-1 transition-all ${
+                        errors?.leader?.name
+                          ? 'border-rose-500/80 focus:ring-rose-500 bg-rose-950/10'
+                          : 'border-[#22e5ff]/25 focus:border-[#22e5ff] focus:ring-[#22e5ff]'
+                      }`}
+                    />
+                  </div>
+                  {errors?.leader?.name && (
+                    <p className="mt-1 text-[11px] font-mono text-rose-400">
+                      {errors.leader.name.message}
+                    </p>
+                  )}
+                </div>
+
+                {/* Email */}
+                <div>
+                  <label className="block text-[11px] font-mono tracking-wider text-[#93a4b8] uppercase mb-1.5">
+                    Institutional / Primary Email <span className="text-[#22e5ff]">*</span>
+                  </label>
+                  <div className="relative">
+                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#93a4b8]" />
+                    <input
+                      type="email"
+                      placeholder="alex.mercer@eng.edu"
+                      {...register('leader.email')}
+                      className={`w-full pl-10 pr-3 py-2.5 rounded-xl bg-[#091522] border text-xs sm:text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:ring-1 transition-all ${
+                        errors?.leader?.email
+                          ? 'border-rose-500/80 focus:ring-rose-500 bg-rose-950/10'
+                          : 'border-[#22e5ff]/25 focus:border-[#22e5ff] focus:ring-[#22e5ff]'
+                      }`}
+                    />
+                  </div>
+                  {errors?.leader?.email && (
+                    <p className="mt-1 text-[11px] font-mono text-rose-400">
+                      {errors.leader.email.message}
+                    </p>
+                  )}
+                </div>
+
+                {/* Mobile Number */}
+                <div>
+                  <label className="block text-[11px] font-mono tracking-wider text-[#93a4b8] uppercase mb-1.5">
+                    Mobile Number (10 Digits) <span className="text-[#22e5ff]">*</span>
+                  </label>
+                  <div className="relative">
+                    <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#93a4b8]" />
+                    <input
+                      type="tel"
+                      maxLength={10}
+                      placeholder="9876543210"
+                      {...register('leader.phone')}
+                      className={`w-full pl-10 pr-3 py-2.5 rounded-xl bg-[#091522] border text-xs sm:text-sm text-slate-100 placeholder-slate-600 font-mono focus:outline-none focus:ring-1 transition-all ${
+                        errors?.leader?.phone
+                          ? 'border-rose-500/80 focus:ring-rose-500 bg-rose-950/10'
+                          : 'border-[#22e5ff]/25 focus:border-[#22e5ff] focus:ring-[#22e5ff]'
+                      }`}
+                    />
+                  </div>
+                  {errors?.leader?.phone && (
+                    <p className="mt-1 text-[11px] font-mono text-rose-400">
+                      {errors.leader.phone.message}
+                    </p>
+                  )}
+                </div>
+
+                {/* Department Dropdown */}
+                <div>
+                  <label className="block text-[11px] font-mono tracking-wider text-[#93a4b8] uppercase mb-1.5">
+                    Academic Department <span className="text-[#22e5ff]">*</span>
+                  </label>
+                  <div className="relative">
+                    <GraduationCap className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#93a4b8] pointer-events-none" />
+                    <select
+                      {...register('leader.department')}
+                      className={`w-full pl-10 pr-8 py-2.5 rounded-xl bg-[#091522] border text-xs sm:text-sm text-slate-100 focus:outline-none focus:ring-1 transition-all appearance-none cursor-pointer ${
+                        errors?.leader?.department
+                          ? 'border-rose-500/80 focus:ring-rose-500'
+                          : 'border-[#22e5ff]/25 focus:border-[#22e5ff] focus:ring-[#22e5ff]'
+                      }`}
+                    >
+                      <option value="" disabled className="bg-[#040a12] text-slate-500">
+                        Select Department Matrix
+                      </option>
+                      {DEPARTMENTS.map((dept) => (
+                        <option key={dept} value={dept} className="bg-[#040a12] text-slate-200">
+                          {dept}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  {errors?.leader?.department && (
+                    <p className="mt-1 text-[11px] font-mono text-rose-400">
+                      {errors.leader.department.message}
+                    </p>
+                  )}
+                </div>
+
+                {/* Academic Standing (Year) */}
+                <div className="md:col-span-2">
+                  <label className="block text-[11px] font-mono tracking-wider text-[#93a4b8] uppercase mb-1.5">
+                    Academic Standing (Year) <span className="text-[#22e5ff]">*</span>
+                  </label>
+                  <div className="grid grid-cols-4 gap-2 max-w-md">
+                    {YEAR_OPTIONS.map((yr) => {
+                      const selected = currentLeaderYear === yr.value;
+                      return (
+                        <button
+                          key={yr.value}
+                          type="button"
+                          onClick={() => setValue('leader.year', yr.value, { shouldValidate: true })}
+                          className={`py-2 px-3 rounded-xl font-mono text-xs font-bold tracking-wider border transition-all ${
+                            selected
+                              ? 'bg-[#22e5ff] text-[#00131c] border-[#22e5ff] shadow-[0_0_15px_rgba(34,229,255,0.4)]'
+                              : 'bg-[#091522] text-[#93a4b8] border-[#22e5ff]/20 hover:text-white hover:border-[#22e5ff]/50'
+                          }`}
+                        >
+                          {yr.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <input type="hidden" {...register('leader.year')} />
+                  {errors?.leader?.year && (
+                    <p className="mt-1.5 text-[11px] font-mono text-rose-400">
+                      {errors.leader.year.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* ---------------------------------------------------------------- */}
+            {/* SECTION 03: COMPLEMENTARY SQUAD OPERATORS (Team Only) */}
+            {/* ---------------------------------------------------------------- */}
+            {isTeamEvent && teamSize > 1 && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between font-mono text-xs text-[#93a4b8] px-1">
+                  <span className="text-[#ffb400] font-bold flex items-center gap-2">
+                    <Layers className="w-4 h-4" />
+                    <span>03 // COMPLEMENTARY SQUAD OPERATORS</span>
+                  </span>
+                  <span>[OPERATORS EN ROUTE: ACTIVE]</span>
+                </div>
+
+                {errors?.members?.root && (
+                  <div className="p-3 rounded-xl bg-rose-950/60 border border-rose-500/40 text-rose-300 text-xs font-mono">
+                    {errors.members.root.message}
+                  </div>
+                )}
+
+                {/* Render exactly teamSize - 1 member fields */}
+                <div className="space-y-4">
+                  <AnimatePresence>
+                    {Array.from({ length: teamSize - 1 }).map((_, idx) => (
+                      <MemberFields
+                        key={idx}
+                        index={idx}
+                        register={register}
+                        errors={errors}
+                        setValue={setValue}
+                        watch={watch}
+                      />
+                    ))}
+                  </AnimatePresence>
+                </div>
+              </div>
+            )}
+
+          </div>
+
+          {/* ================================================================== */}
+          {/* RIGHT COLUMN: LIVE TELEMETRY & TRANSMIT ACTION (lg: 4 cols) */}
+          {/* ================================================================== */}
+          <div className="lg:col-span-4 space-y-6 lg:sticky lg:top-24">
+            
+            {/* TELEMETRY MONITOR CARD */}
+            <div className="rounded-2xl bg-[#06101c]/95 border border-[#22e5ff]/30 p-5 sm:p-6 backdrop-blur-xl shadow-[0_0_30px_rgba(0,0,0,0.7)] relative overflow-hidden">
+              <div className="flex items-center justify-between border-b border-[#22e5ff]/20 pb-3 mb-4 font-mono text-xs">
+                <div className="flex items-center gap-2 text-[#22e5ff] font-bold">
+                  <Radio className="w-4 h-4" />
+                  <span>LIVE TELEMETRY MONITOR</span>
+                </div>
+                <span className="text-[10px] text-[#ffb400] font-bold">REC</span>
+              </div>
+
+              {/* Animated ECG Pulse Wave Graphic */}
+              <div className="p-3 rounded-xl bg-[#040c16] border border-[#22e5ff]/20 mb-5 relative overflow-hidden">
+                <div className="flex items-center justify-between font-mono text-[9px] text-[#93a4b8] mb-1">
+                  <span>TX_FREQ: 142.50 MHz</span>
+                  <span className="text-[#22e5ff]">CARRIER_LOCK</span>
+                </div>
+                <svg className="w-full h-10 text-[#22e5ff]" viewBox="0 0 300 40">
+                  <path
+                    d="M0,20 L50,20 L60,10 L70,30 L80,5 L90,35 L100,20 L180,20 L190,12 L200,28 L210,18 L220,20 L300,20"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeDasharray="4 2"
+                  >
+                    <animate
+                      attributeName="stroke-dashoffset"
+                      values="0; -50"
+                      dur="2.5s"
+                      repeatCount="indefinite"
+                    />
+                  </path>
+                </svg>
+              </div>
+
+              {/* Telemetry Status Readouts */}
+              <div className="space-y-3 font-mono text-xs border-b border-[#22e5ff]/15 pb-5 mb-5">
+                <div className="flex items-center justify-between">
+                  <span className="text-[#93a4b8]">TARGET SCHEMATIC:</span>
+                  <span className="text-[#22e5ff] font-bold">
+                    SRJ-{selectedEvent?.code || 'GEN'}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-[#93a4b8]">CALLSIGN / SQUAD:</span>
+                  <span className="text-white font-bold truncate max-w-[140px]">
+                    {watchedTeamName?.trim() || (isTeamEvent ? 'ALPHA_CREW' : 'SOLO_OPERATOR')}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-[#93a4b8]">TOTAL OPERATORS:</span>
+                  <span className="text-[#ffb400] font-bold">
+                    {isTeamEvent ? `${teamSize} UNITS` : '1 UNIT'}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-[#93a4b8]">LEAD OPERATOR:</span>
+                  <span className="text-white font-bold truncate max-w-[140px]">
+                    {watchedLeaderName?.trim() || 'UNASSIGNED'}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-[#93a4b8]">DISPATCH STATUS:</span>
+                  <span className="text-[#22e5ff] font-bold flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#22e5ff] animate-ping" />
+                    READY_FOR_XMIT
+                  </span>
+                </div>
+              </div>
+
+              {/* PRIMARY TRANSMIT BUTTON */}
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full py-3.5 px-4 rounded-xl font-mono font-bold text-xs sm:text-sm text-[#00131c] bg-[#22e5ff] hover:bg-[#52eeff] disabled:bg-slate-700 disabled:text-slate-400 shadow-[0_0_24px_rgba(34,229,255,0.6)] hover:shadow-[0_0_35px_rgba(34,229,255,0.85)] transition-all flex items-center justify-center gap-2 group tracking-wider"
+              >
+                {isSubmitting ? (
+                  <>
+                    <span className="w-4 h-4 border-2 border-[#00131c]/30 border-t-[#00131c] rounded-full animate-spin" />
+                    <span>ENCODING &amp; DISPATCHING...</span>
+                  </>
+                ) : (
+                  <>
+                    <Zap className="w-4 h-4 fill-current group-hover:scale-110 transition-transform" />
+                    <span>TRANSMIT REGISTRATION</span>
+                  </>
+                )}
+              </button>
+
+              <div className="text-center font-mono text-[9px] text-[#93a4b8] mt-3">
+                TIMESTAMP // 2026.ETAS.ONLINE.NET // ZERO COLLISION ASSURED
+              </div>
+            </div>
+
+            {/* TRANSMISSION PROTOCOLS CHECKLIST */}
+            <div className="rounded-2xl bg-[#06101c]/90 border border-white/10 p-5 font-mono text-xs space-y-3">
+              <div className="flex items-center gap-2 text-[#ffb400] font-bold border-b border-white/10 pb-2">
+                <ShieldAlert className="w-4 h-4" />
+                <span>TRANSMISSION PROTOCOLS</span>
+              </div>
+              <ul className="space-y-2 text-[11px] text-[#93a4b8]">
+                <li className="flex items-start gap-2">
+                  <span className="text-[#22e5ff]">▪</span>
+                  <span>Individual competitions accept precisely single-seated candidates.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-[#22e5ff]">▪</span>
+                  <span>Hackathon rosters allow 2 to 4 validated crew records.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-[#22e5ff]">▪</span>
+                  <span>Unique email and phone hash verified upon final relay dispatch.</span>
+                </li>
+              </ul>
+            </div>
+
+          </div>
+
+        </div>
+      </form>
     </div>
   );
 }

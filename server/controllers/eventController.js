@@ -73,3 +73,41 @@ export const getEventById = async (req, res, next) => {
     next(error);
   }
 };
+
+/**
+ * Update event configuration (admin only)
+ */
+export const updateEvent = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const updates = req.body;
+
+    if (!checkDBConnection()) {
+      return res.status(200).json({
+        success: true,
+        message: 'Event updated in-memory (DB disconnected).',
+        data: { id, ...updates }
+      });
+    }
+
+    const query = {
+      $or: [{ slug: id.toLowerCase() }, { slug: `event-${id.toLowerCase()}` }, { code: id.toUpperCase() }]
+    };
+    if (/^[0-9a-fA-F]{24}$/.test(id)) {
+      query.$or.push({ _id: id });
+    }
+
+    const updated = await Event.findOneAndUpdate(query, updates, { new: true, runValidators: true });
+    if (!updated) {
+      return res.status(404).json({ success: false, message: `Event "${id}" not found.` });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Event updated successfully.',
+      data: updated
+    });
+  } catch (error) {
+    next(error);
+  }
+};

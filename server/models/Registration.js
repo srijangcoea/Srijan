@@ -25,7 +25,7 @@ const participantSchema = new mongoose.Schema(
     },
     college: {
       type: String,
-      required: [true, 'College/Institute name is required'],
+      default: 'Government College of Engineering, Amravati',
       trim: true,
     },
     branch: {
@@ -98,13 +98,7 @@ const registrationSchema = new mongoose.Schema(
 
     termsAccepted: {
       type: Boolean,
-      required: [true, 'You must accept the terms and guidelines'],
-      validate: {
-        validator: function (v) {
-          return v === true;
-        },
-        message: 'Terms and conditions must be accepted',
-      },
+      default: true,
     },
     registeredAt: {
       type: Date,
@@ -112,8 +106,12 @@ const registrationSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ['confirmed', 'cancelled', 'attended'],
+      enum: ['pending', 'confirmed', 'cancelled', 'rejected', 'attended'],
       default: 'confirmed',
+    },
+    rejectionReason: {
+      type: String,
+      trim: true,
     },
   },
   {

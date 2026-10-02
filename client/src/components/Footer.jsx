@@ -252,7 +252,7 @@ export default function Footer() {
                 <img
                   src={sMarkImg}
                   alt="Srijan S Emblem"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                  className="w-full h-full object-contain p-0.5 group-hover:scale-105 transition-transform"
                 />
               </div>
               <div className="flex flex-col">
