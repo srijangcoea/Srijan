@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Clock, FileText, AlertCircle, ArrowRight } from 'lucide-react';
+import { X, Clock, AlertCircle, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function BrochureModal({ isOpen, onClose, event }) {

@@ -10,6 +10,7 @@ import EventsPage from './pages/EventsPage';
 import EventDetailsPage from './pages/EventDetailsPage';
 import AboutPage from './pages/AboutPage';
 import Registration from './pages/Registration';
+import AdminPage from './pages/AdminPage';
 import NotFoundPage from './pages/NotFoundPage';
 
 export default function App() {
@@ -21,7 +22,7 @@ export default function App() {
       {/* Auto scroll-to-top on route navigation */}
       <ScrollToTop />
 
-      {/* Persistent Navigation Bar */}
+      {/* Persistent Navigation Bar (no admin button) */}
       <Navbar />
 
       {/* Main Viewport Content */}
@@ -33,6 +34,7 @@ export default function App() {
           <Route path="/register" element={<Registration />} />
           <Route path="/register/:eventId" element={<Registration />} />
           <Route path="/about" element={<AboutPage />} />
+          <Route path="/admin" element={<AdminPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </main>

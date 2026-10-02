@@ -3,9 +3,7 @@ import IndividualRegistrationForm from './IndividualRegistrationForm';
 import TeamRegistrationForm from './TeamRegistrationForm';
 import RegistrationSuccess from './RegistrationSuccess';
 import { submitRegistration } from '../services/api';
-import { AlertCircle, Calendar, MapPin, Users, Sparkles, ArrowLeft } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import DynamicIcon from './DynamicIcon';
+import { AlertCircle } from 'lucide-react';
 
 export default function RegistrationForm({ event, eventsList, onSelectEvent }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -37,7 +35,6 @@ export default function RegistrationForm({ event, eventsList, onSelectEvent }) {
     return (
       <RegistrationSuccess
         registration={completedRegistration}
-        onReset={() => setCompletedRegistration(null)}
       />
     );
   }
@@ -59,10 +56,16 @@ export default function RegistrationForm({ event, eventsList, onSelectEvent }) {
               <span className="text-xs font-mono uppercase tracking-wider text-slate-300 bg-white/5 px-2.5 py-0.5 rounded border border-white/10">
                 {event.category}
               </span>
-              <span className={`text-xs font-mono uppercase tracking-wider px-2.5 py-0.5 rounded border ${
-                isTeamEvent ? 'bg-orange-500/10 text-orange-300 border-orange-500/20' : 'bg-cyan-500/10 text-cyan-300 border-cyan-500/20'
-              }`}>
-                {isTeamEvent ? `Team Event (${event.minTeamSize || 2}–${event.maxTeamSize || 4} Members)` : 'Individual Participation'}
+              <span
+                className={`text-xs font-mono uppercase tracking-wider px-2.5 py-0.5 rounded border ${
+                  isTeamEvent
+                    ? 'bg-orange-500/10 text-orange-300 border-orange-500/20'
+                    : 'bg-cyan-500/10 text-cyan-300 border-cyan-500/20'
+                }`}
+              >
+                {isTeamEvent
+                  ? `Team Event (${event.minTeamSize || 2}–${event.maxTeamSize || 4} Members)`
+                  : 'Individual Participation'}
               </span>
             </div>
 

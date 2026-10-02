@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Sparkles, ExternalLink, ChevronRight } from 'lucide-react';
+import { ArrowRight, Sparkles } from 'lucide-react';
 import { events } from '../data/events';
 import sMarkImg from '../assets/srijan-s-mark.png';
 
@@ -29,12 +29,11 @@ export default function CTASection() {
             </span>
           </div>
 
-          {/* Exact Heading */}
+          {/* Heading */}
           <h2 className="text-4xl sm:text-5xl md:text-6xl font-display font-extrabold text-white tracking-tight mb-4">
             READY TO CREATE?
           </h2>
 
-          {/* Exact Text */}
           <p className="text-lg sm:text-xl text-slate-300 max-w-2xl mx-auto mb-10 leading-relaxed font-light">
             Choose your challenge. Build your idea. Be part of Srijan.
           </p>
@@ -58,7 +57,7 @@ export default function CTASection() {
             </button>
           </div>
 
-          {/* Direct Event Registration Quick Selector Dropdown/Drawer */}
+          {/* Direct Event Registration Quick Selector Dropdown */}
           {showPicker && (
             <div className="mt-8 pt-8 border-t border-white/10 max-w-2xl mx-auto text-left animate-fade-in">
               <p className="text-xs font-mono uppercase tracking-wider text-amber-400 mb-4 text-center">

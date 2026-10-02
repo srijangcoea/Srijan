@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Users, User, Mail, Phone, School, BookOpen, GraduationCap, CheckSquare, Square, AlertCircle, Loader2, Sparkles } from 'lucide-react';
+import { Users, User, Mail, Phone, School, BookOpen, CheckSquare, Square, AlertCircle, Loader2 } from 'lucide-react';
 
 const createEmptyMember = () => ({
   name: '',
@@ -180,7 +180,6 @@ export default function TeamRegistrationForm({ event, onSubmit, isSubmitting }) 
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {/* Team Name */}
           <div className="sm:col-span-2">
             <label className="block text-xs font-mono text-slate-300 mb-1.5">
               Team Name <span className="text-amber-400">*</span>
@@ -203,7 +202,6 @@ export default function TeamRegistrationForm({ event, onSubmit, isSubmitting }) 
             {errors.teamName && <p className="text-xs text-red-400 mt-1 flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.teamName}</p>}
           </div>
 
-          {/* Number of Team Members */}
           <div>
             <label className="block text-xs font-mono text-slate-300 mb-1.5">
               Total Team Size <span className="text-amber-400">*</span>
@@ -238,7 +236,6 @@ export default function TeamRegistrationForm({ event, onSubmit, isSubmitting }) 
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {/* Leader Name */}
           <div className="sm:col-span-2">
             <label className="block text-xs font-mono text-slate-300 mb-1.5">
               Leader Full Name <span className="text-amber-400">*</span>
@@ -259,7 +256,6 @@ export default function TeamRegistrationForm({ event, onSubmit, isSubmitting }) 
             {errors.leader_name && <p className="text-xs text-red-400 mt-1">{errors.leader_name}</p>}
           </div>
 
-          {/* Leader Email */}
           <div>
             <label className="block text-xs font-mono text-slate-300 mb-1.5">
               Leader Email <span className="text-amber-400">*</span>
@@ -280,7 +276,6 @@ export default function TeamRegistrationForm({ event, onSubmit, isSubmitting }) 
             {errors.leader_email && <p className="text-xs text-red-400 mt-1">{errors.leader_email}</p>}
           </div>
 
-          {/* Leader Phone */}
           <div>
             <label className="block text-xs font-mono text-slate-300 mb-1.5">
               Leader Mobile Number <span className="text-amber-400">*</span>
@@ -302,7 +297,6 @@ export default function TeamRegistrationForm({ event, onSubmit, isSubmitting }) 
             {errors.leader_phone && <p className="text-xs text-red-400 mt-1">{errors.leader_phone}</p>}
           </div>
 
-          {/* Leader College */}
           <div>
             <label className="block text-xs font-mono text-slate-300 mb-1.5">
               College/Institute <span className="text-amber-400">*</span>
@@ -323,7 +317,6 @@ export default function TeamRegistrationForm({ event, onSubmit, isSubmitting }) 
             {errors.leader_college && <p className="text-xs text-red-400 mt-1">{errors.leader_college}</p>}
           </div>
 
-          {/* Leader Branch & Year */}
           <div className="grid grid-cols-2 gap-2">
             <div>
               <label className="block text-xs font-mono text-slate-300 mb-1.5">
@@ -376,7 +369,6 @@ export default function TeamRegistrationForm({ event, onSubmit, isSubmitting }) 
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {/* Member Name */}
               <div className="sm:col-span-2">
                 <label className="block text-xs font-mono text-slate-300 mb-1.5">
                   Member {memberNum} Full Name <span className="text-amber-400">*</span>
@@ -395,7 +387,6 @@ export default function TeamRegistrationForm({ event, onSubmit, isSubmitting }) 
                 )}
               </div>
 
-              {/* Member Email */}
               <div>
                 <label className="block text-xs font-mono text-slate-300 mb-1.5">
                   Member {memberNum} Email <span className="text-amber-400">*</span>
@@ -414,7 +405,6 @@ export default function TeamRegistrationForm({ event, onSubmit, isSubmitting }) 
                 )}
               </div>
 
-              {/* Member Phone */}
               <div>
                 <label className="block text-xs font-mono text-slate-300 mb-1.5">
                   Member {memberNum} Mobile <span className="text-amber-400">*</span>
@@ -434,7 +424,6 @@ export default function TeamRegistrationForm({ event, onSubmit, isSubmitting }) 
                 )}
               </div>
 
-              {/* Member College */}
               <div>
                 <label className="block text-xs font-mono text-slate-300 mb-1.5">
                   College/Institute <span className="text-amber-400">*</span>
@@ -453,7 +442,6 @@ export default function TeamRegistrationForm({ event, onSubmit, isSubmitting }) 
                 )}
               </div>
 
-              {/* Member Branch & Year */}
               <div className="grid grid-cols-2 gap-2">
                 <div>
                   <label className="block text-xs font-mono text-slate-300 mb-1.5">
@@ -500,7 +488,6 @@ export default function TeamRegistrationForm({ event, onSubmit, isSubmitting }) 
           </h3>
         </div>
 
-        {/* Checkbox 1 */}
         <label className="flex items-start gap-3 cursor-pointer group text-xs sm:text-sm text-slate-300">
           <input
             type="checkbox"
@@ -522,7 +509,6 @@ export default function TeamRegistrationForm({ event, onSubmit, isSubmitting }) 
         </label>
         {errors.infoCorrect && <p className="text-xs text-red-400 pl-8">{errors.infoCorrect}</p>}
 
-        {/* Checkbox 2 */}
         <label className="flex items-start gap-3 cursor-pointer group text-xs sm:text-sm text-slate-300">
           <input
             type="checkbox"

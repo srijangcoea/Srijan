@@ -540,8 +540,7 @@ export const siteConfig = {
   collegeName: "College Technical Festival",
   contactEmail: "srijan.fest@college.edu", // PLACEHOLDER EMAIL
   socials: {
-    instagram: "https://www.instagram.com/srijan_gcoea?stkn=OTg3M2RkYXZxOHUx", // PLACEHOLDER INSTAGRAM
-    //linkedin: "https://linkedin.com/company/srijan-techfest", // PLACEHOLDER LINKEDIN
-    email: "mailto:srijan.fest@college.edu" // PLACEHOLDER EMAIL LINK
+    instagram: "https://www.instagram.com/srijan_gcoea?stkn=OTg3M2RkYXZxOHUx",
+    email: "mailto:srijan.fest@college.edu"
   }
 };

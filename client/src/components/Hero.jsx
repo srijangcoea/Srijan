@@ -1,6 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowRight, Sparkles, Terminal, Shield, ChevronDown } from 'lucide-react';
+import { ArrowRight, Sparkles, ChevronDown } from 'lucide-react';
 import srijanLogo from '../assets/srijan-logo.jpg';
 
 export default function Hero() {
@@ -22,7 +21,7 @@ export default function Hero() {
 
   return (
     <section className="relative min-h-[92vh] flex items-center justify-center pt-24 pb-16 sm:pb-24 overflow-hidden tech-grid-bg">
-      {/* Soft atmospheric cosmic glow orbs */}
+      {/* Cosmic glow orbs */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] sm:w-[700px] h-[500px] sm:h-[700px] bg-amber-500/10 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute top-1/3 left-1/4 w-[300px] h-[300px] bg-cyan-500/10 rounded-full blur-[100px] pointer-events-none" />
       <div className="absolute bottom-10 right-1/4 w-[350px] h-[350px] bg-orange-600/10 rounded-full blur-[110px] pointer-events-none" />
@@ -31,10 +30,8 @@ export default function Hero() {
         {/* Brand Logo Presentation */}
         <div className="flex justify-center mb-6 sm:mb-8">
           <div className="relative group">
-            {/* Glowing aura */}
             <div className="absolute -inset-1.5 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 rounded-3xl blur-md opacity-40 group-hover:opacity-75 transition duration-500" />
             
-            {/* Logo frame preserving exact proportions */}
             <div className="relative w-36 h-36 sm:w-44 sm:h-44 md:w-52 md:h-52 rounded-2xl overflow-hidden border border-amber-500/40 bg-space-950 shadow-2xl p-1">
               <img
                 src={srijanLogo}
@@ -53,17 +50,17 @@ export default function Hero() {
 
         {/* SRIJAN Heading */}
         <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-display font-extrabold tracking-tight text-white mb-3 sm:mb-4">
-          SRIJAN <span className ="text-gold-metallic">2026</span>
+          SRIJAN <span className="text-gold-metallic">2026</span>
         </h1>
 
-        {/* Exact Tagline */}
+        {/* Tagline */}
         <div className="mb-6">
           <h2 className="text-xl sm:text-2xl md:text-3xl font-display font-bold tracking-[0.25em] sm:tracking-[0.35em] uppercase text-gold-metallic">
             TOGETHER, WE CREATE
           </h2>
         </div>
 
-        {/* Official Subtitle Description */}
+        {/* Subtitle Description */}
         <p className="text-lg sm:text-xl md:text-2xl text-slate-300 font-light max-w-3xl mx-auto mb-8 sm:mb-10 leading-relaxed">
           &ldquo;A Technical Fest Where Ideas Turn Into Innovation.&rdquo;
         </p>
@@ -89,7 +86,7 @@ export default function Hero() {
           </a>
         </div>
 
-        {/* Subtle Tech Highlights Strip */}
+        {/* Tech Highlights Strip */}
         <div className="pt-6 border-t border-white/10 grid grid-cols-3 gap-4 max-w-2xl mx-auto text-center text-xs sm:text-sm text-slate-400 font-mono">
           <div>
             <div className="text-xl sm:text-2xl font-bold text-white font-display">06</div>
@@ -105,7 +102,7 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* Scroll down indicator */}
+        {/* Scroll indicator */}
         <div className="mt-12 flex justify-center">
           <a
             href="#events-section"

@@ -4,12 +4,6 @@
 
 const rawApiUrl = import.meta.env.VITE_API_URL;
 
-/**
- * Normalize the API base URL:
- * - If not provided, defaults to '/api' (which is proxied by Vite dev server to localhost:9000)
- * - If provided without trailing '/api' (e.g. 'https://srijan-2026-ebak.onrender.com'), appends '/api'
- * - If provided with '/api' (e.g. 'http://localhost:9000/api'), keeps it clean without duplicate slashes
- */
 const formatApiBase = (url) => {
   if (!url || !url.trim()) return '/api';
   const clean = url.trim().replace(/\/+$/, '');
@@ -18,11 +12,6 @@ const formatApiBase = (url) => {
 
 const API_BASE = formatApiBase(rawApiUrl);
 
-/**
- * Safely parse a fetch Response as JSON.
- * If the response is not JSON (e.g. an HTML error page from the proxy or server),
- * throws a user-friendly error instead of a cryptic "Unexpected token" error.
- */
 async function safeJsonParse(res) {
   const contentType = res.headers.get('content-type') || '';
 
@@ -30,28 +19,22 @@ async function safeJsonParse(res) {
     return await res.json();
   }
 
-  // The response is not JSON — likely an HTML error page from a dead backend / proxy
-  // Read the text for debugging but don't expose it to the user
   await res.text().catch(() => '');
 
   if (res.status === 502 || res.status === 503 || res.status === 504) {
-    throw new Error(
-      'The backend server is currently unavailable. Please ensure the server is running on port 9000 and try again.'
-    );
+    throw new Error('Backend server is temporarily unavailable. Please try again in a few moments.');
   }
 
   if (res.status === 404) {
-    throw new Error(
-      'API endpoint not found. Please ensure the backend server is running and the API URL is configured correctly.'
-    );
+    throw new Error('API endpoint not found.');
   }
 
-  // Generic non-JSON response
-  throw new Error(
-    `The server returned an unexpected response (HTTP ${res.status}). Please ensure the backend server is running at ${API_BASE}.`
-  );
+  throw new Error(`Unexpected server response (HTTP ${res.status}).`);
 }
 
+/**
+ * Submit individual or team registration
+ */
 export async function submitRegistration(payload) {
   let res;
   try {
@@ -63,10 +46,7 @@ export async function submitRegistration(payload) {
       body: JSON.stringify(payload),
     });
   } catch (error) {
-    // Network-level errors (server not running, DNS failure, CORS preflight failure, etc.)
-    throw new Error(
-      `Unable to connect to the backend server. Please ensure the server is running at ${API_BASE} and try again.`
-    );
+    throw new Error(`Unable to connect to server at ${API_BASE}. Please ensure backend is running.`);
   }
 
   const data = await safeJsonParse(res);
@@ -78,14 +58,15 @@ export async function submitRegistration(payload) {
   return data;
 }
 
+/**
+ * Get registration details by Registration ID
+ */
 export async function getRegistrationDetails(registrationId) {
   let res;
   try {
     res = await fetch(`${API_BASE}/registrations/${registrationId}`);
   } catch (error) {
-    throw new Error(
-      'Unable to connect to the backend server. Please ensure the server is running and try again.'
-    );
+    throw new Error('Unable to connect to server.');
   }
 
   const data = await safeJsonParse(res);
@@ -97,6 +78,76 @@ export async function getRegistrationDetails(registrationId) {
   return data;
 }
 
+/**
+ * Admin: Fetch registrations with optional filters
+ * @param {Object} filters { eventId, search, type }
+ */
+export async function fetchAdminRegistrations(filters = {}) {
+  const params = new URLSearchParams();
+  if (filters.eventId && filters.eventId !== 'all') params.append('eventId', filters.eventId);
+  if (filters.search && filters.search.trim()) params.append('search', filters.search.trim());
+  if (filters.type && filters.type !== 'all') params.append('type', filters.type);
+
+  const query = params.toString() ? `?${params.toString()}` : '';
+
+  let res;
+  try {
+    res = await fetch(`${API_BASE}/registrations${query}`);
+  } catch (error) {
+    throw new Error('Failed to connect to backend server.');
+  }
+
+  const data = await safeJsonParse(res);
+  if (!res.ok) {
+    throw new Error(data.message || 'Failed to fetch registrations.');
+  }
+
+  return data;
+}
+
+/**
+ * Admin: Fetch aggregated registration statistics per competition
+ */
+export async function fetchRegistrationStats() {
+  let res;
+  try {
+    res = await fetch(`${API_BASE}/registrations/stats`);
+  } catch (error) {
+    throw new Error('Failed to connect to backend server.');
+  }
+
+  const data = await safeJsonParse(res);
+  if (!res.ok) {
+    throw new Error(data.message || 'Failed to fetch stats.');
+  }
+
+  return data;
+}
+
+/**
+ * Admin: Delete a registration
+ */
+export async function deleteRegistrationById(registrationId) {
+  let res;
+  try {
+    res = await fetch(`${API_BASE}/registrations/${registrationId}`, {
+      method: 'DELETE',
+    });
+  } catch (error) {
+    throw new Error('Failed to delete registration.');
+  }
+
+  const data = await safeJsonParse(res);
+  if (!res.ok) {
+    throw new Error(data.message || 'Delete operation failed.');
+  }
+
+  return data;
+}
+
+/**
+ * Check backend health
+ */
 export async function checkBackendHealth() {
   try {
     const res = await fetch(`${API_BASE}/health`);

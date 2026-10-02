@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { CheckCircle2, Copy, Check, Printer, ArrowRight, Calendar, Users, School, Mail, Phone, ChevronDown, ChevronUp } from 'lucide-react';
-import sMarkImg from '../assets/srijan-s-mark.png';
+import { CheckCircle2, Copy, Check, Printer, ArrowRight, ChevronDown, ChevronUp } from 'lucide-react';
 
-export default function RegistrationSuccess({ registration, onReset }) {
+export default function RegistrationSuccess({ registration }) {
   const [copied, setCopied] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
 
@@ -134,28 +133,52 @@ export default function RegistrationSuccess({ registration, onReset }) {
           </button>
 
           {(showDetails || typeof window !== 'undefined') && (
-            <div className={`mt-4 p-4 rounded-xl bg-space-950/80 border border-white/10 text-left text-xs space-y-3 ${showDetails ? 'block' : 'hidden print:block'}`}>
+            <div
+              className={`mt-4 p-4 rounded-xl bg-space-950/80 border border-white/10 text-left text-xs space-y-3 ${
+                showDetails ? 'block' : 'hidden print:block'
+              }`}
+            >
               {registrationType === 'team' ? (
                 <>
                   <div className="border-b border-white/10 pb-2">
-                    <span className="font-mono font-bold text-amber-300 block">Team Leader: {teamLeader?.name}</span>
-                    <span className="text-slate-400 block">{teamLeader?.email} | {teamLeader?.phone}</span>
-                    <span className="text-slate-400 block">{teamLeader?.college} ({teamLeader?.branch}, {teamLeader?.year})</span>
+                    <span className="font-mono font-bold text-amber-300 block">
+                      Team Leader: {teamLeader?.name}
+                    </span>
+                    <span className="text-slate-400 block">
+                      {teamLeader?.email} | {teamLeader?.phone}
+                    </span>
+                    <span className="text-slate-400 block">
+                      {teamLeader?.college} ({teamLeader?.branch}, {teamLeader?.year})
+                    </span>
                   </div>
                   {members.map((m, idx) => (
                     <div key={idx} className="border-b border-white/5 last:border-none pb-2">
-                      <span className="font-mono font-bold text-slate-200 block">Member {idx + 2}: {m.name}</span>
-                      <span className="text-slate-400 block">{m.email} | {m.phone}</span>
-                      <span className="text-slate-400 block">{m.college} ({m.branch}, {m.year})</span>
+                      <span className="font-mono font-bold text-slate-200 block">
+                        Member {idx + 2}: {m.name}
+                      </span>
+                      <span className="text-slate-400 block">
+                        {m.email} | {m.phone}
+                      </span>
+                      <span className="text-slate-400 block">
+                        {m.college} ({m.branch}, {m.year})
+                      </span>
                     </div>
                   ))}
                 </>
               ) : (
                 <div>
-                  <span className="text-slate-300 block"><strong className="text-white">Email:</strong> {participant?.email}</span>
-                  <span className="text-slate-300 block"><strong className="text-white">Phone:</strong> {participant?.phone}</span>
-                  <span className="text-slate-300 block"><strong className="text-white">College:</strong> {participant?.college}</span>
-                  <span className="text-slate-300 block"><strong className="text-white">Branch:</strong> {participant?.branch} ({participant?.year})</span>
+                  <span className="text-slate-300 block">
+                    <strong className="text-white">Email:</strong> {participant?.email}
+                  </span>
+                  <span className="text-slate-300 block">
+                    <strong className="text-white">Phone:</strong> {participant?.phone}
+                  </span>
+                  <span className="text-slate-300 block">
+                    <strong className="text-white">College:</strong> {participant?.college}
+                  </span>
+                  <span className="text-slate-300 block">
+                    <strong className="text-white">Branch:</strong> {participant?.branch} ({participant?.year})
+                  </span>
                 </div>
               )}
             </div>

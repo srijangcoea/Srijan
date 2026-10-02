@@ -1,19 +1,13 @@
 import { Event } from '../models/Event.js';
 import { initialEvents } from '../data/seedData.js';
-import { connectDB, checkDBConnection } from '../config/db.js';
+import { checkDBConnection } from '../config/db.js';
 
 /**
- * Get all available events
- * Auto-seeds initial events if DB is empty
+ * Get all events (auto-seeds if database is empty)
  */
 export const getEvents = async (req, res, next) => {
   try {
     if (!checkDBConnection()) {
-      await connectDB();
-    }
-
-    if (!checkDBConnection()) {
-      // Fallback to static seed data if DB is temporarily not connected
       return res.status(200).json({
         success: true,
         source: 'static',
@@ -22,14 +16,12 @@ export const getEvents = async (req, res, next) => {
       });
     }
 
-
     let events = await Event.find().sort({ slug: 1 }).lean();
 
-    // Auto-seed if database is empty
     if (!events || events.length === 0) {
       await Event.insertMany(initialEvents);
       events = await Event.find().sort({ slug: 1 }).lean();
-      console.log('🌱 [MongoDB] Auto-seeded 6 Srijan events into database.');
+      console.log('🌱 [MongoDB] Auto-seeded initial Srijan events into database.');
     }
 
     res.status(200).json({
@@ -44,49 +36,39 @@ export const getEvents = async (req, res, next) => {
 };
 
 /**
- * Get single event by slug or ID
+ * Get single event by slug, code, or ID
  */
 export const getEventById = async (req, res, next) => {
   try {
     const { id } = req.params;
-
-    if (!checkDBConnection()) {
-      await connectDB();
-    }
+    const lowerId = id.toLowerCase();
 
     if (!checkDBConnection()) {
       const fallback = initialEvents.find(
-        (e) => e.slug === id.toLowerCase() || e.slug === `event-${id}`
+        (e) => e.slug === lowerId || e.slug === `event-${lowerId}` || e.code?.toLowerCase() === lowerId
       );
 
       if (!fallback) {
-        return res.status(404).json({
-          success: false,
-          message: `Event with ID "${id}" not found.`,
-        });
+        return res.status(404).json({ success: false, message: `Event "${id}" not found.` });
       }
       return res.status(200).json({ success: true, source: 'static', data: fallback });
     }
 
-    const isObjectId = /^[0-9a-fA-F]{24}$/.test(id);
-    const orConditions = [{ slug: id.toLowerCase() }, { slug: `event-${id.toLowerCase()}` }];
-    if (isObjectId) {
-      orConditions.push({ _id: id });
+    const query = {
+      $or: [{ slug: lowerId }, { slug: `event-${lowerId}` }, { code: id.toUpperCase() }],
+    };
+
+    if (/^[0-9a-fA-F]{24}$/.test(id)) {
+      query.$or.push({ _id: id });
     }
 
-    const event = await Event.findOne({ $or: orConditions }).lean();
+    const event = await Event.findOne(query).lean();
 
     if (!event) {
-      return res.status(404).json({
-        success: false,
-        message: `Event with ID "${id}" not found.`,
-      });
+      return res.status(404).json({ success: false, message: `Event "${id}" not found.` });
     }
 
-    res.status(200).json({
-      success: true,
-      data: event,
-    });
+    res.status(200).json({ success: true, data: event });
   } catch (error) {
     next(error);
   }

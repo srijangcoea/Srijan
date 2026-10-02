@@ -5,13 +5,10 @@ import {
   MapPin,
   Users,
   FileText,
-  ExternalLink,
   ArrowLeft,
   CheckCircle2,
-  Clock,
-  Award,
   AlertCircle,
-  Share2
+  ArrowRight,
 } from 'lucide-react';
 import DynamicIcon from './DynamicIcon';
 
@@ -24,13 +21,6 @@ export default function EventDetails({ event, onOpenBrochure }) {
       window.open(event.brochure, '_blank', 'noopener,noreferrer');
     } else if (onOpenBrochure) {
       onOpenBrochure(event);
-    }
-  };
-
-  const handleRegisterClick = (e) => {
-    e.preventDefault();
-    if (event.registrationUrl) {
-      window.open(event.registrationUrl, '_blank', 'noopener,noreferrer');
     }
   };
 
@@ -102,14 +92,13 @@ export default function EventDetails({ event, onOpenBrochure }) {
             className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-base font-medium text-slate-200 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-amber-500/30 transition-colors"
           >
             <FileText className="w-4 h-4 text-amber-400" />
-            <span>{event.brochureAvailable ? "Download Brochure" : "View Brochure"}</span>
+            <span>{event.brochureAvailable ? 'Download Brochure' : 'View Brochure'}</span>
           </button>
         </div>
       </div>
 
       {/* Grid: Event Meta & Logistics */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-        {/* Date Box */}
         <div className="p-6 rounded-2xl bg-space-900/80 border border-white/10 flex items-start gap-4">
           <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 flex-shrink-0">
             <Calendar className="w-5 h-5" />
@@ -124,7 +113,6 @@ export default function EventDetails({ event, onOpenBrochure }) {
           </div>
         </div>
 
-        {/* Venue Box */}
         <div className="p-6 rounded-2xl bg-space-900/80 border border-white/10 flex items-start gap-4">
           <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 flex-shrink-0">
             <MapPin className="w-5 h-5" />
@@ -139,7 +127,6 @@ export default function EventDetails({ event, onOpenBrochure }) {
           </div>
         </div>
 
-        {/* Team Size Box */}
         <div className="p-6 rounded-2xl bg-space-900/80 border border-white/10 flex items-start gap-4 sm:col-span-2 lg:col-span-1">
           <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 flex-shrink-0">
             <Users className="w-5 h-5" />
@@ -157,7 +144,6 @@ export default function EventDetails({ event, onOpenBrochure }) {
 
       {/* Detailed Overview & Rules Sections */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
-        {/* Left Column: Full Overview */}
         <div className="lg:col-span-2 space-y-8">
           <div className="p-6 sm:p-8 rounded-2xl bg-space-900/80 border border-white/10">
             <h3 className="text-xl font-display font-bold text-white mb-4 flex items-center gap-2">
@@ -169,7 +155,6 @@ export default function EventDetails({ event, onOpenBrochure }) {
             </p>
           </div>
 
-          {/* Rules & Guidelines */}
           <div className="p-6 sm:p-8 rounded-2xl bg-space-900/80 border border-white/10">
             <h3 className="text-xl font-display font-bold text-white mb-4 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-amber-400" />
@@ -193,9 +178,7 @@ export default function EventDetails({ event, onOpenBrochure }) {
           </div>
         </div>
 
-        {/* Right Column: Coordination & Notice */}
         <div className="space-y-6">
-          {/* Important Notice Card */}
           <div className="p-6 rounded-2xl bg-space-950/80 border border-amber-500/20">
             <div className="flex items-center gap-2 text-amber-400 font-mono text-xs font-bold uppercase mb-3">
               <AlertCircle className="w-4 h-4" />
@@ -213,7 +196,6 @@ export default function EventDetails({ event, onOpenBrochure }) {
             </Link>
           </div>
 
-          {/* Coordinators placeholder if available */}
           {event.coordinators && event.coordinators.length > 0 && (
             <div className="p-6 rounded-2xl bg-space-900/80 border border-white/10">
               <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-slate-400 mb-4">

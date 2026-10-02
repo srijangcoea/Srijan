@@ -7,7 +7,7 @@ import WhySrijan from '../components/WhySrijan';
 import CTASection from '../components/CTASection';
 import { events, siteConfig } from '../data/events';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 export default function Home() {
   return (
@@ -40,14 +40,14 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 3. Events Section (Exactly 5 Events) */}
+      {/* 3. Featured Events Section */}
       <section id="events-section" className="py-20 sm:py-28 relative scroll-mt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeading
             badge="COMPETITIONS & CHALLENGES"
             title="Featured"
             highlight="Technical Events"
-            subtitle="Explore our five flagship competitions. Dive into challenges, review guidelines, and register your team."
+            subtitle="Explore our flagship competitions. Dive into challenges, review guidelines, and register your team."
           />
 
           <EventGrid events={events} />

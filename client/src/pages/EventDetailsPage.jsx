@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { useParams, Link, Navigate } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { events } from '../data/events';
 import EventDetails from '../components/EventDetails';
 import BrochureModal from '../components/BrochureModal';
-import { ArrowLeft, ArrowRight, Sparkles } from 'lucide-react';
+import { ArrowLeft, Sparkles } from 'lucide-react';
 
 export default function EventDetailsPage() {
   const { eventId } = useParams();
@@ -20,7 +20,7 @@ export default function EventDetailsPage() {
         </div>
         <h1 className="text-3xl font-display font-bold text-white mb-3">Event Not Found</h1>
         <p className="text-slate-400 text-sm mb-8">
-          The requested event could not be found. Please browse through the five flagship events.
+          The requested event could not be found. Please browse through the flagship events.
         </p>
         <Link
           to="/events"
@@ -33,7 +33,7 @@ export default function EventDetailsPage() {
     );
   }
 
-  // Find next and other events
+  // Find other events
   const otherEvents = events.filter((e) => e.id !== event.id);
 
   return (
@@ -49,7 +49,7 @@ export default function EventDetailsPage() {
         <h3 className="text-xl font-display font-bold text-white mb-6 flex items-center gap-2">
           <span>Other Srijan Competitions</span>
         </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {otherEvents.map((oe) => (
             <Link
               key={oe.id}

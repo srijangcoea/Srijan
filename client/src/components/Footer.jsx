@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Mail, Linkedin, Instagram, ExternalLink, ArrowUp } from 'lucide-react';
+import { Mail, Instagram, ArrowUp } from 'lucide-react';
 import { events, siteConfig } from '../data/events';
 import sMarkImg from '../assets/srijan-s-mark.png';
 
@@ -16,7 +16,6 @@ export default function Footer() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 sm:gap-12 mb-12">
-          
           {/* Col 1 & 2: Brand & Identity */}
           <div className="lg:col-span-2 space-y-4">
             <Link to="/" className="flex items-center gap-3 group inline-flex">
@@ -37,38 +36,24 @@ export default function Footer() {
               A college-level technical fest where ideas turn into innovation. Empowering student innovators, builders, and problem solvers.
             </p>
 
-            {/* Social Links Placeholders */}
             <div className="pt-2">
               <p className="text-xs font-mono uppercase tracking-wider text-slate-400 mb-3">
                 Connect With Us
               </p>
               <div className="flex items-center gap-3">
-                {/* PLACEHOLDER: Replace instagram URL in src/data/events.js */}
                 <a
                   href={siteConfig.socials.instagram}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label="Instagram (Placeholder Link)"
+                  aria-label="Instagram"
                   className="w-9 h-9 rounded-lg bg-space-900 border border-white/10 hover:border-amber-400/50 hover:text-amber-400 flex items-center justify-center text-slate-400 transition-colors"
                 >
                   <Instagram className="w-4 h-4" />
                 </a>
 
-                {/* PLACEHOLDER: Replace LinkedIn URL in src/data/events.js */}
-                {/* <a
-                  href={siteConfig.socials.linkedin}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="LinkedIn (Placeholder Link)"
-                  className="w-9 h-9 rounded-lg bg-space-900 border border-white/10 hover:border-amber-400/50 hover:text-amber-400 flex items-center justify-center text-slate-400 transition-colors"
-                >
-                  <Linkedin className="w-4 h-4" />
-                </a> */}
-
-                {/* PLACEHOLDER: Replace Email in src/data/events.js */}
                 <a
                   href={siteConfig.socials.email}
-                  aria-label="Email (Placeholder Link)"
+                  aria-label="Email"
                   className="w-9 h-9 rounded-lg bg-space-900 border border-white/10 hover:border-amber-400/50 hover:text-amber-400 flex items-center justify-center text-slate-400 transition-colors"
                 >
                   <Mail className="w-4 h-4" />
@@ -99,14 +84,14 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <a href="#register-cta" className="text-slate-300 hover:text-white transition-colors">
+                <Link to="/register" className="text-slate-300 hover:text-white transition-colors">
                   Register
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
 
-          {/* Col 4 & 5: Event Links (5 events) */}
+          {/* Col 4 & 5: Event Links */}
           <div className="lg:col-span-2">
             <h4 className="text-xs font-mono font-bold tracking-widest uppercase text-amber-400 mb-4">
               Events Directory
@@ -129,9 +114,7 @@ export default function Footer() {
 
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-slate-400">
-          <div>
-            &copy; 2026 Srijan. All rights reserved.
-          </div>
+          <div>&copy; 2026 Srijan. All rights reserved.</div>
 
           <div className="flex items-center gap-4">
             <span className="text-amber-500/80">TOGETHER, WE CREATE</span>
