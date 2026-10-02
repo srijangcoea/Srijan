@@ -538,9 +538,9 @@ export const siteConfig = {
   heroSubtitle: "A Technical Fest Where Ideas Turn Into Innovation.",
   aboutText: "Srijan is a technical event that brings together students, ideas, innovation and competition on a common platform.",
   collegeName: "College Technical Festival",
-  contactEmail: "srijan.fest@college.edu", // PLACEHOLDER EMAIL
+  contactEmail: "srijan.gcoea@gmail.com",
   socials: {
     instagram: "https://www.instagram.com/srijan_gcoea?stkn=OTg3M2RkYXZxOHUx",
-    email: "mailto:srijan.fest@college.edu"
+    email: "mailto:srijan.gcoea@gmail.com"
   }
 };
