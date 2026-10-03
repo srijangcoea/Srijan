@@ -53,7 +53,7 @@ export default function CTASection() {
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl text-base font-semibold text-slate-200 bg-white/5 hover:bg-white/10 hover:text-white border border-white/15 hover:border-amber-500/40 backdrop-blur-md transition-all duration-200"
             >
               <span>REGISTER NOW</span>
-              <Sparkles className="w-4 h-4 text-amber-400" />
+              {/* <Sparkles className="w-4 h-4 text-amber-400" /> */}
             </button>
           </div>
 

@@ -213,7 +213,7 @@ export default function Hero() {
         .from('.l', { yPercent: 120, opacity: 0, rotationX: -80, filter: 'blur(14px)', duration: 0.9, stagger: 0.09, transformOrigin: '50% 100%' }, '-=0.8')
         .from('.node', { scale: 0, opacity: 0, duration: 0.6, stagger: 0.08, ease: 'back.out(2)' }, '-=0.5')
         .from('.sub u', { scaleX: 0, duration: 0.7 }, '-=0.4')
-        .from('.sub', { opacity: 0, letterSpacing: '0.8em', duration: 0.9 }, '<')
+        // .from('.sub', { opacity: 0, letterSpacing: '0.8em', duration: 0.9 }, '<')
         .add(() => scramble(tagRef.current, '"Where Ideas Take Shape"'), '-=0.5')
         .from('.desc', { opacity: 0, y: 20, duration: 0.7 }, '-=0.2')
         .from('.chip', { opacity: 0, y: 20, scale: 0.9, stagger: 0.1, duration: 0.5 }, '-=0.4')
@@ -244,7 +244,7 @@ export default function Hero() {
         });
         gsap.to('#shine', { backgroundPosition: '150% 0', duration: 1.4, repeat: -1, repeatDelay: 3, ease: 'power1.inOut' });
         gsap.to('#tk', { xPercent: -50, duration: 40, ease: 'none', repeat: -1 });
-        gsap.to('.cta .btn-primary-glow', { boxShadow: '0 0 44px #22e5ffcc', duration: 1.2, repeat: -1, yoyo: true });
+        // gsap.to('.cta .btn-primary-glow', { boxShadow: '0 0 44px #22e5ffcc', duration: 1.2, repeat: -1, yoyo: true });
         gsap.to('.peek', { opacity: 0.5, duration: 1, repeat: -1, yoyo: true });
 
         // Random digital glitch on title letters
@@ -282,24 +282,6 @@ export default function Hero() {
       };
       hero.addEventListener('mousemove', handleHeroMouseMove);
 
-      // 7. Magnetic Button Physics
-      const magButtons = hero.querySelectorAll('.mag');
-      magButtons.forEach((b) => {
-        const handleMagMove = (e) => {
-          const r = b.getBoundingClientRect();
-          gsap.to(b, {
-            x: (e.clientX - r.left - r.width / 2) * 0.3,
-            y: (e.clientY - r.top - r.height / 2) * 0.4,
-            duration: 0.3,
-          });
-        };
-        const handleMagLeave = () => {
-          gsap.to(b, { x: 0, y: 0, duration: 0.6, ease: 'elastic.out(1, 0.4)' });
-        };
-
-        b.addEventListener('mousemove', handleMagMove);
-        b.addEventListener('mouseleave', handleMagLeave);
-      });
 
       // 8. Click Shockwave Rings
       const handleHeroClick = (e) => {
@@ -622,12 +604,12 @@ export default function Hero() {
           border: 0;
           border-radius: 12px;
           padding: 12px 24px;
-          cursor: pointer;
+          // cursor: pointer;
           background: var(--cy);
           color: #00131c;
-          box-shadow: 0 0 24px #22e5ff66;
-          letter-spacing: 0.05em;
-          transition: transform 0.2s;
+          // box-shadow: none;
+          // letter-spacing: 0.05em;
+          // transition: transform 0.2s;
         }
         .btn-ghost-glow {
           font: 700 14px 'JetBrains Mono', monospace;
@@ -641,10 +623,10 @@ export default function Hero() {
           box-shadow: none;
           transition: border-color 0.2s;
         }
-        .btn-ghost-glow:hover {
-          border-color: #22e5ff;
-          color: #22e5ff;
-        }
+        // .btn-ghost-glow:hover {
+        //   border-color: #22e5ff;
+        //   color: #22e5ff;
+        // }
         .ticker {
           position: absolute;
           z-index: 4;
@@ -854,9 +836,9 @@ export default function Hero() {
             <button
               type="button"
               onClick={() => navigate('/register')}
-              className="btn btn-ghost-glow mag"
+              className="btn btn-ghost-glow "
             >
-              Register Now ✦
+              Register Now 
             </button>
           </div>
         </div>
