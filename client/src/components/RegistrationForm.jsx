@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { useRegistration } from '../hooks/useRegistration';
 import MemberFields from './MemberFields';
+import { notify } from '../utils/toast';
 
 const DEPARTMENTS = [
   'Electronics & Telecommunication Engineering',
@@ -73,6 +74,7 @@ export default function RegistrationForm({ eventsList = [] }) {
   const copyRegistrationId = (id) => {
     navigator.clipboard.writeText(id);
     setCopied(true);
+    notify.info('Copied to Clipboard', `Registration ID: #${id}`);
     setTimeout(() => setCopied(false), 2500);
   };
 

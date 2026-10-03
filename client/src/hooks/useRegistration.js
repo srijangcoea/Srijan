@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { buildRegistrationSchema } from '../utils/registrationSchema';
 import { submitRegistration } from '../services/registrationService';
+import { notify } from '../utils/toast';
 
 /**
  * Custom Hook: useRegistration
@@ -151,10 +152,16 @@ export function useRegistration(eventsList = []) {
       const result = await submitRegistration(data, selectedEvent);
       if (result.success) {
         setSuccessData(result.data);
+        notify.success(
+          'Registration Confirmed',
+          `Transaction ID: #${result.data.registrationId}`
+        );
       }
     } catch (err) {
       console.error('Registration dispatch error:', err);
-      setErrorToast(err.message || 'Failed to submit registration. Please verify parameters.');
+      const msg = err.message || 'Failed to submit registration. Please verify parameters.';
+      setErrorToast(msg);
+      notify.error('Registration Failed', msg);
     } finally {
       setIsSubmitting(false);
     }

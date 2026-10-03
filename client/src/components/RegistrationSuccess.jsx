@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CheckCircle2, Copy, Check, Printer, ArrowRight, ChevronDown, ChevronUp } from 'lucide-react';
+import { notify } from '../utils/toast';
 
 export default function RegistrationSuccess({ registration }) {
   const [copied, setCopied] = useState(false);
@@ -22,6 +23,7 @@ export default function RegistrationSuccess({ registration }) {
   const handleCopy = () => {
     navigator.clipboard.writeText(registrationId);
     setCopied(true);
+    notify.info('Copied to Clipboard', `Registration ID: #${registrationId}`);
     setTimeout(() => setCopied(false), 2000);
   };
 

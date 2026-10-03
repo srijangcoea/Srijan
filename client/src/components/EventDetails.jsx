@@ -11,6 +11,7 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import DynamicIcon from './DynamicIcon';
+import { notify } from '../utils/toast';
 
 export default function EventDetails({ event, onOpenBrochure }) {
   if (!event) return null;
@@ -19,8 +20,10 @@ export default function EventDetails({ event, onOpenBrochure }) {
     e.preventDefault();
     if (event.brochureAvailable && event.brochure) {
       window.open(event.brochure, '_blank', 'noopener,noreferrer');
+      notify.info('Brochure Opened', `Viewing official rulebook for ${event.name}`);
     } else if (onOpenBrochure) {
       onOpenBrochure(event);
+      notify.warning('Brochure Finalizing', `Official document for ${event.name} will be released shortly`);
     }
   };
 

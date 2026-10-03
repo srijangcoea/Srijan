@@ -5,6 +5,7 @@ import {
   Activity, LogOut, Menu, X, ChevronRight, Search, Command, Zap
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { notify } from '../../utils/toast';
 
 const navItems = [
   { path: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -54,6 +55,7 @@ export default function AdminLayout() {
 
   const handleLogout = () => {
     logout();
+    notify.info('Logged Out', 'You have been signed out of the console');
     navigate('/admin');
   };
 

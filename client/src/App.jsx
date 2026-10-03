@@ -33,13 +33,13 @@ export default function App() {
     <AuthProvider>
       <Toaster
         position="top-right"
+        containerClassName="!z-[99999]"
+        containerStyle={{
+          top: 24,
+          right: 24,
+        }}
         toastOptions={{
-          style: {
-            background: '#090d16',
-            color: '#e2e8f0',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            fontSize: '13px',
-          },
+          duration: 4000,
         }}
       />
 

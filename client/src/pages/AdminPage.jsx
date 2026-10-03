@@ -6,6 +6,7 @@ import {
 } from '../services/api';
 import { events } from '../data/events';
 import DynamicIcon from '../components/DynamicIcon';
+import { notify } from '../utils/toast';
 import {
   Users,
   User,
@@ -116,8 +117,9 @@ export default function AdminPage() {
         setActiveDetail(null);
       }
       loadData();
+      notify.info('Deleted', `Registration ${regId} deleted`);
     } catch (err) {
-      alert(`Delete failed: ${err.message}`);
+      notify.error('Delete Failed', err.message || 'Could not delete registration');
     } finally {
       setDeletingId(null);
     }
@@ -126,7 +128,7 @@ export default function AdminPage() {
   // Export to CSV
   const exportToCSV = () => {
     if (!registrations || registrations.length === 0) {
-      alert('No registrations available to export.');
+      notify.warning('No Records', 'No registrations available to export.');
       return;
     }
 

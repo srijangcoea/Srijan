@@ -32,6 +32,7 @@ import ChartCard from '../../components/admin/ChartCard';
 import StatusBadge from '../../components/admin/StatusBadge';
 import DetailDrawer from '../../components/admin/DetailDrawer';
 import { getDashboardStats, updateRegistrationStatus } from '../../services/adminService';
+import { notify } from '../../utils/toast';
 
 const STATUS_COLORS = {
   confirmed: '#10b981', // emerald-500
@@ -70,6 +71,7 @@ export default function DashboardPage() {
   const handleRefresh = () => {
     setRefreshing(true);
     fetchStats();
+    notify.info('Dashboard Refreshed', 'Latest metrics and data loaded');
   };
 
   const handleStatusChange = async (id, newStatus, reason) => {
@@ -80,8 +82,15 @@ export default function DashboardPage() {
         setSelectedReg((prev) => ({ ...prev, status: newStatus, rejectionReason: reason }));
       }
       fetchStats();
+      if (newStatus === 'confirmed') {
+        notify.success('Status Confirmed', 'Registration officially approved');
+      } else if (newStatus === 'rejected') {
+        notify.warning('Status Rejected', reason || 'Registration marked as rejected');
+      } else {
+        notify.info('Status Updated', `Registration marked as ${newStatus}`);
+      }
     } catch (err) {
-      alert(`Failed to update status: ${err.message}`);
+      notify.error('Update Failed', err.message || 'Could not update registration status');
     }
   };
 

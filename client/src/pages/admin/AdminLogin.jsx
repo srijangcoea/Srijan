@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Zap, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { seedAdmin } from '../../services/adminService';
+import { notify } from '../../utils/toast';
 
 export default function AdminLogin() {
   const [email, setEmail] = useState('');
@@ -25,9 +26,12 @@ export default function AdminLogin() {
     setLoading(true);
     try {
       await login(email.trim(), password);
+      notify.success('Welcome back!', 'Signed into Srijan Admin Console');
       navigate('/admin/dashboard', { replace: true });
     } catch (err) {
-      setError(err.message || 'Invalid credentials');
+      const errMsg = err.message || 'Invalid credentials';
+      setError(errMsg);
+      notify.error('Authentication Failed', errMsg);
     } finally {
       setLoading(false);
     }
@@ -37,8 +41,10 @@ export default function AdminLogin() {
     try {
       const res = await seedAdmin();
       setSeedMsg(res.message);
+      notify.success('Admin Initialized', res.message);
     } catch (err) {
       setSeedMsg(err.message);
+      notify.error('Setup Error', err.message);
     }
   };
 

@@ -15,6 +15,7 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import { getAdminEvents, updateAdminEvent } from '../../services/adminService';
+import { notify } from '../../utils/toast';
 
 export default function EventManagementPage() {
   const [eventsList, setEventsList] = useState([]);
@@ -54,8 +55,12 @@ export default function EventManagementPage() {
             : e
         )
       );
+      notify.success(
+        'Registration Status Updated',
+        `${event.name} registrations are now ${newStatus ? 'OPEN' : 'CLOSED'}`
+      );
     } catch (err) {
-      alert(`Failed to update status: ${err.message}`);
+      notify.error('Update Failed', err.message || 'Failed to update registration status');
     }
   };
 
@@ -74,10 +79,14 @@ export default function EventManagementPage() {
         )
       );
       setSaveSuccess(`Successfully updated configuration for "${editingEvent.name}"`);
+      notify.success(
+        'Event Configuration Saved',
+        `Updated settings for "${editingEvent.name}"`
+      );
       setTimeout(() => setSaveSuccess(''), 4000);
       setEditingEvent(null);
     } catch (err) {
-      alert(`Update failed: ${err.message}`);
+      notify.error('Update Failed', err.message || 'Failed to update event configuration');
     } finally {
       setSaving(false);
     }

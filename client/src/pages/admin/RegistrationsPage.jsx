@@ -25,6 +25,7 @@ import {
 } from '../../services/adminService';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
+import { notify } from '../../utils/toast';
 
 const EVENT_TABS = [
   { code: 'ALL', label: 'All Events' },
@@ -154,8 +155,15 @@ export default function RegistrationsPage() {
       if (selectedReg && (selectedReg._id === id || selectedReg.id === id)) {
         setSelectedReg((prev) => ({ ...prev, status: newStatus, rejectionReason: reason }));
       }
+      if (newStatus === 'confirmed') {
+        notify.success('Status Confirmed', 'Registration has been officially verified');
+      } else if (newStatus === 'rejected') {
+        notify.warning('Status Rejected', reason || 'Registration marked as rejected');
+      } else {
+        notify.info('Status Updated', `Registration marked as ${newStatus}`);
+      }
     } catch (err) {
-      alert(`Error updating status: ${err.message}`);
+      notify.error('Update Failed', err.message || 'Could not update registration status');
     }
   };
 
@@ -187,8 +195,9 @@ export default function RegistrationsPage() {
       await bulkUpdateStatus(ids, 'confirmed');
       setRowSelection({});
       fetchData();
+      notify.success('Batch Confirmed', `Successfully confirmed ${ids.length} registration(s)`);
     } catch (err) {
-      alert(`Bulk confirm failed: ${err.message}`);
+      notify.error('Bulk Action Failed', err.message || 'Failed to update selected registrations');
     }
   };
 
@@ -205,11 +214,13 @@ export default function RegistrationsPage() {
   const executeBulkReject = async () => {
     try {
       await bulkUpdateStatus(rejectReasonPrompt.ids, 'rejected', rejectReasonPrompt.reason);
+      const count = rejectReasonPrompt.ids.length;
       setRejectReasonPrompt({ open: false, ids: [], reason: '' });
       setRowSelection({});
       fetchData();
+      notify.warning('Batch Rejected', `Marked ${count} registration(s) as rejected`);
     } catch (err) {
-      alert(`Bulk reject failed: ${err.message}`);
+      notify.error('Bulk Action Failed', err.message || 'Failed to reject selected registrations');
     }
   };
 
@@ -228,8 +239,9 @@ export default function RegistrationsPage() {
           setConfirmDialog((prev) => ({ ...prev, open: false }));
           setRowSelection({});
           fetchData();
+          notify.info('Deleted', `Permanently removed ${ids.length} registration(s)`);
         } catch (err) {
-          alert(`Delete failed: ${err.message}`);
+          notify.error('Delete Failed', err.message || 'Could not delete registrations');
         }
       },
     });
@@ -237,6 +249,10 @@ export default function RegistrationsPage() {
 
   const handleExportSelected = () => {
     const rows = selectedRowsList.length > 0 ? selectedRowsList : filteredData;
+    if (rows.length === 0) {
+      notify.warning('No Records', 'No registrations available to export');
+      return;
+    }
     const exportData = rows.map((r) => ({
       'Registration ID': r.registrationId || r.registration_id || r._id,
       Event: r.eventName || r.eventCode || r.eventId,
@@ -259,6 +275,7 @@ export default function RegistrationsPage() {
     const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
     const dataBlob = new Blob([excelBuffer], { type: 'application/octet-stream' });
     saveAs(dataBlob, `Srijan_Registrations_${activeTab}_${Date.now()}.xlsx`);
+    notify.success('Export Ready', `Downloaded Excel report with ${exportData.length} records`);
   };
 
   // Table Columns

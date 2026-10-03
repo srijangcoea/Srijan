@@ -11,6 +11,7 @@ import {
   Filter,
 } from 'lucide-react';
 import { getAttendance, markAttendance, getAttendanceStats, getAllRegistrations } from '../../services/adminService';
+import { notify } from '../../utils/toast';
 
 const EVENT_LIST = ['ALL', 'HACK', 'KBC', 'PCB', 'CAD', 'BRG', 'CIRCUIT'];
 
@@ -82,13 +83,17 @@ export default function AttendancePage() {
 
     try {
       await markAttendance(record.id, newStatus);
+      notify.success(
+        'Attendance Updated',
+        `${record.leaderName || 'Participant'} marked as ${newStatus ? 'PRESENT' : 'ABSENT'}`
+      );
     } catch (err) {
       console.error('Failed to mark attendance', err);
       // Rollback on error
       setRecords((prev) =>
         prev.map((r) => (r.id === record.id ? { ...r, present: record.present } : r))
       );
-      alert(`Could not mark attendance: ${err.message}`);
+      notify.error('Attendance Error', err.message || 'Could not mark attendance');
     }
   };
 

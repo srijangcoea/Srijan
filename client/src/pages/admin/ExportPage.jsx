@@ -12,6 +12,7 @@ import {
 import { getAllRegistrations } from '../../services/adminService';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
+import { notify } from '../../utils/toast';
 
 const EVENTS = [
   { code: 'ALL', name: 'All Events (Combined)' },
@@ -85,6 +86,10 @@ export default function ExportPage() {
     setExporting(true);
     try {
       const dataRows = generateDataRows();
+      if (dataRows.length === 0) {
+        notify.warning('No Records', 'No registrations match your export criteria');
+        return;
+      }
       const worksheet = XLSX.utils.json_to_sheet(dataRows);
       const workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(workbook, worksheet, 'Registrations');
@@ -93,8 +98,9 @@ export default function ExportPage() {
       const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
       const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
       saveAs(blob, `Srijan2026_${selectedEvent}_${selectedStatus}_${Date.now()}.xlsx`);
+      notify.success('Excel Generated', `Exported ${dataRows.length} records successfully`);
     } catch (err) {
-      alert(`Export failed: ${err.message}`);
+      notify.error('Export Failed', err.message || 'Could not export Excel file');
     } finally {
       setExporting(false);
     }
@@ -104,12 +110,17 @@ export default function ExportPage() {
     setExporting(true);
     try {
       const dataRows = generateDataRows();
+      if (dataRows.length === 0) {
+        notify.warning('No Records', 'No registrations match your export criteria');
+        return;
+      }
       const worksheet = XLSX.utils.json_to_sheet(dataRows);
       const csvOutput = XLSX.utils.sheet_to_csv(worksheet);
       const blob = new Blob([csvOutput], { type: 'text/csv;charset=utf-8;' });
       saveAs(blob, `Srijan2026_${selectedEvent}_${selectedStatus}_${Date.now()}.csv`);
+      notify.success('CSV Generated', `Exported ${dataRows.length} records successfully`);
     } catch (err) {
-      alert(`Export failed: ${err.message}`);
+      notify.error('Export Failed', err.message || 'Could not export CSV file');
     } finally {
       setExporting(false);
     }
