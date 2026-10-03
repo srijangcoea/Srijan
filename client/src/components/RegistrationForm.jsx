@@ -1,17 +1,17 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Terminal, 
-  Layers, 
-  User, 
-  Mail, 
-  Phone, 
-  GraduationCap, 
-  Zap, 
-  CheckCircle2, 
-  AlertTriangle, 
-  Copy, 
-  Check, 
+import {
+  Terminal,
+  Layers,
+  User,
+  Mail,
+  Phone,
+  GraduationCap,
+  Zap,
+  CheckCircle2,
+  AlertTriangle,
+  Copy,
+  Check,
   RotateCcw,
   Sparkles,
   ShieldAlert,
@@ -83,6 +83,9 @@ export default function RegistrationForm({ eventsList = [] }) {
   // ============================================================================
   if (successData) {
     const isTeam = successData.registrationType === 'team';
+    const leader = successData.leader || successData.teamLeader || successData.participant || {};
+    const members = Array.isArray(successData.members) ? successData.members : [];
+
     return (
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
@@ -148,14 +151,14 @@ export default function RegistrationForm({ eventsList = [] }) {
             <div className="p-4 rounded-xl bg-[#071320] border border-white/10 space-y-1">
               <span className="text-[#93a4b8] block">TARGET SCHEMATIC</span>
               <span className="text-white font-bold text-sm">
-                {successData.eventName} ({successData.eventCode})
+                {successData.eventName || 'Srijan Event'} {successData.eventCode ? `(${successData.eventCode})` : ''}
               </span>
             </div>
 
             <div className="p-4 rounded-xl bg-[#071320] border border-white/10 space-y-1">
               <span className="text-[#93a4b8] block">MODALITY &amp; SQUAD</span>
               <span className="text-[#ffb400] font-bold text-sm">
-                {isTeam ? `TEAM: ${successData.teamName}` : 'SOLO CANDIDATE'}
+                {isTeam ? `TEAM: ${successData.teamName || 'Team'}` : 'SOLO CANDIDATE'}
               </span>
             </div>
           </div>
@@ -164,34 +167,34 @@ export default function RegistrationForm({ eventsList = [] }) {
           <div className="p-5 rounded-2xl bg-[#071320] border border-white/10 space-y-3">
             <div className="flex items-center justify-between font-mono text-[11px] text-[#93a4b8] border-b border-white/10 pb-2">
               <span>ENROLLED OPERATORS</span>
-              <span>{isTeam ? `${successData.teamSize} UNITS` : '1 UNIT'}</span>
+              <span>{isTeam ? `${successData.teamSize || members.length + 1} UNITS` : '1 UNIT'}</span>
             </div>
 
             <div className="space-y-2">
-              {/* Leader */}
+              {/* Leader / Participant */}
               <div className="flex items-center justify-between p-3 rounded-lg bg-[#091829] text-xs">
                 <div className="flex items-center gap-2">
                   <span className="px-1.5 py-0.5 rounded bg-[#22e5ff]/15 text-[#22e5ff] font-mono text-[10px] font-bold">
-                    LEAD
+                    {isTeam ? 'LEAD' : 'PARTICIPANT'}
                   </span>
-                  <span className="font-bold text-white">{successData.leader.name}</span>
+                  <span className="font-bold text-white">{leader.name || 'Participant'}</span>
                 </div>
                 <span className="text-slate-400 font-mono text-[11px] hidden sm:inline">
-                  {successData.leader.email} · {successData.leader.department} ({successData.leader.year})
+                  {leader.email || ''} {leader.department || leader.branch ? `· ${leader.department || leader.branch}` : ''} {leader.year ? `(${leader.year})` : ''}
                 </span>
               </div>
 
               {/* Members */}
-              {successData.members?.map((m, idx) => (
+              {members.map((m, idx) => (
                 <div key={idx} className="flex items-center justify-between p-3 rounded-lg bg-[#081522] text-xs">
                   <div className="flex items-center gap-2">
                     <span className="px-1.5 py-0.5 rounded bg-[#ffb400]/15 text-[#ffb400] font-mono text-[10px] font-bold">
                       OP #{idx + 2}
                     </span>
-                    <span className="text-slate-200">{m.name}</span>
+                    <span className="text-slate-200">{m?.name || `Member ${idx + 2}`}</span>
                   </div>
                   <span className="text-slate-400 font-mono text-[11px] hidden sm:inline">
-                    {m.email} · {m.department} ({m.year})
+                    {m?.email || ''} {m?.department || m?.branch ? `· ${m?.department || m?.branch}` : ''} {m?.year ? `(${m.year})` : ''}
                   </span>
                 </div>
               ))}
@@ -223,11 +226,11 @@ export default function RegistrationForm({ eventsList = [] }) {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#22e5ff]/20 pb-5 mb-8">
         <div>
           <h1 className="font-mono font-black text-2xl sm:text-3xl md:text-4xl text-white tracking-tight uppercase flex items-center gap-3">
-            <span>COMMON REGISTRATION PORTAL</span>
+            <span>REGISTRATION PORTAL</span>
           </h1>
           <p className="text-[11px] sm:text-xs font-mono text-[#93a4b8] tracking-wider mt-1 flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-[#ffb400]" />
-            <span>SECURE TRANSMISSION // SRIJAN 2026 CANDIDATE ENROLLMENT PIPELINE</span>
+            <span>// SRIJAN 2026 CANDIDATE ENROLLMENT</span>
           </p>
         </div>
 
@@ -238,11 +241,11 @@ export default function RegistrationForm({ eventsList = [] }) {
           </span>
           <span>→</span>
           <span className="px-2.5 py-1 rounded bg-[#091522] border border-white/10">
-            02 DOSSIER
+            02 FILL
           </span>
           <span>→</span>
           <span className="px-2.5 py-1 rounded bg-[#091522] border border-white/10">
-            03 DISPATCH
+            03 CONFIRM
           </span>
         </div>
       </div>
@@ -271,12 +274,12 @@ export default function RegistrationForm({ eventsList = [] }) {
       {/* FORM WRAPPER */}
       <form onSubmit={onSubmit}>
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          
+
           {/* ================================================================== */}
           {/* LEFT COLUMN: SECTIONS 01, 02, 03 (lg: 8 cols) */}
           {/* ================================================================== */}
           <div className="lg:col-span-8 space-y-8">
-            
+
             {/* ---------------------------------------------------------------- */}
             {/* SECTION 01: EVENT SPECIFICATION MATRIX */}
             {/* ---------------------------------------------------------------- */}
@@ -284,11 +287,8 @@ export default function RegistrationForm({ eventsList = [] }) {
               <div className="flex items-center justify-between border-b border-[#22e5ff]/15 pb-3.5 mb-5 font-mono text-xs">
                 <div className="flex items-center gap-2 text-[#22e5ff] font-bold">
                   <Terminal className="w-4 h-4" />
-                  <span>01 // EVENT SPECIFICATION MATRIX</span>
+                  <span>01 REGISTER FOR EVENT</span>
                 </div>
-                <span className="text-[11px] text-[#ffb400] font-bold tracking-widest hidden sm:inline">
-                  CONFIG_BUS_READY
-                </span>
               </div>
 
               {/* 6 Event Selection Grid */}
@@ -302,22 +302,20 @@ export default function RegistrationForm({ eventsList = [] }) {
                       key={evt.id}
                       type="button"
                       onClick={() => handleSelectEvent(evt)}
-                      className={`p-3.5 rounded-xl border text-left transition-all relative overflow-hidden group ${
-                        isSelected
+                      className={`p-3.5 rounded-xl border text-left transition-all relative overflow-hidden group ${isSelected
                           ? 'bg-[#0d2538] border-[#22e5ff] shadow-[0_0_15px_rgba(34,229,255,0.25)]'
                           : 'bg-[#091522] border-white/10 hover:border-[#22e5ff]/40 hover:bg-[#0c1c2b]'
-                      }`}
+                        }`}
                     >
                       <div className="flex items-center justify-between mb-2 font-mono text-[10px]">
                         <span className={isSelected ? 'text-[#ffb400] font-bold' : 'text-[#93a4b8]'}>
                           ETAS-0{idx + 1}
                         </span>
                         <span
-                          className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${
-                            isTeam
+                          className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${isTeam
                               ? 'bg-[#22e5ff]/15 text-[#22e5ff] border border-[#22e5ff]/30'
                               : 'bg-white/10 text-slate-300'
-                          }`}
+                            }`}
                         >
                           {isTeam ? `TEAM [${evt.minTeamSize}-${evt.maxTeamSize}]` : 'SOLO [1]'}
                         </span>
@@ -337,14 +335,14 @@ export default function RegistrationForm({ eventsList = [] }) {
               {/* Active Channel Telemetry Banner */}
               <div className="p-3 rounded-xl bg-[#091726] border border-[#22e5ff]/20 font-mono text-[11px] flex flex-wrap items-center justify-between gap-2 mb-6">
                 <div>
-                  <span className="text-[#93a4b8]">ACTIVE CHANNEL: </span>
+                  <span className="text-[#93a4b8]">ACTIVE CODE: </span>
                   <span className="text-[#22e5ff] font-bold">
                     {selectedEvent?.name?.toUpperCase()} (SRJ-{selectedEvent?.code})
                   </span>
                 </div>
                 <div className="flex items-center gap-3">
                   <span className="text-[#93a4b8]">
-                    MODALITY:{' '}
+                    TEAM TYPE:{' '}
                     <span className="text-[#ffb400] font-bold">
                       {isTeamEvent ? 'TEAM SQUAD' : 'SOLO OPERATOR'}
                     </span>
@@ -369,17 +367,16 @@ export default function RegistrationForm({ eventsList = [] }) {
                     {/* Team Callsign */}
                     <div>
                       <label className="block text-[11px] font-mono tracking-wider text-[#93a4b8] uppercase mb-1.5">
-                        Team Callsign / Squad Name <span className="text-[#22e5ff]">*</span>
+                        Team  Name <span className="text-[#22e5ff]">*</span>
                       </label>
                       <input
                         type="text"
                         placeholder="e.g. CyberVanguard-0x1"
                         {...register('teamName')}
-                        className={`w-full px-3.5 py-2.5 rounded-xl bg-[#091522] border text-xs sm:text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:ring-1 transition-all ${
-                          errors.teamName
+                        className={`w-full px-3.5 py-2.5 rounded-xl bg-[#091522] border text-xs sm:text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:ring-1 transition-all ${errors.teamName
                             ? 'border-rose-500/80 focus:ring-rose-500 bg-rose-950/10'
                             : 'border-[#22e5ff]/25 focus:border-[#22e5ff] focus:ring-[#22e5ff]'
-                        }`}
+                          }`}
                       />
                       {errors.teamName && (
                         <p className="mt-1 text-[11px] font-mono text-rose-400">
@@ -391,7 +388,7 @@ export default function RegistrationForm({ eventsList = [] }) {
                     {/* Team Size Selector (Driven strictly by minTeamSize & maxTeamSize) */}
                     <div>
                       <label className="block text-[11px] font-mono tracking-wider text-[#93a4b8] uppercase mb-1.5">
-                        Team Size (Slots) <span className="text-[#22e5ff]">*</span>
+                        Team Size  <span className="text-[#22e5ff]">*</span>
                       </label>
                       <div className="flex items-center gap-2">
                         {Array.from(
@@ -404,11 +401,10 @@ export default function RegistrationForm({ eventsList = [] }) {
                               key={size}
                               type="button"
                               onClick={() => handleTeamSizeChange(size)}
-                              className={`flex-1 py-2.5 rounded-xl font-mono text-xs font-bold border transition-all ${
-                                isSelected
+                              className={`flex-1 py-2.5 rounded-xl font-mono text-xs font-bold border transition-all ${isSelected
                                   ? 'bg-[#22e5ff] text-[#00131c] border-[#22e5ff] shadow-[0_0_15px_rgba(34,229,255,0.4)]'
                                   : 'bg-[#091522] text-[#93a4b8] border-[#22e5ff]/20 hover:text-white hover:border-[#22e5ff]/50'
-                              }`}
+                                }`}
                             >
                               {size}
                             </button>
@@ -429,12 +425,10 @@ export default function RegistrationForm({ eventsList = [] }) {
                 <div className="flex items-center gap-2 text-[#22e5ff] font-bold">
                   <User className="w-4 h-4" />
                   <span>
-                    02 // {isTeamEvent ? 'SQUAD LEADER DOSSIER' : 'PARTICIPANT DOSSIER'}
+                    02 // {isTeamEvent ? 'TEAM LEADER' : 'INDIVISUAL PARTICIPANT'}
                   </span>
                 </div>
-                <span className="text-[11px] text-[#ffb400] font-bold tracking-widest hidden sm:inline">
-                  HOST_CTX: LEAD_PRIMARY
-                </span>
+                
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -449,11 +443,10 @@ export default function RegistrationForm({ eventsList = [] }) {
                       type="text"
                       placeholder="Alex J. Mercer"
                       {...register('leader.name')}
-                      className={`w-full pl-10 pr-3 py-2.5 rounded-xl bg-[#091522] border text-xs sm:text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:ring-1 transition-all ${
-                        errors?.leader?.name
+                      className={`w-full pl-10 pr-3 py-2.5 rounded-xl bg-[#091522] border text-xs sm:text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:ring-1 transition-all ${errors?.leader?.name
                           ? 'border-rose-500/80 focus:ring-rose-500 bg-rose-950/10'
                           : 'border-[#22e5ff]/25 focus:border-[#22e5ff] focus:ring-[#22e5ff]'
-                      }`}
+                        }`}
                     />
                   </div>
                   {errors?.leader?.name && (
@@ -466,7 +459,7 @@ export default function RegistrationForm({ eventsList = [] }) {
                 {/* Email */}
                 <div>
                   <label className="block text-[11px] font-mono tracking-wider text-[#93a4b8] uppercase mb-1.5">
-                    Institutional / Primary Email <span className="text-[#22e5ff]">*</span>
+                    Email <span className="text-[#22e5ff]">*</span>
                   </label>
                   <div className="relative">
                     <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#93a4b8]" />
@@ -474,11 +467,10 @@ export default function RegistrationForm({ eventsList = [] }) {
                       type="email"
                       placeholder="alex.mercer@eng.edu"
                       {...register('leader.email')}
-                      className={`w-full pl-10 pr-3 py-2.5 rounded-xl bg-[#091522] border text-xs sm:text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:ring-1 transition-all ${
-                        errors?.leader?.email
+                      className={`w-full pl-10 pr-3 py-2.5 rounded-xl bg-[#091522] border text-xs sm:text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:ring-1 transition-all ${errors?.leader?.email
                           ? 'border-rose-500/80 focus:ring-rose-500 bg-rose-950/10'
                           : 'border-[#22e5ff]/25 focus:border-[#22e5ff] focus:ring-[#22e5ff]'
-                      }`}
+                        }`}
                     />
                   </div>
                   {errors?.leader?.email && (
@@ -500,11 +492,10 @@ export default function RegistrationForm({ eventsList = [] }) {
                       maxLength={10}
                       placeholder="9876543210"
                       {...register('leader.phone')}
-                      className={`w-full pl-10 pr-3 py-2.5 rounded-xl bg-[#091522] border text-xs sm:text-sm text-slate-100 placeholder-slate-600 font-mono focus:outline-none focus:ring-1 transition-all ${
-                        errors?.leader?.phone
+                      className={`w-full pl-10 pr-3 py-2.5 rounded-xl bg-[#091522] border text-xs sm:text-sm text-slate-100 placeholder-slate-600 font-mono focus:outline-none focus:ring-1 transition-all ${errors?.leader?.phone
                           ? 'border-rose-500/80 focus:ring-rose-500 bg-rose-950/10'
                           : 'border-[#22e5ff]/25 focus:border-[#22e5ff] focus:ring-[#22e5ff]'
-                      }`}
+                        }`}
                     />
                   </div>
                   {errors?.leader?.phone && (
@@ -517,20 +508,19 @@ export default function RegistrationForm({ eventsList = [] }) {
                 {/* Department Dropdown */}
                 <div>
                   <label className="block text-[11px] font-mono tracking-wider text-[#93a4b8] uppercase mb-1.5">
-                    Academic Department <span className="text-[#22e5ff]">*</span>
+                    Department <span className="text-[#22e5ff]">*</span>
                   </label>
                   <div className="relative">
                     <GraduationCap className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#93a4b8] pointer-events-none" />
                     <select
                       {...register('leader.department')}
-                      className={`w-full pl-10 pr-8 py-2.5 rounded-xl bg-[#091522] border text-xs sm:text-sm text-slate-100 focus:outline-none focus:ring-1 transition-all appearance-none cursor-pointer ${
-                        errors?.leader?.department
+                      className={`w-full pl-10 pr-8 py-2.5 rounded-xl bg-[#091522] border text-xs sm:text-sm text-slate-100 focus:outline-none focus:ring-1 transition-all appearance-none cursor-pointer ${errors?.leader?.department
                           ? 'border-rose-500/80 focus:ring-rose-500'
                           : 'border-[#22e5ff]/25 focus:border-[#22e5ff] focus:ring-[#22e5ff]'
-                      }`}
+                        }`}
                     >
                       <option value="" disabled className="bg-[#040a12] text-slate-500">
-                        Select Department Matrix
+                        Select Department 
                       </option>
                       {DEPARTMENTS.map((dept) => (
                         <option key={dept} value={dept} className="bg-[#040a12] text-slate-200">
@@ -559,11 +549,10 @@ export default function RegistrationForm({ eventsList = [] }) {
                           key={yr.value}
                           type="button"
                           onClick={() => setValue('leader.year', yr.value, { shouldValidate: true })}
-                          className={`py-2 px-3 rounded-xl font-mono text-xs font-bold tracking-wider border transition-all ${
-                            selected
+                          className={`py-2 px-3 rounded-xl font-mono text-xs font-bold tracking-wider border transition-all ${selected
                               ? 'bg-[#22e5ff] text-[#00131c] border-[#22e5ff] shadow-[0_0_15px_rgba(34,229,255,0.4)]'
                               : 'bg-[#091522] text-[#93a4b8] border-[#22e5ff]/20 hover:text-white hover:border-[#22e5ff]/50'
-                          }`}
+                            }`}
                         >
                           {yr.label}
                         </button>
@@ -588,9 +577,8 @@ export default function RegistrationForm({ eventsList = [] }) {
                 <div className="flex items-center justify-between font-mono text-xs text-[#93a4b8] px-1">
                   <span className="text-[#ffb400] font-bold flex items-center gap-2">
                     <Layers className="w-4 h-4" />
-                    <span>03 // COMPLEMENTARY SQUAD OPERATORS</span>
+                    <span>03 // OTHER MEMBERS</span>
                   </span>
-                  <span>[OPERATORS EN ROUTE: ACTIVE]</span>
                 </div>
 
                 {errors?.members?.root && (
@@ -623,109 +611,60 @@ export default function RegistrationForm({ eventsList = [] }) {
           {/* RIGHT COLUMN: LIVE TELEMETRY & TRANSMIT ACTION (lg: 4 cols) */}
           {/* ================================================================== */}
           <div className="lg:col-span-4 space-y-6 lg:sticky lg:top-24">
-            
+
             {/* TELEMETRY MONITOR CARD */}
-            <div className="rounded-2xl bg-[#06101c]/95 border border-[#22e5ff]/30 p-5 sm:p-6 backdrop-blur-xl shadow-[0_0_30px_rgba(0,0,0,0.7)] relative overflow-hidden">
-              <div className="flex items-center justify-between border-b border-[#22e5ff]/20 pb-3 mb-4 font-mono text-xs">
-                <div className="flex items-center gap-2 text-[#22e5ff] font-bold">
-                  <Radio className="w-4 h-4" />
-                  <span>LIVE TELEMETRY MONITOR</span>
-                </div>
-                <span className="text-[10px] text-[#ffb400] font-bold">REC</span>
+            
+
+            {/* Animated ECG Pulse Wave Graphic */}
+            <div className="p-3 rounded-xl bg-[#040c16] border border-[#22e5ff]/20 mb-5 relative overflow-hidden">
+              <div className="flex items-center justify-between font-mono text-[9px] text-[#93a4b8] mb-1">
+                <span>TX_FREQ: 142.50 MHz</span>
+                <span className="text-[#22e5ff]">CARRIER_LOCK</span>
               </div>
-
-              {/* Animated ECG Pulse Wave Graphic */}
-              <div className="p-3 rounded-xl bg-[#040c16] border border-[#22e5ff]/20 mb-5 relative overflow-hidden">
-                <div className="flex items-center justify-between font-mono text-[9px] text-[#93a4b8] mb-1">
-                  <span>TX_FREQ: 142.50 MHz</span>
-                  <span className="text-[#22e5ff]">CARRIER_LOCK</span>
-                </div>
-                <svg className="w-full h-10 text-[#22e5ff]" viewBox="0 0 300 40">
-                  <path
-                    d="M0,20 L50,20 L60,10 L70,30 L80,5 L90,35 L100,20 L180,20 L190,12 L200,28 L210,18 L220,20 L300,20"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeDasharray="4 2"
-                  >
-                    <animate
-                      attributeName="stroke-dashoffset"
-                      values="0; -50"
-                      dur="2.5s"
-                      repeatCount="indefinite"
-                    />
-                  </path>
-                </svg>
-              </div>
-
-              {/* Telemetry Status Readouts */}
-              <div className="space-y-3 font-mono text-xs border-b border-[#22e5ff]/15 pb-5 mb-5">
-                <div className="flex items-center justify-between">
-                  <span className="text-[#93a4b8]">TARGET SCHEMATIC:</span>
-                  <span className="text-[#22e5ff] font-bold">
-                    SRJ-{selectedEvent?.code || 'GEN'}
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <span className="text-[#93a4b8]">CALLSIGN / SQUAD:</span>
-                  <span className="text-white font-bold truncate max-w-[140px]">
-                    {watchedTeamName?.trim() || (isTeamEvent ? 'ALPHA_CREW' : 'SOLO_OPERATOR')}
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <span className="text-[#93a4b8]">TOTAL OPERATORS:</span>
-                  <span className="text-[#ffb400] font-bold">
-                    {isTeamEvent ? `${teamSize} UNITS` : '1 UNIT'}
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <span className="text-[#93a4b8]">LEAD OPERATOR:</span>
-                  <span className="text-white font-bold truncate max-w-[140px]">
-                    {watchedLeaderName?.trim() || 'UNASSIGNED'}
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <span className="text-[#93a4b8]">DISPATCH STATUS:</span>
-                  <span className="text-[#22e5ff] font-bold flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#22e5ff] animate-ping" />
-                    READY_FOR_XMIT
-                  </span>
-                </div>
-              </div>
-
-              {/* PRIMARY TRANSMIT BUTTON */}
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full py-3.5 px-4 rounded-xl font-mono font-bold text-xs sm:text-sm text-[#00131c] bg-[#22e5ff] hover:bg-[#52eeff] disabled:bg-slate-700 disabled:text-slate-400 shadow-[0_0_24px_rgba(34,229,255,0.6)] hover:shadow-[0_0_35px_rgba(34,229,255,0.85)] transition-all flex items-center justify-center gap-2 group tracking-wider"
-              >
-                {isSubmitting ? (
-                  <>
-                    <span className="w-4 h-4 border-2 border-[#00131c]/30 border-t-[#00131c] rounded-full animate-spin" />
-                    <span>ENCODING &amp; DISPATCHING...</span>
-                  </>
-                ) : (
-                  <>
-                    <Zap className="w-4 h-4 fill-current group-hover:scale-110 transition-transform" />
-                    <span>TRANSMIT REGISTRATION</span>
-                  </>
-                )}
-              </button>
-
-              <div className="text-center font-mono text-[9px] text-[#93a4b8] mt-3">
-                TIMESTAMP // 2026.ETAS.ONLINE.NET // ZERO COLLISION ASSURED
-              </div>
+              <svg className="w-full h-10 text-[#22e5ff]" viewBox="0 0 300 40">
+                <path
+                  d="M0,20 L50,20 L60,10 L70,30 L80,5 L90,35 L100,20 L180,20 L190,12 L200,28 L210,18 L220,20 L300,20"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeDasharray="4 2"
+                >
+                  <animate
+                    attributeName="stroke-dashoffset"
+                    values="0; -50"
+                    dur="2.5s"
+                    repeatCount="indefinite"
+                  />
+                </path>
+              </svg>
             </div>
+
+
+            {/* PRIMARY TRANSMIT BUTTON */}
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full py-3.5 px-4 rounded-xl font-mono font-bold text-xs sm:text-sm text-[#00131c] bg-[#22e5ff] hover:bg-[#52eeff] disabled:bg-slate-700 disabled:text-slate-400 shadow-[0_0_24px_rgba(34,229,255,0.6)] transition-all flex items-center justify-center gap-2 group tracking-wider"
+            >
+              {isSubmitting ? (
+                <>
+                  <span className="w-4 h-4 border-2 border-[#00131c]/30 border-t-[#00131c] rounded-full animate-spin" />
+                  <span>ENCODING &amp; DISPATCHING...</span>
+                </>
+              ) : (
+                <>
+                  <Zap className="w-4 h-4 fill-current group-hover:scale-110 " />
+                  <span>Register Now</span>
+                </>
+              )}
+            </button>
+
 
             {/* TRANSMISSION PROTOCOLS CHECKLIST */}
             <div className="rounded-2xl bg-[#06101c]/90 border border-white/10 p-5 font-mono text-xs space-y-3">
               <div className="flex items-center gap-2 text-[#ffb400] font-bold border-b border-white/10 pb-2">
                 <ShieldAlert className="w-4 h-4" />
-                <span>TRANSMISSION PROTOCOLS</span>
+                <span>REGISTRATION PROTOCOLS</span>
               </div>
               <ul className="space-y-2 text-[11px] text-[#93a4b8]">
                 <li className="flex items-start gap-2">

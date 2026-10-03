@@ -421,17 +421,27 @@ export default function DashboardPage() {
                     {reg.eventName || reg.event_code || reg.eventId}
                   </td>
                   <td className="py-2.5 px-3">
-                    <p className="font-semibold text-white">
-                      {reg.teamName || reg.team_name || reg.leader?.name || reg.name || 'Participant'}
-                    </p>
-                    {reg.teamName && (
-                      <p className="text-[10px] text-slate-500">
-                        Lead: {reg.leader?.name || reg.name}
-                      </p>
-                    )}
+                    {(() => {
+                      const lead = reg.teamLeader || reg.participant || reg.leader;
+                      return (
+                        <>
+                          <p className="font-semibold text-white">
+                            {reg.teamName || reg.team_name || lead?.name || reg.name || 'Participant'}
+                          </p>
+                          {reg.teamName && (
+                            <p className="text-[10px] text-slate-500">
+                              Lead: {lead?.name || reg.name}
+                            </p>
+                          )}
+                        </>
+                      );
+                    })()}
                   </td>
                   <td className="py-2.5 px-3 text-slate-400">
-                    {reg.leader?.email || reg.email || '—'}
+                    {(() => {
+                      const lead = reg.teamLeader || reg.participant || reg.leader;
+                      return lead?.email || reg.email || '—';
+                    })()}
                   </td>
                   <td className="py-2.5 px-3">
                     <StatusBadge status={reg.status || 'pending'} />

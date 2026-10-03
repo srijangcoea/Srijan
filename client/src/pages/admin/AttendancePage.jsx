@@ -44,16 +44,17 @@ export default function AttendancePage() {
       const combined = (regRes.data || []).map((r) => {
         const regId = r.registrationId || r.registration_id || r._id;
         const att = attendanceMap.get(regId);
+        const lead = r.teamLeader || r.participant || r.leader;
         return {
           id: regId,
           _id: r._id,
           registrationId: regId,
           eventCode: r.eventCode || r.event_code || r.eventId,
           teamName: r.teamName || r.team_name,
-          leaderName: r.leader?.name || r.name,
-          leaderMobile: r.leader?.mobile || r.phone,
-          department: r.leader?.department || r.department,
-          year: r.leader?.year || r.year,
+          leaderName: lead?.name || r.name,
+          leaderMobile: lead?.phone || lead?.mobile || r.phone,
+          department: lead?.department || lead?.branch || r.department,
+          year: lead?.year || r.year,
           present: att ? att.present : r.status === 'attended' || false,
           markedAt: att ? att.markedAt || att.marked_at : null,
         };

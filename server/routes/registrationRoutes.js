@@ -5,6 +5,7 @@ import {
   getAllRegistrations,
   getRegistrationStats,
   deleteRegistration,
+  checkRegistrationDuplicate,
 } from '../controllers/registrationController.js';
 import { registrationRateLimiter } from '../middleware/rateLimiter.js';
 
@@ -12,6 +13,9 @@ const router = express.Router();
 
 // Public registration creation with rate limiter
 router.post('/', registrationRateLimiter, createRegistration);
+
+// Check duplicate email for event
+router.get('/check', checkRegistrationDuplicate);
 
 // Admin stats summary
 router.get('/stats', getRegistrationStats);

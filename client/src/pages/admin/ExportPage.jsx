@@ -53,22 +53,24 @@ export default function ExportPage() {
 
   const generateDataRows = () => {
     return filtered.map((r, idx) => {
+      const lead = r.teamLeader || r.participant || r.leader;
       const membersText = (r.members || [])
-        .map((m, i) => `${i + 1}. ${m.name} (${m.email || ''}, ${m.mobile || ''})`)
+        .map((m, i) => `${i + 1}. ${m.name} (${m.email || ''}, ${m.phone || m.mobile || ''}, ${m.branch || m.department || ''})`)
         .join(' | ');
 
       const row = {
         'Sl No': idx + 1,
         'Registration ID': r.registrationId || r.registration_id || r._id,
         'Event Code': r.eventCode || r.event_code || r.eventId,
+        'Event Name': r.eventName || '',
         'Team Name': r.teamName || r.team_name || 'Individual',
         'Team Size': r.teamSize || r.team_size || (r.members ? r.members.length + 1 : 1),
-        'Leader Name': r.leader?.name || r.name || '',
-        'Leader Email': r.leader?.email || r.email || '',
-        'Leader Mobile': r.leader?.mobile || r.phone || '',
-        Department: r.leader?.department || r.department || '',
-        Year: r.leader?.year || r.year || '',
-        'College / ID': r.leader?.college_id || r.college || '',
+        'Leader / Participant Name': lead?.name || r.name || '',
+        'Leader / Participant Email': lead?.email || r.email || '',
+        'Leader / Participant Mobile': lead?.phone || lead?.mobile || r.phone || '',
+        Department: lead?.department || lead?.branch || r.department || '',
+        Year: lead?.year || r.year || '',
+        College: lead?.college || r.college || 'Government College of Engineering, Amravati',
         Status: r.status || 'pending',
         'Rejection Reason': r.rejectionReason || '',
         'Submission Timestamp': r.createdAt ? new Date(r.createdAt).toLocaleString() : '',

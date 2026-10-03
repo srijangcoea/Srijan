@@ -86,10 +86,21 @@ export default function RegistrationsPage() {
   // Filtered dataset
   const filteredData = useMemo(() => {
     return registrations.filter((reg) => {
-      // Event tab filter
+      const lead = reg.teamLeader || reg.participant || reg.leader;
       const eventCode = (reg.eventCode || reg.event_code || reg.eventId || '').toUpperCase();
-      if (activeTab !== 'ALL' && !eventCode.includes(activeTab)) {
-        return false;
+
+      // Event tab filter
+      if (activeTab !== 'ALL') {
+        const tabMatch =
+          eventCode === activeTab ||
+          eventCode.includes(activeTab) ||
+          (activeTab === 'HACK' && (eventCode.includes('HACK') || reg.eventId === 'event-1')) ||
+          (activeTab === 'KBC' && (eventCode.includes('KBC') || reg.eventId === 'event-2')) ||
+          (activeTab === 'PCB' && (eventCode.includes('PCB') || reg.eventId === 'event-3')) ||
+          (activeTab === 'CAD' && (eventCode.includes('CAD') || reg.eventId === 'event-4')) ||
+          (activeTab === 'BRG' && (eventCode.includes('BRG') || reg.eventId === 'event-5')) ||
+          (activeTab === 'CIRCUIT' && (eventCode.includes('CIRCUIT') || reg.eventId === 'event-6'));
+        if (!tabMatch) return false;
       }
 
       // Status filter
@@ -98,13 +109,13 @@ export default function RegistrationsPage() {
       }
 
       // Year filter
-      const leaderYear = reg.leader?.year || reg.year || '';
+      const leaderYear = lead?.year || reg.year || '';
       if (yearFilter !== 'ALL' && leaderYear !== yearFilter) {
         return false;
       }
 
       // Department filter
-      const leaderDept = (reg.leader?.department || reg.department || '').toLowerCase();
+      const leaderDept = (lead?.department || lead?.branch || reg.department || '').toLowerCase();
       if (deptFilter !== 'ALL' && !leaderDept.includes(deptFilter.toLowerCase())) {
         return false;
       }
@@ -126,16 +137,18 @@ export default function RegistrationsPage() {
         const query = globalFilter.toLowerCase();
         const regId = (reg.registrationId || reg.registration_id || reg._id || '').toLowerCase();
         const teamName = (reg.teamName || reg.team_name || '').toLowerCase();
-        const leaderName = (reg.leader?.name || reg.name || '').toLowerCase();
-        const leaderEmail = (reg.leader?.email || reg.email || '').toLowerCase();
-        const leaderMobile = (reg.leader?.mobile || reg.phone || '').toLowerCase();
+        const leaderName = (lead?.name || reg.name || '').toLowerCase();
+        const leaderEmail = (lead?.email || reg.email || '').toLowerCase();
+        const leaderMobile = (lead?.phone || lead?.mobile || reg.phone || '').toLowerCase();
+        const leaderCollege = (lead?.college || reg.college || '').toLowerCase();
 
         return (
           regId.includes(query) ||
           teamName.includes(query) ||
           leaderName.includes(query) ||
           leaderEmail.includes(query) ||
-          leaderMobile.includes(query)
+          leaderMobile.includes(query) ||
+          leaderCollege.includes(query)
         );
       }
 
@@ -253,21 +266,24 @@ export default function RegistrationsPage() {
       notify.warning('No Records', 'No registrations available to export');
       return;
     }
-    const exportData = rows.map((r) => ({
-      'Registration ID': r.registrationId || r.registration_id || r._id,
-      Event: r.eventName || r.eventCode || r.eventId,
-      'Team Name': r.teamName || r.team_name || 'Individual',
-      'Team Size': r.teamSize || r.team_size || (r.members ? r.members.length + 1 : 1),
-      'Leader Name': r.leader?.name || r.name,
-      'Leader Email': r.leader?.email || r.email,
-      'Leader Mobile': r.leader?.mobile || r.phone,
-      Department: r.leader?.department || r.department || '',
-      Year: r.leader?.year || r.year || '',
-      College: r.leader?.college_id || r.college || '',
-      Status: r.status || 'pending',
-      'Rejection Reason': r.rejectionReason || '',
-      'Date Submitted': r.createdAt ? new Date(r.createdAt).toLocaleString() : '',
-    }));
+    const exportData = rows.map((r) => {
+      const lead = r.teamLeader || r.participant || r.leader;
+      return {
+        'Registration ID': r.registrationId || r.registration_id || r._id,
+        Event: r.eventName || r.eventCode || r.eventId,
+        'Team Name': r.teamName || r.team_name || 'Individual',
+        'Team Size': r.teamSize || r.team_size || (r.members ? r.members.length + 1 : 1),
+        'Leader / Participant Name': lead?.name || r.name || '',
+        'Leader / Participant Email': lead?.email || r.email || '',
+        'Leader / Participant Mobile': lead?.phone || lead?.mobile || r.phone || '',
+        Department: lead?.department || lead?.branch || r.department || '',
+        Year: lead?.year || r.year || '',
+        College: lead?.college || r.college || '',
+        Status: r.status || 'pending',
+        'Rejection Reason': r.rejectionReason || '',
+        'Date Submitted': r.createdAt ? new Date(r.createdAt).toLocaleString() : '',
+      };
+    });
 
     const worksheet = XLSX.utils.json_to_sheet(exportData);
     const workbook = XLSX.utils.book_new();
@@ -327,11 +343,12 @@ export default function RegistrationsPage() {
         header: 'Participant / Team',
         cell: ({ row }) => {
           const r = row.original;
-          const isTeam = r.teamName || (r.members && r.members.length > 0);
+          const lead = r.teamLeader || r.participant || r.leader;
+          const isTeam = r.registrationType === 'team' || r.teamName || (r.members && r.members.length > 0);
           return (
             <div>
               <div className="font-medium text-white flex items-center gap-1.5">
-                <span>{r.teamName || r.team_name || r.leader?.name || r.name}</span>
+                <span>{r.teamName || r.team_name || lead?.name || r.name}</span>
                 {isTeam && (
                   <span className="text-[10px] px-1.5 py-0.2 rounded bg-cyan-500/10 text-cyan-300 font-mono">
                     Team ({(r.members?.length || 0) + 1})
@@ -340,7 +357,7 @@ export default function RegistrationsPage() {
               </div>
               {isTeam && (
                 <div className="text-[10px] text-slate-500">
-                  Lead: {r.leader?.name || r.name}
+                  Lead: {lead?.name || r.name}
                 </div>
               )}
             </div>
@@ -352,10 +369,11 @@ export default function RegistrationsPage() {
         header: 'Contact Info',
         cell: ({ row }) => {
           const r = row.original;
+          const lead = r.teamLeader || r.participant || r.leader;
           return (
             <div className="text-[11px]">
-              <div className="text-slate-300">{r.leader?.email || r.email || '—'}</div>
-              <div className="text-slate-500 font-mono">{r.leader?.mobile || r.phone || '—'}</div>
+              <div className="text-slate-300">{lead?.email || r.email || '—'}</div>
+              <div className="text-slate-500 font-mono">{lead?.phone || lead?.mobile || r.phone || '—'}</div>
             </div>
           );
         },
@@ -365,11 +383,12 @@ export default function RegistrationsPage() {
         header: 'Dept & Year',
         cell: ({ row }) => {
           const r = row.original;
+          const lead = r.teamLeader || r.participant || r.leader;
           return (
             <div className="text-[11px] text-slate-400">
-              <span>{r.leader?.department || r.department || '—'}</span>
+              <span>{lead?.department || lead?.branch || r.department || '—'}</span>
               <span className="mx-1 text-slate-600">/</span>
-              <span>{r.leader?.year || r.year || '—'}</span>
+              <span>{lead?.year || r.year || '—'}</span>
             </div>
           );
         },

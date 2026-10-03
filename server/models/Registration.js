@@ -58,6 +58,12 @@ const registrationSchema = new mongoose.Schema(
       trim: true,
       index: true,
     },
+    eventCode: {
+      type: String,
+      trim: true,
+      uppercase: true,
+      index: true,
+    },
     eventName: {
       type: String,
       required: [true, 'Event Name is required'],

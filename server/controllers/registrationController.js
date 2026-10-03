@@ -7,16 +7,56 @@ import { checkDBConnection } from '../config/db.js';
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_REGEX = /^[6-9]\d{9}$/;
 
+const EVENT_CODE_MAP = {
+  'event-1': 'HACK',
+  '1': 'HACK',
+  'hack': 'HACK',
+  'hackathon': 'HACK',
+  'event-2': 'KBC',
+  '2': 'KBC',
+  'kbc': 'KBC',
+  'event-3': 'PCB',
+  '3': 'PCB',
+  'pcb': 'PCB',
+  'event-4': 'CAD',
+  '4': 'CAD',
+  'cad': 'CAD',
+  'event-5': 'BRG',
+  '5': 'BRG',
+  'brg': 'BRG',
+  'bridge': 'BRG',
+  'event-6': 'CIRCUIT',
+  '6': 'CIRCUIT',
+  'circuit': 'CIRCUIT',
+};
+
+const getEventCodeFromSlug = (slug) => {
+  if (!slug) return 'GEN';
+  const clean = slug.toLowerCase().trim();
+  return EVENT_CODE_MAP[clean] || clean.toUpperCase();
+};
+
+const normalizePersonPhone = (phone) => {
+  let clean = phone ? String(phone).trim().replace(/\D/g, '') : '';
+  if (clean.length === 12 && clean.startsWith('91')) {
+    clean = clean.slice(2);
+  } else if (clean.length === 11 && clean.startsWith('0')) {
+    clean = clean.slice(1);
+  }
+  return clean;
+};
+
 const validatePerson = (p, role = 'Participant') => {
   if (!p) throw new Error(`${role} information is required.`);
   if (!p.name?.trim()) throw new Error(`${role} name is required.`);
   if (!p.email?.trim() || !EMAIL_REGEX.test(p.email.trim())) {
     throw new Error(`Valid email required for ${role.toLowerCase()}.`);
   }
-  const cleanPhone = p.phone?.trim()?.replace(/\D/g, '');
+  const cleanPhone = normalizePersonPhone(p.phone);
   if (!cleanPhone || !PHONE_REGEX.test(cleanPhone)) {
     throw new Error(`Valid 10-digit Indian mobile number required for ${role.toLowerCase()}.`);
   }
+  p.phone = cleanPhone;
   if (!p.college?.trim()) p.college = 'Government College of Engineering, Amravati';
   if (!p.branch?.trim() && p.department?.trim()) p.branch = p.department;
   if (!p.branch?.trim()) throw new Error(`${role} department is required.`);
@@ -24,8 +64,104 @@ const validatePerson = (p, role = 'Participant') => {
 };
 
 /**
+ * Normalizes registration document for client-side consumption
+ */
+const formatRegistration = (reg) => {
+  if (!reg) return reg;
+  const lead = reg.registrationType === 'team' ? reg.teamLeader : reg.participant;
+  const eventCode = reg.eventCode || getEventCodeFromSlug(reg.eventId);
+  return {
+    ...reg,
+    eventCode,
+    leader: reg.leader || lead || {
+      name: lead?.name || '',
+      email: lead?.email || '',
+      phone: lead?.phone || '',
+      mobile: lead?.phone || '',
+      department: lead?.branch || lead?.department || '',
+      branch: lead?.branch || lead?.department || '',
+      year: lead?.year || '',
+      college: lead?.college || 'Government College of Engineering, Amravati',
+    },
+    department: reg.department || lead?.branch || lead?.department || '',
+    year: reg.year || lead?.year || '',
+    phone: reg.phone || lead?.phone || '',
+    teamSize: reg.registrationType === 'team' ? (reg.members?.length || 0) + 1 : 1,
+  };
+};
+
+/**
+ * GET /api/registrations/check
+ * Check if email is already registered for an event
+ */
+export const checkRegistrationDuplicate = async (req, res, next) => {
+  try {
+    if (!checkDBConnection()) {
+      return res.status(503).json({ success: false, message: 'Database is not connected.' });
+    }
+
+    const { eventId, email } = req.query;
+    if (!eventId || !email) {
+      return res.status(400).json({ success: false, message: 'eventId and email query parameters are required.' });
+    }
+
+    const normEmail = email.trim().toLowerCase();
+    const cleanEventId = eventId.toLowerCase().trim();
+
+    // Find event
+    let event = await Event.findOne({
+      $or: [
+        { slug: cleanEventId },
+        { slug: `event-${cleanEventId}` },
+        { code: cleanEventId.toUpperCase() },
+      ],
+    }).lean();
+
+    if (!event) {
+      event = initialEvents.find(
+        (e) =>
+          e.slug === cleanEventId ||
+          e.slug === `event-${cleanEventId}` ||
+          (e.code && e.code.toUpperCase() === cleanEventId.toUpperCase())
+      );
+    }
+
+    const targetSlugs = event
+      ? [event.slug, event.slug.replace(/^event-/, ''), (event.code || '').toUpperCase()]
+      : [cleanEventId, `event-${cleanEventId}`, cleanEventId.toUpperCase()];
+
+    const existing = await Registration.findOne({
+      $or: [
+        { eventId: { $in: targetSlugs } },
+        { eventCode: (event?.code || cleanEventId).toUpperCase() },
+      ],
+      $or: [
+        { 'participant.email': normEmail },
+        { 'teamLeader.email': normEmail },
+        { 'members.email': normEmail },
+      ],
+    }).lean();
+
+    if (existing) {
+      return res.status(200).json({
+        success: true,
+        isDuplicate: true,
+        message: `Email "${normEmail}" is already registered for this competition (ID: ${existing.registrationId}).`,
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      isDuplicate: false,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
  * POST /api/registrations
- * Create individual or team registration
+ * Create individual or team registration in MongoDB Atlas
  */
 export const createRegistration = async (req, res, next) => {
   try {
@@ -36,21 +172,36 @@ export const createRegistration = async (req, res, next) => {
       });
     }
 
-    const { eventId, registrationType, participant, teamName, teamLeader, members, termsAccepted = true } = req.body;
+    const {
+      eventId,
+      registrationType,
+      participant,
+      teamName,
+      teamLeader,
+      members,
+      termsAccepted = true,
+    } = req.body;
 
     if (!eventId) {
       return res.status(400).json({ success: false, message: 'Event ID is required.' });
     }
 
     // Find Event definition (DB or fallback seed)
-    const lowerEventId = eventId.toLowerCase();
+    const cleanEventId = String(eventId).trim().toLowerCase();
     let event = await Event.findOne({
-      $or: [{ slug: lowerEventId }, { slug: `event-${lowerEventId}` }],
+      $or: [
+        { slug: cleanEventId },
+        { slug: `event-${cleanEventId}` },
+        { code: cleanEventId.toUpperCase() },
+      ],
     }).lean();
 
     if (!event) {
       event = initialEvents.find(
-        (e) => e.slug === lowerEventId || e.slug === `event-${lowerEventId}`
+        (e) =>
+          e.slug === cleanEventId ||
+          e.slug === `event-${cleanEventId}` ||
+          (e.code && e.code.toUpperCase() === cleanEventId.toUpperCase())
       );
     }
 
@@ -59,6 +210,14 @@ export const createRegistration = async (req, res, next) => {
     }
 
     const isTeam = event.registrationType === 'team' || registrationType === 'team';
+    const eventCode = (event.code || getEventCodeFromSlug(event.slug)).toUpperCase();
+    const eventMatchQuery = {
+      $or: [
+        { eventId: event.slug },
+        { eventId: event.slug.replace(/^event-/, '') },
+        { eventCode },
+      ],
+    };
 
     if (isTeam) {
       // Validate Team
@@ -94,31 +253,48 @@ export const createRegistration = async (req, res, next) => {
         });
       }
 
+      // Check unique phones in team
+      const allPhones = [
+        teamLeader.phone,
+        ...teamMembers.map((m) => m.phone),
+      ];
+      if (new Set(allPhones).size !== allPhones.length) {
+        return res.status(400).json({
+          success: false,
+          message: 'All team members must have unique mobile numbers.',
+        });
+      }
+
       // Check duplicate in DB for this competition
       const existing = await Registration.findOne({
-        eventId: event.slug,
-        $or: [{ 'teamLeader.email': { $in: allEmails } }, { 'members.email': { $in: allEmails } }],
+        ...eventMatchQuery,
+        $or: [
+          { 'teamLeader.email': { $in: allEmails } },
+          { 'members.email': { $in: allEmails } },
+          { 'participant.email': { $in: allEmails } },
+        ],
       }).lean();
 
       if (existing) {
         return res.status(409).json({
           success: false,
-          message: `A team member is already registered for ${event.name} under team "${existing.teamName}".`,
+          message: `A participant is already registered for ${event.name} (Registration ID: ${existing.registrationId}).`,
         });
       }
 
-      const registrationId = await generateRegistrationId(event.code || 'HACK');
+      const registrationId = await generateRegistrationId(eventCode);
 
       const newRegistration = await Registration.create({
         registrationId,
         eventId: event.slug,
+        eventCode,
         eventName: event.name,
         registrationType: 'team',
         teamName: teamName.trim(),
         teamLeader: {
           name: teamLeader.name.trim(),
           email: teamLeader.email.trim().toLowerCase(),
-          phone: teamLeader.phone.trim().replace(/\D/g, ''),
+          phone: teamLeader.phone,
           college: teamLeader.college.trim(),
           branch: teamLeader.branch.trim(),
           year: teamLeader.year.trim(),
@@ -126,60 +302,68 @@ export const createRegistration = async (req, res, next) => {
         members: teamMembers.map((m) => ({
           name: m.name.trim(),
           email: m.email.trim().toLowerCase(),
-          phone: m.phone.trim().replace(/\D/g, ''),
+          phone: m.phone,
           college: m.college.trim(),
           branch: m.branch.trim(),
           year: m.year.trim(),
         })),
-        termsAccepted: true,
+        termsAccepted: Boolean(termsAccepted),
         registeredAt: new Date(),
+        status: 'confirmed',
       });
 
       return res.status(201).json({
         success: true,
         message: 'Registration successful!',
-        data: newRegistration,
+        data: formatRegistration(newRegistration.toObject()),
       });
     } else {
       // Validate Individual
-      validatePerson(participant, 'Participant');
-      const email = participant.email.trim().toLowerCase();
+      const personData = participant || teamLeader;
+      validatePerson(personData, 'Participant');
+      const email = personData.email.trim().toLowerCase();
 
       const existing = await Registration.findOne({
-        eventId: event.slug,
-        'participant.email': email,
+        ...eventMatchQuery,
+        $or: [
+          { 'participant.email': email },
+          { 'teamLeader.email': email },
+          { 'members.email': email },
+        ],
       }).lean();
 
       if (existing) {
         return res.status(409).json({
           success: false,
-          message: `Email "${email}" is already registered for ${event.name} (ID: ${existing.registrationId}).`,
+          message: `Email "${email}" is already registered for ${event.name} (Registration ID: ${existing.registrationId}).`,
         });
       }
 
-      const registrationId = await generateRegistrationId(event.code || 'IND');
+      const registrationId = await generateRegistrationId(eventCode);
 
       const newRegistration = await Registration.create({
         registrationId,
         eventId: event.slug,
+        eventCode,
         eventName: event.name,
         registrationType: 'individual',
         participant: {
-          name: participant.name.trim(),
+          name: personData.name.trim(),
           email,
-          phone: participant.phone.trim().replace(/\D/g, ''),
-          college: participant.college.trim(),
-          branch: participant.branch.trim(),
-          year: participant.year.trim(),
+          phone: personData.phone,
+          college: personData.college.trim(),
+          branch: personData.branch.trim(),
+          year: personData.year.trim(),
         },
-        termsAccepted: true,
+        termsAccepted: Boolean(termsAccepted),
         registeredAt: new Date(),
+        status: 'confirmed',
       });
 
       return res.status(201).json({
         success: true,
         message: 'Registration successful!',
-        data: newRegistration,
+        data: formatRegistration(newRegistration.toObject()),
       });
     }
   } catch (error) {
@@ -204,9 +388,13 @@ export const getAllRegistrations = async (req, res, next) => {
     const filter = {};
 
     if (eventId && eventId !== 'all') {
-      // Support matching slug like 'event-1' or raw id '1'
-      const cleanEventId = eventId.toLowerCase();
-      filter.$or = [{ eventId: cleanEventId }, { eventId: `event-${cleanEventId}` }];
+      const cleanEventId = eventId.toLowerCase().trim();
+      const code = cleanEventId.toUpperCase();
+      filter.$or = [
+        { eventId: cleanEventId },
+        { eventId: `event-${cleanEventId}` },
+        { eventCode: code },
+      ];
     }
 
     if (type && type !== 'all') {
@@ -219,17 +407,21 @@ export const getAllRegistrations = async (req, res, next) => {
       const searchConditions = [
         { registrationId: regex },
         { eventName: regex },
+        { eventCode: regex },
         { teamName: regex },
         { 'participant.name': regex },
         { 'participant.email': regex },
         { 'participant.college': regex },
         { 'participant.phone': regex },
+        { 'participant.branch': regex },
         { 'teamLeader.name': regex },
         { 'teamLeader.email': regex },
         { 'teamLeader.college': regex },
         { 'teamLeader.phone': regex },
+        { 'teamLeader.branch': regex },
         { 'members.name': regex },
         { 'members.email': regex },
+        { 'members.phone': regex },
       ];
 
       if (filter.$or) {
@@ -240,14 +432,16 @@ export const getAllRegistrations = async (req, res, next) => {
       }
     }
 
-    const registrations = await Registration.find(filter)
+    const rawRegistrations = await Registration.find(filter)
       .sort({ createdAt: -1 })
       .lean();
 
+    const formatted = rawRegistrations.map(formatRegistration);
+
     res.status(200).json({
       success: true,
-      count: registrations.length,
-      data: registrations,
+      count: formatted.length,
+      data: formatted,
     });
   } catch (error) {
     next(error);
@@ -273,6 +467,7 @@ export const getRegistrationStats = async (req, res, next) => {
           $group: {
             _id: '$eventId',
             eventName: { $first: '$eventName' },
+            eventCode: { $first: '$eventCode' },
             count: { $sum: 1 },
           },
         },
@@ -281,10 +476,19 @@ export const getRegistrationStats = async (req, res, next) => {
 
     const perEvent = {};
     eventStats.forEach((st) => {
+      const code = st.eventCode || getEventCodeFromSlug(st._id);
       perEvent[st._id] = {
         name: st.eventName,
+        code,
         count: st.count,
       };
+      if (code) {
+        perEvent[code] = {
+          name: st.eventName,
+          code,
+          count: st.count,
+        };
+      }
     });
 
     res.status(200).json({
@@ -320,7 +524,7 @@ export const getRegistrationById = async (req, res, next) => {
       return res.status(404).json({ success: false, message: `Registration "${registrationId}" not found.` });
     }
 
-    res.status(200).json({ success: true, data: reg });
+    res.status(200).json({ success: true, data: formatRegistration(reg) });
   } catch (error) {
     next(error);
   }

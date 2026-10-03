@@ -3,7 +3,7 @@ import { useSearchParams, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { buildRegistrationSchema } from '../utils/registrationSchema';
-import { submitRegistration } from '../services/registrationService';
+import { submitRegistration, syncLocalPendingRegistrations } from '../services/registrationService';
 import { notify } from '../utils/toast';
 
 /**
@@ -90,6 +90,15 @@ export function useRegistration(eventsList = []) {
 
   const { register, handleSubmit, reset, setValue, getValues, watch, formState } = form;
 
+  // On mount, auto-sync any pending registrations that failed earlier
+  useEffect(() => {
+    syncLocalPendingRegistrations().then((count) => {
+      if (count > 0) {
+        console.log(`Synced ${count} offline registration(s) to database.`);
+      }
+    }).catch(() => {});
+  }, []);
+
   // When selected event changes, update URL param and form defaults
   useEffect(() => {
     if (selectedEvent) {
@@ -152,6 +161,9 @@ export function useRegistration(eventsList = []) {
       const result = await submitRegistration(data, selectedEvent);
       if (result.success) {
         setSuccessData(result.data);
+        if (typeof window !== 'undefined') {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
         notify.success(
           'Registration Confirmed',
           `Transaction ID: #${result.data.registrationId}`
