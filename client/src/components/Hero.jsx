@@ -493,7 +493,7 @@ export default function Hero() {
           -webkit-background-clip: text;
           background-clip: text;
           color: transparent;
-          filter: drop-shadow(0 0 20px #22e5ff66);
+          // filter: drop-shadow(0 0 20px #22e5ff66);
           cursor: pointer;
           user-select: none;
         }
@@ -745,13 +745,11 @@ export default function Hero() {
           </div>
 
           {/* Srijan Titlewrap with Orbiting Nodes */}
-          <div className="titlewrap" id="tw" ref={titleWrapRef}>
-            <div className="orbit" id="orbit" ref={orbitRef} />
-            <h1 className="title" id="title" aria-label="SRIJAN">
-              {/* S Logo with Masked Shine */}
-              <span className="s" id="logo" ref={logoRef}>
+          <div className="" id="" ref={titleWrapRef}>
+            <div className="" id="" ref={orbitRef} />
+            <h1 className="title" id="" aria-label="SRIJAN">
+              <span className="s" id="" ref={logoRef}>
                 <img src={sMarkImg} alt="S Logo" />
-                <span className="shine" id="shine" ref={shineRef} />
               </span>
               <span className="l">R</span>
               <span className="l">I</span>
