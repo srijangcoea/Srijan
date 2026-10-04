@@ -37,6 +37,8 @@ export default function Navbar() {
     { name: 'EVENTS', path: '/events' },
     { name: 'SCHEDULE', path: '/events' },
     { name: 'ABOUT', path: '/about' },
+    { name: 'OUT TEAM', path: '/ourteam' },
+
   ];
 
   const isActive = (path) => {

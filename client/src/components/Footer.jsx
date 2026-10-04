@@ -163,78 +163,132 @@ export default function Footer() {
         </div>
       )}
 
-      {/* 1. CALL TO ACTION BANNER: "REGISTER NOW" */}
-      <div className="relative border-b border-white/10 bg-gradient-to-b from-space-900/40 via-space-950 to-transparent">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-12">
-          <div className="relative rounded-2xl bg-gradient-to-r from-space-900 via-space-850 to-space-900 border border-amber-500/25 p-6 sm:p-8 md:p-10 overflow-hidden shadow-2xl backdrop-blur-md">
-            {/* Ambient inner glow */}
-            <div className="absolute -right-8 -bottom-8 w-60 h-60 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute -left-8 -top-8 w-60 h-60 bg-starlight-500/10 rounded-full blur-3xl pointer-events-none" />
+      {/* ============================================================
+    CALL TO ACTION BANNER — REGISTER NOW
+============================================================ */}
+      <section className="relative overflow-hidden border-b border-white/10 bg-gradient-to-b from-space-900/50 via-space-950 to-transparent">
+        {/* Background tournament grid */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 opacity-[0.07] [background-image:linear-gradient(rgba(125,211,252,0.7)_1px,transparent_1px),linear-gradient(90deg,rgba(125,211,252,0.7)_1px,transparent_1px)] [background-size:38px_38px]"
+        />
 
-            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 relative z-10">
-              <div className="space-y-2 max-w-2xl">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-mono uppercase tracking-wider">
-                  <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
-                  Registrations Live • Srijan 2026
+        {/* Decorative light streaks */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute left-[8%] top-12 h-px w-52 rotate-[-18deg] bg-gradient-to-r from-transparent via-starlight-300 to-transparent opacity-70 shadow-[0_0_18px_rgba(125,211,252,0.75)]"
+        />
+
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute right-[5%] bottom-12 h-px w-72 rotate-[18deg] bg-gradient-to-r from-transparent via-amber-300 to-transparent opacity-70 shadow-[0_0_18px_rgba(245,158,11,0.7)]"
+        />
+
+        <div className="relative mx-auto max-w-7xl px-4 py-10 sm:px-6 md:py-14 lg:px-8">
+          <div className="group relative overflow-hidden border border-amber-400/30 bg-gradient-to-br from-space-900 via-space-850 to-space-950 shadow-[0_20px_70px_rgba(0,0,0,0.45)] backdrop-blur-xl [clip-path:polygon(0_0,98%_0,100%_12%,100%_100%,2%_100%,0_88%)]">
+            {/* Gradient outline effect */}
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(125,211,252,0.55),transparent_25%,transparent_72%,rgba(251,146,60,0.65))] opacity-70"
+            />
+
+            {/* Ambient glow layers */}
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute -left-20 -top-24 h-64 w-64 rounded-full bg-starlight-500/15 blur-3xl"
+            />
+
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute -bottom-24 -right-20 h-72 w-72 rounded-full bg-amber-500/15 blur-3xl"
+            />
+
+            {/* Large faded decorative text */}
+            <span
+              aria-hidden="true"
+              className="pointer-events-none absolute -right-3 top-1/2 hidden -translate-y-1/2 select-none font-display text-[10rem] font-black uppercase italic leading-none tracking-tighter text-white/[0.025] lg:block"
+            >
+              2026
+            </span>
+
+            {/* Vertical accent strip */}
+            <div className="absolute bottom-8 left-0 top-8 w-1 bg-gradient-to-b from-transparent via-starlight-300 to-amber-400" />
+
+            <div className="relative z-10 flex flex-col gap-8 p-6 sm:p-8 md:p-10 lg:flex-row lg:items-center lg:justify-between lg:gap-10">
+              {/* Content */}
+              <div className="max-w-2xl">
+                <div className="inline-flex items-center gap-2 border border-amber-400/35 bg-amber-500/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-amber-300 [clip-path:polygon(8%_0,100%_0,92%_100%,0_100%)] sm:text-xs">
+                  <span className="relative flex h-2.5 w-2.5">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-300 opacity-70" />
+                    <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-amber-300 shadow-[0_0_10px_rgba(251,191,36,1)]" />
+                  </span>
+
+                  Registrations live // Srijan 2026
                 </div>
-                <h3 className="text-2xl sm:text-3xl md:text-4xl font-display font-extrabold text-white tracking-tight">
-                  Ready to Build, Break, and Ship?
+
+                <h3 className="mt-5 font-display text-3xl font-extrabold uppercase italic leading-[0.95] tracking-tight text-white sm:text-4xl md:text-5xl">
+                  Ready to{" "}
+                  <span className="bg-gradient-to-r from-starlight-300 via-amber-300 to-solar-400 bg-clip-text text-transparent">
+                    Build, Break,
+                  </span>
+                  <br className="hidden sm:block" /> and Ship?
                 </h3>
-                <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
-                  Join Central India's premier technical gathering. Transform bold ideas into functional prototypes, win grand bounties, and connect with top tech minds.
+
+                <p className="mt-5 max-w-xl text-sm leading-7 text-slate-300 sm:text-base">
+                  Join Central India&apos;s premier technical gathering. Turn bold
+                  ideas into functional prototypes, compete for grand bounties, and
+                  connect with ambitious builders and tech minds.
                 </p>
+
+                {/* Small event stats */}
+                <div className="mt-6 flex flex-wrap gap-3">
+                  <div className="border border-starlight-300/20 bg-starlight-300/[0.06] px-3 py-2 text-xs font-semibold text-starlight-100 [clip-path:polygon(7%_0,100%_0,93%_100%,0_100%)]">
+                    <span className="mr-1.5 text-starlight-300">06+</span>
+                    Competition tracks
+                  </div>
+
+                  <div className="border border-amber-300/20 bg-amber-300/[0.06] px-3 py-2 text-xs font-semibold text-amber-100 [clip-path:polygon(7%_0,100%_0,93%_100%,0_100%)]">
+                    <span className="mr-1.5 text-amber-300">∞</span>
+                    Ideas waiting
+                  </div>
+                </div>
               </div>
 
-              {/* Action Buttons */}
-              <div className="flex flex-wrap items-center gap-3 sm:gap-4 w-full lg:w-auto">
+              {/* Actions */}
+              <div className="flex w-full shrink-0 flex-col gap-3 sm:w-auto sm:flex-row lg:flex-col xl:flex-row">
                 <Link
                   to="/register"
-                  className="group relative inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl font-bold text-sm text-space-950 bg-gradient-to-r from-amber-400 via-amber-500 to-solar-400 hover:from-amber-300 hover:to-solar-300 transition-all duration-300 shadow-[0_0_20px_rgba(245,158,11,0.35)] hover:shadow-[0_0_30px_rgba(245,158,11,0.6)] transform hover:-translate-y-0.5 w-full sm:w-auto"
+                  className="group/button relative inline-flex min-h-12 w-full items-center justify-center gap-2 overflow-hidden border border-amber-100 bg-gradient-to-r from-amber-400 via-amber-500 to-solar-400 px-7 py-3.5 text-sm font-extrabold uppercase tracking-[0.08em] text-space-950 shadow-[0_0_24px_rgba(245,158,11,0.35)] transition-all duration-300 hover:-translate-y-1 hover:from-amber-300 hover:via-amber-400 hover:to-solar-300 hover:shadow-[0_0_36px_rgba(245,158,11,0.6)] [clip-path:polygon(7%_0,100%_0,93%_100%,0_100%)] sm:w-auto"
                 >
-                  <span>Register Now</span>
-                  <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+                  {/* Moving shine */}
+                  <span className="pointer-events-none absolute inset-y-0 left-0 w-1/3 -translate-x-[180%] -skew-x-[24deg] bg-white/45 transition-transform duration-700 group-hover/button:translate-x-[520%]" />
+
+                  <span className="relative z-10">Register Now</span>
+
+                  <ArrowRight className="relative z-10 h-4 w-4 transition-transform duration-300 group-hover/button:translate-x-1.5" />
                 </Link>
 
                 <Link
                   to="/events"
-                  className="inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl font-medium text-sm text-slate-200 hover:text-white bg-space-800/90 hover:bg-space-800 border border-white/10 hover:border-amber-500/40 transition-all w-full sm:w-auto"
+                  className="group/tracks inline-flex min-h-12 w-full items-center justify-center gap-2 border border-white/10 bg-space-800/75 px-6 py-3.5 text-sm font-bold text-slate-200 transition-all duration-300 hover:-translate-y-0.5 hover:border-starlight-300/50 hover:bg-space-800 hover:text-white [clip-path:polygon(7%_0,100%_0,93%_100%,0_100%)] sm:w-auto"
                 >
                   <span>Explore Tracks</span>
-                  <ExternalLink className="w-4 h-4 text-amber-400" />
+
+                  <ExternalLink className="h-4 w-4 text-amber-400 transition-transform duration-300 group-hover/tracks:translate-x-0.5 group-hover/tracks:-translate-y-0.5" />
                 </Link>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
 
-      {/* 2. SPONSOR LOGO STRIP */}
-      <div className="border-b border-white/5 bg-space-950/80 py-5">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <p className="text-center text-[10px] font-mono tracking-widest text-slate-400 uppercase mb-3">
-            Supported By Industry Partners & Innovators
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-8 md:gap-12 opacity-80 hover:opacity-100 transition-opacity">
-            {sponsorPartners.map((sponsor, idx) => (
-              <div
-                key={idx}
-                className="group flex items-center gap-2 px-3 py-1.5 rounded-lg border border-white/5 bg-space-900/50 hover:border-amber-500/30 hover:bg-space-900 transition-all cursor-pointer"
-                title={`${sponsor.name} — ${sponsor.role}`}
-              >
-                <div className="w-5 h-5 rounded-md bg-gradient-to-br from-amber-500/30 to-starlight-500/30 flex items-center justify-center text-[10px] font-mono font-bold text-amber-300 group-hover:from-amber-500 group-hover:to-cyan-400 transition-colors">
-                  {sponsor.name.charAt(0)}
-                </div>
-                <span className="font-sans font-medium text-xs text-slate-400 group-hover:text-slate-200 transition-colors">
-                  {sponsor.name}
-                </span>
-                <span className="text-[10px] font-mono text-amber-500/60 hidden sm:inline">
-                  [{sponsor.role}]
-                </span>
-              </div>
-            ))}
+            {/* Bottom status line */}
+            <div className="relative z-10 flex items-center gap-3 border-t border-white/10 bg-black/10 px-6 py-3 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500 sm:px-8">
+              <span className="h-1.5 w-1.5 rounded-full bg-starlight-300 shadow-[0_0_8px_rgba(125,211,252,1)]" />
+              Srijan Mission Control // Registration Portal Active
+            </div>
           </div>
         </div>
-      </div>
+      </section>
+
+
 
       {/* 3. MAIN MULTI-COLUMN FOOTER CONTENT */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-16">

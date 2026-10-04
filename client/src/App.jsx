@@ -24,6 +24,7 @@ import EventManagementPage from './pages/admin/EventManagementPage';
 import AttendancePage from './pages/admin/AttendancePage';
 import ExportPage from './pages/admin/ExportPage';
 import ActivityLogPage from './pages/admin/ActivityLogPage';
+import Ourteam from './pages/Ourteam';
 
 export default function App() {
   const location = useLocation();
@@ -63,6 +64,8 @@ export default function App() {
             <Route path="/register" element={<Registration />} />
             <Route path="/register/:eventId" element={<Registration />} />
             <Route path="/about" element={<AboutPage />} />
+            <Route path="/ourteam" element={<Ourteam />} />
+
 
             {/* Admin Authentication */}
             <Route path="/admin/login" element={<AdminLogin />} />

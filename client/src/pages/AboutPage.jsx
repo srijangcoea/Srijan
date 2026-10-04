@@ -1,6 +1,7 @@
 import React from 'react';
 import AboutSection from '../components/AboutSection';
 import CTASection from '../components/CTASection';
+import Ourteam from './Ourteam';
 
 /**
  * AboutPage
@@ -16,6 +17,7 @@ export default function AboutPage() {
       {/* Conversion / Challenge Selector Section */}
       <div className="mt-12">
         <CTASection />
+        <Ourteam/>
       </div>
     </div>
   );
