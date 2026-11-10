@@ -24,6 +24,10 @@ export default defineConfig(({ mode }) => {
               if (id.includes('recharts')) {
                 return 'vendor-charts';
               }
+              // Split GSAP into its own chunk — keeps main bundle lean
+              if (id.includes('gsap')) {
+                return 'vendor-gsap';
+              }
             }
           },
         },

@@ -1,22 +1,69 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import EventCard from './EventCard';
 import BrochureModal from './BrochureModal';
-import Reveal from './Reveal';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
+
+// Globally configure GSAP for smoothness
+gsap.config({ force3D: true });
 
 export default function EventGrid({ events }) {
   const [selectedEventForBrochure, setSelectedEventForBrochure] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const gridRef = useRef(null);
+  const ctxRef = useRef(null);
+  const rafRef = useRef(null);
 
-  // Extract unique categories
   const categories = ['All', ...new Set(events.map((e) => e.category))];
-
   const filteredEvents =
-    selectedCategory === 'All'
-      ? events
-      : events.filter((e) => e.category === selectedCategory);
+    selectedCategory === 'All' ? events : events.filter((e) => e.category === selectedCategory);
+
+  useEffect(() => {
+    // Skip for reduced-motion users
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    // Cancel any pending frame and kill previous context
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    if (ctxRef.current) { ctxRef.current.revert(); ctxRef.current = null; }
+
+    rafRef.current = requestAnimationFrame(() => {
+      if (!gridRef.current) return;
+      const cards = Array.from(gridRef.current.querySelectorAll('[data-event-card]'));
+      if (!cards.length) return;
+
+      ctxRef.current = gsap.context(() => {
+        // Hide all upfront — only opacity + translateY, NO scale (avoids layout recalc)
+        gsap.set(cards, { opacity: 0, y: 24, force3D: true });
+
+        // One ScrollTrigger batch for the whole grid — fires per viewport batch
+        // Much cheaper than one trigger per card
+        ScrollTrigger.batch(cards, {
+          start: 'top 95%',
+          onEnter: (batch) => {
+            gsap.to(batch, {
+              opacity: 1,
+              y: 0,
+              duration: 0.5,          // shorter = snappier, less jank
+              stagger: 0.07,          // tight stagger: feels staggered but fast
+              ease: 'power2.out',     // gentler than power3
+              force3D: true,
+              overwrite: 'auto',
+            });
+          },
+        });
+      }, gridRef);
+    });
+
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      if (ctxRef.current) { ctxRef.current.revert(); ctxRef.current = null; }
+    };
+  }, [filteredEvents.length, selectedCategory]);
 
   return (
-    <div className="w-full">
+    <div className="w-full" ref={gridRef}>
       {/* Category Filter Pills */}
       {categories.length > 2 && (
         <div className="flex flex-wrap items-center gap-2 mb-8 sm:mb-10">
@@ -36,19 +83,18 @@ export default function EventGrid({ events }) {
         </div>
       )}
 
-      {/* Grid of Events with Staggered Reveal (2 cards per row on mobile) */}
+      {/* Grid — 2 cols mobile, 3 cols desktop */}
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 md:gap-8">
-        {filteredEvents.map((event, idx) => (
-          <Reveal key={event.id} delay={idx * 90} className="h-full">
+        {filteredEvents.map((event) => (
+          <div key={event.id} data-event-card="true" className="h-full">
             <EventCard
               event={event}
               onOpenBrochure={(ev) => setSelectedEventForBrochure(ev)}
             />
-          </Reveal>
+          </div>
         ))}
       </div>
 
-      {/* Brochure Modal */}
       {selectedEventForBrochure && (
         <BrochureModal
           isOpen={Boolean(selectedEventForBrochure)}

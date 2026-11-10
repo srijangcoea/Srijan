@@ -219,7 +219,7 @@ export default function Ourteam() {
 
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-2 gap-3 sm:gap-6 md:gap-8 max-w-4xl mx-auto">
+            <div className="grid grid-cols-2 md:grid-cols-2 gap-3 sm:gap-5 md:gap-6 max-w-3xl mx-auto">
               {CONVENORS.slice(0, 2).map((member) => (
                 <div
                   key={member.name}
@@ -229,7 +229,7 @@ export default function Ourteam() {
                   <div className="absolute top-0 right-0 w-5 h-5 sm:w-8 sm:h-8 bg-[#ffd799]/20 pointer-events-none" />
 
                   {/* Member Photo */}
-                  <div className="relative w-full h-44 sm:h-72 md:h-80 lg:h-96 overflow-hidden bg-[#0d141d]">
+                  <div className="relative w-full h-44 sm:h-56 md:h-64 overflow-hidden bg-[#0d141d]">
                     <div className="absolute top-2 left-2 sm:top-4 sm:left-4 z-10 flex items-center gap-1 bg-[#0d141d]/85 backdrop-blur-md px-2 py-0.5 sm:px-3 sm:py-1 rounded border border-[#ffd799]/40 text-[#ffd799] font-mono text-[9px] sm:text-xs font-bold tracking-wider shadow-md">
                       <span>★</span> <span>{member.badge}</span>
                     </div>
@@ -245,24 +245,24 @@ export default function Ourteam() {
                   </div>
 
                   {/* Details Overlay */}
-                  <div className="p-3 sm:p-6 md:p-8 flex flex-col gap-1.5 sm:gap-2 flex-1 justify-between -mt-6 sm:-mt-12 relative z-10 bg-gradient-to-t from-[#151c26] via-[#151c26] to-transparent pt-4 sm:pt-6">
+                  <div className="p-3 sm:p-5 flex flex-col gap-1.5 sm:gap-2 flex-1 justify-between -mt-6 sm:-mt-10 relative z-10 bg-gradient-to-t from-[#151c26] via-[#151c26] to-transparent pt-4 sm:pt-5">
                     <div>
                       <div className="font-mono text-[9px] sm:text-xs text-[#ffd799] tracking-widest uppercase">
                         {member.category}
                       </div>
-                      <h3 className="font-display text-sm sm:text-2xl md:text-3xl italic uppercase text-[#dce3f0] tracking-wide mt-0.5 sm:mt-1 font-bold line-clamp-1 sm:line-clamp-none">
+                      <h3 className="font-display text-sm sm:text-xl md:text-2xl italic uppercase text-[#dce3f0] tracking-wide mt-0.5 sm:mt-1 font-bold line-clamp-1 sm:line-clamp-none">
                         {member.name}
                       </h3>
-                      <p className="font-display text-xs sm:text-base text-[#ffd799] mt-0.5 sm:mt-1 font-medium">
+                      <p className="font-display text-xs sm:text-sm text-[#ffd799] mt-0.5 sm:mt-1 font-medium">
                         {member.role}
                       </p>
-                      <p className="font-sans text-[11px] sm:text-sm text-[#bac9cc] mt-1.5 sm:mt-2.5 leading-normal sm:leading-relaxed line-clamp-2 sm:line-clamp-none">
+                      <p className="font-sans text-[11px] sm:text-xs text-[#bac9cc] mt-1.5 sm:mt-2 leading-normal sm:leading-relaxed line-clamp-2 sm:line-clamp-none">
                         {member.bio}
                       </p>
                     </div>
 
                     {/* Action Bar */}
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 pt-2.5 sm:pt-4 border-t border-[#3b494c]/30 mt-2.5 sm:mt-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 pt-2.5 sm:pt-3 border-t border-[#3b494c]/30 mt-2.5 sm:mt-3">
                       <button
                         type="button"
                         onClick={() => handleContactClick(member.name, member.email)}
@@ -370,7 +370,7 @@ export default function Ourteam() {
 
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-2 gap-3 sm:gap-6 md:gap-8 max-w-4xl mx-auto">
+            <div className="grid grid-cols-2 md:grid-cols-2 gap-3 sm:gap-5 md:gap-6 max-w-3xl mx-auto">
               {DEVELOPERS.map((dev) => (
                 <div
                   key={dev.name}
@@ -380,7 +380,7 @@ export default function Ourteam() {
                   <div className="absolute top-0 right-0 w-5 h-5 sm:w-8 sm:h-8 bg-[#00e5ff]/20 pointer-events-none" />
 
                   {/* Dev Photo */}
-                  <div className="relative w-full h-44 sm:h-72 md:h-80 lg:h-96 overflow-hidden bg-[#0d141d]">
+                  <div className="relative w-full h-44 sm:h-56 md:h-64 overflow-hidden bg-[#0d141d]">
                     <div className="absolute top-2 left-2 sm:top-4 sm:left-4 z-10 flex items-center gap-1 bg-[#0d141d]/85 backdrop-blur-md px-2 py-0.5 sm:px-3 sm:py-1 rounded border border-[#00e5ff]/40 text-[#00e5ff] font-mono text-[9px] sm:text-xs font-bold tracking-wider shadow-md">
                       <span>★</span> <span>{dev.badge}</span>
                     </div>
@@ -396,28 +396,28 @@ export default function Ourteam() {
                   </div>
 
                   {/* Dev Content Area */}
-                  <div className="p-3 sm:p-6 md:p-8 flex flex-col gap-1.5 sm:gap-2 flex-1 justify-between -mt-6 sm:-mt-12 relative z-10 bg-gradient-to-t from-[#151c26] via-[#151c26] to-transparent pt-4 sm:pt-6">
+                  <div className="p-3 sm:p-5 flex flex-col gap-1.5 sm:gap-2 flex-1 justify-between -mt-6 sm:-mt-10 relative z-10 bg-gradient-to-t from-[#151c26] via-[#151c26] to-transparent pt-4 sm:pt-5">
                     <div>
                       <div className="font-mono text-[9px] sm:text-xs text-[#00daf3] tracking-widest uppercase">
                         {dev.category}
                       </div>
-                      <h3 className="font-display text-sm sm:text-2xl md:text-3xl italic uppercase text-[#dce3f0] tracking-wide mt-0.5 sm:mt-1 font-bold line-clamp-1 sm:line-clamp-none">
+                      <h3 className="font-display text-sm sm:text-xl md:text-2xl italic uppercase text-[#dce3f0] tracking-wide mt-0.5 sm:mt-1 font-bold line-clamp-1 sm:line-clamp-none">
                         {dev.name}
                       </h3>
-                      <p className="font-display text-xs sm:text-base text-[#00daf3] mt-0.5 sm:mt-1 font-medium">
+                      <p className="font-display text-xs sm:text-sm text-[#00daf3] mt-0.5 sm:mt-1 font-medium">
                         {dev.role}
                       </p>
-                      <p className="font-sans text-[11px] sm:text-sm text-[#bac9cc] mt-1.5 sm:mt-2.5 leading-normal sm:leading-relaxed line-clamp-2 sm:line-clamp-none">
+                      <p className="font-sans text-[11px] sm:text-xs text-[#bac9cc] mt-1.5 sm:mt-2 leading-normal sm:leading-relaxed line-clamp-2 sm:line-clamp-none">
                         {dev.bio}
                       </p>
 
                       {/* Tech stack chips */}
                       {dev.skills && dev.skills.length > 0 && (
-                        <div className="flex flex-wrap items-center gap-1 sm:gap-2 my-2 sm:my-3.5">
+                        <div className="flex flex-wrap items-center gap-1 sm:gap-1.5 my-2 sm:my-3">
                           {dev.skills.map((skill) => (
                             <span
                               key={skill}
-                              className="font-mono text-[9px] sm:text-xs px-1.5 sm:px-2.5 py-0.5 rounded bg-[#19202a] text-[#c3f5ff] border border-[#3b494c]/40 font-medium"
+                              className="font-mono text-[9px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded bg-[#19202a] text-[#c3f5ff] border border-[#3b494c]/40 font-medium"
                             >
                               {skill}
                             </span>
@@ -427,7 +427,7 @@ export default function Ourteam() {
                     </div>
 
                     {/* Action Bar */}
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 pt-2.5 sm:pt-4 border-t border-[#3b494c]/30 mt-2.5 sm:mt-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 pt-2.5 sm:pt-3 border-t border-[#3b494c]/30 mt-2.5 sm:mt-3">
                       {dev.github && (
                         <a
                           href={dev.github}

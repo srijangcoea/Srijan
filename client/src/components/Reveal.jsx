@@ -65,12 +65,12 @@ export default function Reveal({
     ? {
         opacity: 1,
         transform: 'translateY(0px)',
-        transition: `opacity ${duration}s cubic-bezier(0.16, 1, 0.3, 1) ${safeDelay}ms, transform ${duration}s cubic-bezier(0.16, 1, 0.3, 1) ${safeDelay}ms`,
+        transition: `opacity ${duration}s ease-out ${safeDelay}ms, transform ${duration}s ease-out ${safeDelay}ms`,
         willChange: isAnimating ? 'opacity, transform' : 'auto',
       }
     : {
         opacity: 0,
-        transform: 'translateY(30px)',
+        transform: 'translateY(18px)',
         willChange: 'opacity, transform',
       };
 
