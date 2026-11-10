@@ -4,6 +4,8 @@
  * ============================================================================
  */
 
+import { events as defaultEvents } from '../data/events.js';
+
 const rawApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:9000';
 const API_BASE = (() => {
   const clean = (rawApiUrl || '').trim().replace(/\/+$/, '');
@@ -159,9 +161,7 @@ export const getAdminEvents = async () => {
     });
     return await handleResponse(res);
   } catch (err) {
-    console.warn('API getEvents failed, fallback to local config', err);
-    const { events } = await import('../data/events.js');
-    return { success: true, data: events };
+    return { success: true, data: defaultEvents };
   }
 };
 

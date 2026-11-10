@@ -21,10 +21,18 @@ export default function Navbar() {
   const location = useLocation();
 
   useEffect(() => {
+    let ticking = false;
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const scrolled = window.scrollY > 20;
+          setIsScrolled((prev) => (prev !== scrolled ? scrolled : prev));
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -33,12 +41,11 @@ export default function Navbar() {
   }, [location]);
 
   const navLinks = [
-    { name: 'HOME', path: '/' },
-    { name: 'EVENTS', path: '/events' },
-    { name: 'SCHEDULE', path: '/events' },
-    { name: 'ABOUT', path: '/about' },
-    { name: 'OUT TEAM', path: '/ourteam' },
-
+    { name: 'Home', path: '/' },
+    { name: 'Events', path: '/events' },
+    { name: 'Schedule', path: '/schedule' },
+    { name: 'About', path: '/about' },
+    { name: 'Our Team', path: '/ourteam' },
   ];
 
   const isActive = (path) => {
@@ -91,18 +98,18 @@ export default function Navbar() {
             </div>
           </Link>
 
-          {/* CENTER: Navigation Links (Sponsors & Status tab removed per request) */}
-          <nav className="hidden md:flex items-center gap-2 lg:gap-3" aria-label="Main Navigation">
+          {/* CENTER: Navigation Links */}
+          <nav className="hidden md:flex items-center gap-5 lg:gap-7" aria-label="Main Navigation">
             {navLinks.map((link) => {
               const active = isActive(link.path);
               return (
                 <Link
                   key={link.name}
                   to={link.path}
-                  className={`px-4 py-2 rounded-xl text-xs lg:text-[13px] font-mono font-bold tracking-wider transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#22e5ff] ${
+                  className={`py-1 text-sm font-medium tracking-wide transition-colors border-b-2 ${
                     active
-                      ? 'bg-[#0d2335] text-white border border-[#22e5ff]/50 shadow-[0_0_15px_rgba(34,229,255,0.2)]'
-                      : 'text-[#93a4b8] hover:text-white hover:bg-[#0c1d2c]/60 border border-transparent'
+                      ? 'text-[#22e5ff] border-[#22e5ff] shadow-[0_2px_10px_rgba(34,229,255,0.25)]'
+                      : 'text-[#93a4b8] border-transparent hover:text-white hover:border-[#22e5ff]/40'
                   }`}
                 >
                   {link.name}
@@ -169,9 +176,9 @@ export default function Navbar() {
               <Link
                 key={link.name}
                 to={link.path}
-                className={`block px-4 py-2.5 rounded-xl font-mono text-xs font-bold tracking-wider transition-colors ${
+                className={`block px-4 py-2.5 rounded-lg text-sm font-medium tracking-wide transition-colors ${
                   active
-                    ? 'text-white bg-[#0d2335] border border-[#22e5ff]/50 shadow-[0_0_12px_rgba(34,229,255,0.2)]'
+                    ? 'text-[#22e5ff] bg-[#0d2335] border-l-2 border-[#22e5ff]'
                     : 'text-[#93a4b8] hover:text-white hover:bg-[#0c1d2c]/60'
                 }`}
               >

@@ -10,6 +10,26 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [react()],
+    build: {
+      target: 'esnext',
+      minify: 'esbuild',
+      cssCodeSplit: true,
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes('node_modules')) {
+              if (id.includes('xlsx') || id.includes('file-saver')) {
+                return 'vendor-export';
+              }
+              if (id.includes('recharts')) {
+                return 'vendor-charts';
+              }
+            }
+          },
+        },
+      },
+      chunkSizeWarningLimit: 800,
+    },
     server: {
       port: 3000,
       open: true,

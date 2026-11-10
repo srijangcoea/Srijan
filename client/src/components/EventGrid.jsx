@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import EventCard from './EventCard';
 import BrochureModal from './BrochureModal';
+import Reveal from './Reveal';
 
 export default function EventGrid({ events }) {
   const [selectedEventForBrochure, setSelectedEventForBrochure] = useState(null);
@@ -18,15 +19,15 @@ export default function EventGrid({ events }) {
     <div className="w-full">
       {/* Category Filter Pills */}
       {categories.length > 2 && (
-        <div className="flex flex-wrap items-center justify-center gap-2 mb-8 sm:mb-12">
+        <div className="flex flex-wrap items-center gap-2 mb-8 sm:mb-10">
           {categories.map((cat) => (
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className={`px-4 py-1.5 rounded-full text-xs font-mono uppercase tracking-wider transition-all duration-200 ${
+              className={`px-4 py-1.5 rounded-lg text-xs font-mono uppercase tracking-wider transition-all duration-200 border ${
                 selectedCategory === cat
-                  ? 'bg-amber-500 text-white font-bold shadow-md shadow-amber-500/20'
-                  : 'bg-space-900/80 text-slate-400 hover:text-white border border-white/10'
+                  ? 'bg-[#00e5ff]/15 text-[#00e5ff] border-[#00e5ff] font-bold shadow-[0_0_12px_rgba(0,229,255,0.25)]'
+                  : 'bg-[#151c26] text-[#bac9cc] border-[#3b494c]/30 hover:border-[#00daf3]/40 hover:text-white'
               }`}
             >
               {cat}
@@ -35,23 +36,26 @@ export default function EventGrid({ events }) {
         </div>
       )}
 
-      {/* Grid of Events */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-        {filteredEvents.map((event) => (
-          <EventCard
-            key={event.id}
-            event={event}
-            onOpenBrochure={(ev) => setSelectedEventForBrochure(ev)}
-          />
+      {/* Grid of Events with Staggered Reveal (2 cards per row on mobile) */}
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 md:gap-8">
+        {filteredEvents.map((event, idx) => (
+          <Reveal key={event.id} delay={idx * 90} className="h-full">
+            <EventCard
+              event={event}
+              onOpenBrochure={(ev) => setSelectedEventForBrochure(ev)}
+            />
+          </Reveal>
         ))}
       </div>
 
-      {/* Brochure Coming Soon Modal */}
-      <BrochureModal
-        isOpen={Boolean(selectedEventForBrochure)}
-        onClose={() => setSelectedEventForBrochure(null)}
-        event={selectedEventForBrochure}
-      />
+      {/* Brochure Modal */}
+      {selectedEventForBrochure && (
+        <BrochureModal
+          isOpen={Boolean(selectedEventForBrochure)}
+          onClose={() => setSelectedEventForBrochure(null)}
+          event={selectedEventForBrochure}
+        />
+      )}
     </div>
   );
 }

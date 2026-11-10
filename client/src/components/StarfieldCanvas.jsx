@@ -77,18 +77,27 @@ export default function StarfieldCanvas() {
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
         ctx.fillStyle = p.colorBase + p.alpha + ')';
-        ctx.shadowColor = p.colorBase + '0.8)';
-        ctx.shadowBlur = p.radius > 1.2 ? 6 : 0;
         ctx.fill();
       }
 
-      animationFrameId = requestAnimationFrame(render);
+      if (!document.hidden) {
+        animationFrameId = requestAnimationFrame(render);
+      }
     };
 
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = requestAnimationFrame(render);
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
     render();
 
     return () => {
       window.removeEventListener('resize', handleResize);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       cancelAnimationFrame(animationFrameId);
     };
   }, []);

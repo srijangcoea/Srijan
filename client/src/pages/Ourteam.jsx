@@ -1,1008 +1,564 @@
+import React, { useState } from 'react';
+import {
+  Users,
+  Code2,
+  ShieldCheck,
+  Mail,
+  Share2,
+  Terminal,
+  Headphones,
+  Zap,
+  ExternalLink,
+  Sparkles,
+  Layers
+} from 'lucide-react';
+import toast from 'react-hot-toast';
 
-Ourteam
-import { useEffect, useMemo, useRef, useState } from "react";
+// ==============================================================================
+// SRIJAN 2026 — OUR TEAM ROSTER DATA
+// Easily edit names, roles, descriptions, photos, and links here.
+// ==============================================================================
 
+const CONVENORS = [
 
-// ============================================================
-// EDIT TEAM DATA HERE
-//
-// Add photos in public/team/ and use paths like:
-// img: "/team/member-01.jpg"
-//
-// Valid roles only:
-// "Convenor" | "Co-Convenor" | "Developer" | "Core Member"
-// ============================================================
-const TEAM = [
-    {
-        name: "Vedant Chaware",
-        role: "Convenor",
-        skills: [],
-        img: "/team/convenor.png",
-        bio: "Leading the Srijan 2026 mission with vision, strategy, and championship-level execution.",
-        linkedin: "https://linkedin.com",
-        github: "",
-        instagram: "https://instagram.com",
+  {
+    name: "Vedant Chaware",
+    role: "Convenor",
+    badge: "CONVENOR",
+    category: "STUDENT LEADERSHIP",
+    bio: "Leading the Srijan 2026 mission with technical vision, execution strategy, and symposium-wide orchestration.",
+    email: "vedant.chaware@college.edu",
+    linkedin: "https://linkedin.com",
+    img: "/team/convenor.png",
+    fallbackImg: "",
+  },
+  {
+    name: "Gayatri Phale",
+    role: "Co-Convenor",
+    badge: "CO-CONVENOR",
+    category: "STUDENT LEADERSHIP",
+    bio: "Driving coordination, event momentum, and student committee logistics across all technical tracks.",
+    email: "gayatri.phale@college.edu",
+    linkedin: "https://linkedin.com",
+    img: "/team/coconvenor.png",
+    fallbackImg: "",
+  },
+];
+
+const DEVELOPERS = [
+  {
+    name: "Tejas Jalit",
+    role: "Developer",
+        badge: "DEVELOPER",
+    category: "TECH ROSTER",
+    bio: "Engineering real-time database architecture, administrative controllers, and event platform security.",
+    skills: ["React.js", "APIs", "MongoDB", "Express"],
+    github: "https://github.com",
+    linkedin: "https://linkedin.com",
+    email: "tejas@college.edu",
+    img: "/team/Lead.jpeg",
+    fallbackImg: "",
     },
     {
-        name: "Gayatri Phale",
-        role: "Co-Convenor",
-        skills: [],
-        img: "/team/coconvenor.png",
-        bio: "Driving coordination, momentum, and team operations across every Srijan 2026 event.",
-        linkedin: "https://linkedin.com",
-        github: "",
-        instagram: "https://instagram.com",
-    },
-    {
-        name: "Member",
+        name: "Samrudhi Take",
         role: "Developer",
-        skills: ["React", "Node", "MongoDB", "Frontend"],
-        img: "/team/.jpeg",
-        bio: "Building fast, reliable, and high-impact technical experiences for Srijan 2026.",
-        linkedin: "https://linkedin.com",
+        badge: "DEVELOPER",
+        category: "TECH ROSTER",
+        bio: "Architecting the core digital platform, high-performance telemetry interfaces, and secure registration infrastructure.",
+        skills: ["Next.js", "TypeScript", "Tailwind CSS"],
         github: "https://github.com",
-        instagram: "",
-    },
-    {
-        name: "Tejas",
-        role: "Developer",
-        skills: ["React.js", "APIs", "Database", "Backend"],
-        img: "/team/Member.jpeg",
-        bio: "Engineering the systems, dashboards, and event platforms behind the festival.",
         linkedin: "https://linkedin.com",
-        github: "https://github.com",
-        instagram: "",
+        email: "rohan.kulkarni@college.edu",
+        img: "/team/fullstack1.png",
+        fallbackImg: "/team/2.png",
     },
-
-
-    {
-        name: "Member Name 07",
-        role: "Core Member",
-        skills: [],
-        img: "",
-        bio: "Supporting planning, participation, and seamless execution across all event arenas.",
-        linkedin: "https://linkedin.com",
-        github: "",
-        instagram: "https://instagram.com",
-    },
-    {
-        name: "Member Name 08",
-        role: "Core Member",
-        skills: [],
-        img: "",
-        bio: "Helping make every Srijan event more organized, exciting, and memorable.",
-        linkedin: "https://linkedin.com",
-        github: "",
-        instagram: "https://instagram.com",
-    },
-    {
-        name: "Member Name 09",
-        role: "Core Member",
-        skills: [],
-        img: "",
-        bio: "Coordinating people, ideas, and event operations with energy and precision.",
-        linkedin: "",
-        github: "",
-        instagram: "https://instagram.com",
-    },
-    {
-        name: "Member Name 10",
-        role: "Core Member",
-        skills: [],
-        img: "",
-        bio: "Working behind the scenes to turn every challenge into a successful event.",
-        linkedin: "https://linkedin.com",
-        github: "",
-        instagram: "",
-    },
-
-
-
 ];
 
-
-const ROLE_ORDER = ["Convenor", "Co-Convenor", "Developer", "Core Member"];
-
-
-const FILTERS = [
-    { id: "all", label: "ALL" },
-    { id: "convenors", label: "CONVENORS" },
-    { id: "developers", label: "DEVELOPERS" },
-    { id: "core", label: "CORE MEMBERS" },
+const CORE_MEMBERS = [
+  {
+    name: "-----",
+    role: "Operations Lead",
+    badge: "OPERATIONS",
+    category: "CORE DIVISION",
+    bio: "Supervising stage production, technical arena scheduling, and competition hall preparedness.",
+    linkedin: "https://linkedin.com",
+    email: "operations@srijan.org",
+  },
+  {
+      name: "-----",
+    role: "Public Relations Lead",
+    badge: "PUBLIC RELATIONS",
+    category: "CORE DIVISION",
+    bio: "Connecting collegiate technical delegations, student chapters, and university outreach networks.",
+    linkedin: "https://linkedin.com",
+    email: "pr@srijan.org",
+  },
+  {
+      name: "-----",
+    role: "Technical Logistics",
+    badge: "LOGISTICS",
+    category: "CORE DIVISION",
+    bio: "Managing testing benches, hardware stations, lab resources, and electronic measuring apparatus.",
+    linkedin: "https://linkedin.com",
+    email: "logistics@srijan.org",
+  },
+  {
+      name: "-----",
+    role: "Registration Coordinator",
+    badge: "REGISTRATIONS",
+    category: "CORE DIVISION",
+    bio: "Managing on-ground delegate accreditation, verification credentials, and participant onboarding.",
+    linkedin: "https://linkedin.com",
+    email: "registrations@srijan.org",
+  },
 ];
 
+// Helper for image error handling with graceful fallback
+function SafeImage({ src, fallback, alt, className }) {
+  const [imgSrc, setImgSrc] = useState(src || fallback);
+  const [hasError, setHasError] = useState(false);
 
-const EVENTS = [
-    "HACKATHON",
-    "KBC QUIZ",
-    "PCB DESIGNING",
-    "CAD MODELING",
-    "BRIDGE MAKING",
-    "CIRCUIT MAKING",
-];
-
-
-function getInitials(name) {
-    return name
-        .split(" ")
-        .map((part) => part[0])
-        .slice(0, 2)
-        .join("")
-        .toUpperCase();
-}
-
-
-function getRoleMeta(role) {
-    if (role === "Convenor") {
-        return {
-            icon: "★",
-            badge: "CONVENOR",
-            initials: "01",
-            badgeClass:
-                "border-amber-300/60 bg-amber-300/10 text-amber-200 shadow-[0_0_20px_rgba(245,158,11,0.14)]",
-        };
+  const handleError = () => {
+    if (!hasError && fallback && imgSrc !== fallback) {
+      setImgSrc(fallback);
+      setHasError(true);
+    } else {
+      setHasError(true);
     }
+  };
 
-
-    if (role === "Co-Convenor") {
-        return {
-            icon: "★",
-            badge: "CO-CONVENOR",
-            initials: "02",
-            badgeClass:
-                "border-orange-300/60 bg-orange-300/10 text-orange-200 shadow-[0_0_20px_rgba(251,146,60,0.14)]",
-        };
-    }
-
-
-    if (role === "Developer") {
-        return {
-            icon: "</>",
-            badge: "DEVELOPER",
-            initials: "03",
-            badgeClass:
-                "border-sky-300/60 bg-sky-300/10 text-sky-200 shadow-[0_0_20px_rgba(56,189,248,0.14)]",
-        };
-    }
-
-
-    return {
-        icon: "⬡",
-        badge: "CORE MEMBER",
-        initials: "04",
-        badgeClass:
-            "border-sky-200/40 bg-sky-200/[0.08] text-sky-100 shadow-[0_0_20px_rgba(125,211,252,0.1)]",
-    };
-}
-
-
-function useCountUp(target) {
-    const [count, setCount] = useState(0);
-    const elementRef = useRef(null);
-    const completedRef = useRef(false);
-
-
-    useEffect(() => {
-        const element = elementRef.current;
-
-
-        if (!element) return undefined;
-
-
-        const observer = new IntersectionObserver(
-            ([entry]) => {
-                if (!entry.isIntersecting || completedRef.current) return;
-
-
-                completedRef.current = true;
-
-
-                const duration = 1100;
-                const startTime = performance.now();
-
-
-                const animate = (time) => {
-                    const progress = Math.min((time - startTime) / duration, 1);
-                    const easeOut = 1 - Math.pow(1 - progress, 4);
-
-
-                    setCount(Math.floor(target * easeOut));
-
-
-                    if (progress < 1) {
-                        requestAnimationFrame(animate);
-                    } else {
-                        setCount(target);
-                    }
-                };
-
-
-                requestAnimationFrame(animate);
-            },
-            { threshold: 0.4 }
-        );
-
-
-        observer.observe(element);
-
-
-        return () => observer.disconnect();
-    }, [target]);
-
-
-    return [elementRef, count];
-}
-
-
-function SocialButton({ href, type, name }) {
-    if (!href) return null;
-
-
-    const labels = {
-        linkedin: "in",
-        github: "GH",
-        instagram: "IG",
-    };
-
-
+  if (hasError && (!imgSrc || imgSrc === fallback)) {
     return (
-        <a
-            href={href}
-            target="_blank"
-            rel="noreferrer"
-            aria-label={`${name} ${type}`}
-            className="grid h-9 min-w-9 place-items-center border border-white/20 bg-[#081323]/95 px-2 text-[10px] font-black text-slate-100 transition hover:border-sky-300 hover:bg-sky-300 hover:text-[#05080f] [clip-path:polygon(16%_0,100%_0,84%_100%,0_100%)]"
-        >
-            {labels[type]}
-        </a>
+      <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-b from-[#151c26] to-[#0d141d] text-slate-500 p-6 text-center">
+        <Sparkles className="w-10 h-10 text-[#00daf3]/40 mb-2" />
+        <span className="font-mono text-xs uppercase tracking-widest text-[#00daf3]/70">{alt}</span>
+      </div>
     );
+  }
+
+  return (
+    <img
+      src={imgSrc}
+      alt={alt}
+      onError={handleError}
+      className={className}
+      loading="lazy"
+    />
+  );
 }
-
-
-function PlayerCard({ member, index, cardWidthClass = "" }) {
-    const cardRef = useRef(null);
-    const [isTouch, setIsTouch] = useState(false);
-    const [flipped, setFlipped] = useState(false);
-
-
-    const roleMeta = getRoleMeta(member.role);
-    const isLeader =
-        member.role === "Convenor" || member.role === "Co-Convenor";
-
-
-    useEffect(() => {
-        const query = window.matchMedia("(hover: none), (pointer: coarse)");
-
-
-        const updateTouchMode = () => {
-            setIsTouch(query.matches);
-        };
-
-
-        updateTouchMode();
-        query.addEventListener("change", updateTouchMode);
-
-
-        return () => query.removeEventListener("change", updateTouchMode);
-    }, []);
-
-
-    const handleMouseMove = (event) => {
-        if (isTouch || !cardRef.current) return;
-
-
-        const card = cardRef.current;
-        const rect = card.getBoundingClientRect();
-
-
-        const x = event.clientX - rect.left;
-        const y = event.clientY - rect.top;
-
-
-        const rotateX = ((y - rect.height / 2) / rect.height) * -6;
-        const rotateY = ((x - rect.width / 2) / rect.width) * 6;
-
-
-        card.style.setProperty("--tilt-x", `${rotateX}deg`);
-        card.style.setProperty("--tilt-y", `${rotateY}deg`);
-        card.style.setProperty("--glow-x", `${x}px`);
-        card.style.setProperty("--glow-y", `${y}px`);
-    };
-
-
-    const resetTilt = () => {
-        if (!cardRef.current) return;
-
-
-        cardRef.current.style.setProperty("--tilt-x", "0deg");
-        cardRef.current.style.setProperty("--tilt-y", "0deg");
-    };
-
-
-    return (
-        <div
-            className={`team-card-enter w-full ${cardWidthClass} ${index % 2 === 0 ? "team-card-left" : "team-card-right"}`}
-            style={{ animationDelay: `${index * 85}ms` }}
-        >
-            <div
-                ref={cardRef}
-                onMouseMove={handleMouseMove}
-                onMouseLeave={resetTilt}
-                onClick={() => isTouch && setFlipped((previous) => !previous)}
-                className="group relative h-[30rem] w-full cursor-pointer [perspective:1200px]"
-            >
-                <div
-                    className={`relative h-full w-full transition-transform duration-500 [transform-style:preserve-3d] ${flipped ? "[transform:rotateY(180deg)]" : ""
-                        }`}
-                    style={{
-                        transform:
-                            !isTouch && !flipped
-                                ? "rotateX(var(--tilt-x,0deg)) rotateY(var(--tilt-y,0deg))"
-                                : undefined,
-                    }}
-                >
-                    {/* Front */}
-                    <article
-                        className={`absolute inset-0 overflow-hidden border bg-[#08111f]/90 shadow-2xl shadow-black/40 backdrop-blur-xl [backface-visibility:hidden] [clip-path:polygon(0_0,92%_0,100%_7%,100%_100%,8%_100%,0_93%)] ${isLeader
-                            ? "border-amber-300/70 shadow-[0_0_28px_rgba(245,158,11,0.16)]"
-                            : "border-sky-300/35"
-                            }`}
-                    >
-                        {/* Blue-to-gold border treatment */}
-                        <div className="pointer-events-none absolute inset-0 border border-transparent bg-[linear-gradient(135deg,rgba(56,189,248,0.75),transparent_24%,transparent_70%,rgba(251,146,60,0.72))] opacity-60" />
-
-
-                        {/* Giant faded player number */}
-                        <span className="pointer-events-none absolute -right-3 top-10 select-none font-['Anton',Impact,sans-serif] text-[10rem] leading-none text-white/[0.045] sm:text-[12rem]">
-                            {roleMeta.initials}
-                        </span>
-
-
-                        {/* Role badge */}
-                        <div
-                            className={`absolute left-4 top-4 z-20 inline-flex items-center gap-2 border px-3 py-1.5 text-[10px] font-black tracking-[0.14em] [clip-path:polygon(8%_0,100%_0,92%_100%,0_100%)] ${roleMeta.badgeClass}`}
-                        >
-                            <span className="text-xs">{roleMeta.icon}</span>
-                            {roleMeta.badge}
-                        </div>
-
-
-                        {/* Decorative diagonal streak */}
-                        <div className="absolute right-9 top-0 h-56 w-px rotate-[25deg] bg-gradient-to-b from-transparent via-sky-300/80 to-transparent" />
-
-
-                        {/* Image / initials silhouette */}
-                        <div className="absolute inset-x-0 top-0 h-[67%] overflow-hidden">
-                            {member.img ? (
-                                <img
-                                    src={member.img}
-                                    alt={member.name}
-                                    loading="lazy"
-                                    className="h-full w-full object-cover object-center transition duration-700 group-hover:scale-105"
-                                />
-                            ) : (
-                                <div className="relative h-full w-full overflow-hidden bg-[radial-gradient(circle_at_50%_26%,rgba(56,189,248,0.32),transparent_28%),linear-gradient(145deg,#142846_0%,#07101e_58%,#2c1806_120%)]">
-                                    <div className="absolute bottom-0 left-1/2 h-48 w-40 -translate-x-1/2 rounded-t-[5rem] bg-gradient-to-t from-[#02050a] via-[#0a1930] to-sky-300/20" />
-
-
-                                    <div className="absolute left-1/2 top-[38%] grid h-24 w-24 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border border-sky-200/30 bg-[#07101e]/75 shadow-[0_0_35px_rgba(56,189,248,0.22)]">
-                                        <span className="font-['Anton',Impact,sans-serif] text-4xl text-sky-100">
-                                            {getInitials(member.name)}
-                                        </span>
-                                    </div>
-
-
-                                    <span className="absolute bottom-8 left-1/2 -translate-x-1/2 font-['Anton',Impact,sans-serif] text-7xl text-white/[0.07]">
-                                        {roleMeta.badge.slice(0, 3)}
-                                    </span>
-                                </div>
-                            )}
-
-
-                            <div className="absolute inset-0 bg-gradient-to-t from-[#08111f] via-[#08111f]/30 to-transparent" />
-                        </div>
-
-
-                        {/* Mouse-following light */}
-                        <div
-                            aria-hidden="true"
-                            className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-                            style={{
-                                background:
-                                    "radial-gradient(280px circle at var(--glow-x,50%) var(--glow-y,50%),rgba(125,211,252,0.17),transparent 58%)",
-                            }}
-                        />
-
-
-                        {/* Diagonal light sweep */}
-                        <div className="pointer-events-none absolute -left-[130%] top-0 h-full w-[55%] -skew-x-[25deg] bg-gradient-to-r from-transparent via-sky-100/20 to-transparent transition-all duration-1000 group-hover:left-[145%]" />
-
-
-                        {/* Bottom player details */}
-                        <div className="absolute inset-x-0 bottom-0 z-10 p-5 sm:p-6">
-                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-sky-200/75">
-                                Official roster
-                            </p>
-
-
-                            <h3 className="mt-2 font-['Anton',Impact,sans-serif] text-4xl uppercase italic leading-[0.88] tracking-wide text-white sm:text-5xl">
-                                {member.name}
-                            </h3>
-
-
-                            <p className="mt-2 text-xs font-black uppercase tracking-[0.16em] text-orange-300">
-                                {member.role}
-                            </p>
-
-
-                            {member.role === "Developer" && (
-                                <div className="mt-4 flex flex-wrap gap-2">
-                                    {member.skills.map((skill, skillIndex) => (
-                                        <span
-                                            key={skill}
-                                            className="border border-sky-300/20 bg-sky-300/[0.08] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-sky-100 [clip-path:polygon(8%_0,100%_0,92%_100%,0_100%)]"
-                                        >
-                                            <span className="mr-1 text-orange-300">
-                                                0{skillIndex + 1}
-                                            </span>
-                                            {skill}
-                                        </span>
-                                    ))}
-                                </div>
-                            )}
-
-
-                            <div className="mt-5 flex translate-y-3 gap-2 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-                                <SocialButton
-                                    href={member.linkedin}
-                                    type="linkedin"
-                                    name={member.name}
-                                />
-                                <SocialButton
-                                    href={member.github}
-                                    type="github"
-                                    name={member.name}
-                                />
-                                <SocialButton
-                                    href={member.instagram}
-                                    type="instagram"
-                                    name={member.name}
-                                />
-                            </div>
-
-
-                            <p className="mt-4 text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500 md:hidden">
-                                Tap for player intel
-                            </p>
-                        </div>
-                    </article>
-
-
-                    {/* Back: shown on touch-device tap */}
-                    <article className="absolute inset-0 flex rotate-y-180 flex-col justify-between overflow-hidden border border-sky-300/40 bg-[#091426]/95 p-6 [backface-visibility:hidden] [clip-path:polygon(0_0,92%_0,100%_7%,100%_100%,8%_100%,0_93%)] [transform:rotateY(180deg)]">
-                        <div className="absolute -right-14 -top-14 h-56 w-56 rounded-full bg-orange-400/15 blur-3xl" />
-                        <div className="absolute -bottom-16 -left-16 h-56 w-56 rounded-full bg-sky-400/15 blur-3xl" />
-
-
-                        <div className="relative">
-                            <p className="text-xs font-black uppercase tracking-[0.2em] text-sky-300">
-                                Player intel
-                            </p>
-
-
-                            <h3 className="mt-4 font-['Anton',Impact,sans-serif] text-4xl uppercase italic leading-none text-white">
-                                {member.name}
-                            </h3>
-
-
-                            <p className="mt-2 text-xs font-black uppercase tracking-[0.16em] text-orange-300">
-                                {member.role}
-                            </p>
-
-
-                            <div className="mt-6 h-px w-full bg-gradient-to-r from-sky-300 via-amber-300 to-transparent" />
-
-
-                            <p className="mt-6 text-sm leading-7 text-slate-300">
-                                {member.bio}
-                            </p>
-                        </div>
-
-
-                        <div className="relative">
-                            {member.skills.length > 0 && (
-                                <div className="mb-5 flex flex-wrap gap-2">
-                                    {member.skills.map((skill) => (
-                                        <span
-                                            key={skill}
-                                            className="border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[10px] font-bold uppercase tracking-wide text-slate-200 [clip-path:polygon(8%_0,100%_0,92%_100%,0_100%)]"
-                                        >
-                                            {skill}
-                                        </span>
-                                    ))}
-                                </div>
-                            )}
-
-
-                            <div className="flex gap-2">
-                                <SocialButton
-                                    href={member.linkedin}
-                                    type="linkedin"
-                                    name={member.name}
-                                />
-                                <SocialButton
-                                    href={member.github}
-                                    type="github"
-                                    name={member.name}
-                                />
-                                <SocialButton
-                                    href={member.instagram}
-                                    type="instagram"
-                                    name={member.name}
-                                />
-                            </div>
-
-
-                            <p className="mt-5 text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500">
-                                Tap again to return
-                            </p>
-                        </div>
-                    </article>
-                </div>
-            </div>
-        </div>
-    );
-}
-
-
-function SectionHeading({ eyebrow, title, count }) {
-    return (
-        <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-                <p className="text-xs font-black uppercase tracking-[0.2em] text-sky-300">
-                    {eyebrow}
-                </p>
-
-
-                <h2 className="mt-2 font-['Anton',Impact,sans-serif] text-5xl uppercase italic leading-none tracking-wide text-white sm:text-6xl">
-                    {title}
-                </h2>
-            </div>
-
-
-            {typeof count === "number" && (
-                <div className="w-fit border border-amber-300/25 bg-amber-300/[0.08] px-4 py-2 text-xs font-black uppercase tracking-[0.13em] text-amber-200 [clip-path:polygon(8%_0,100%_0,92%_100%,0_100%)]">
-                    {count} player{count !== 1 ? "s" : ""}
-                </div>
-            )}
-        </div>
-    );
-}
-
 
 export default function Ourteam() {
-    const [activeFilter, setActiveFilter] = useState("all");
+  const [activeTab, setActiveTab] = useState('all'); // 'all' | 'convenors' | 'developers' | 'core'
 
+  const handleContactClick = (name, email) => {
+    if (email) {
+      window.location.href = `mailto:${email}?subject=Inquiry%20regarding%20Srijan%202026`;
+    } else {
+      toast.success(`Contact request noted for ${name}`);
+    }
+  };
 
-    const [membersRef, memberCount] = useCountUp(TEAM.length);
-    const [developerRef, developerCount] = useCountUp(
-        TEAM.filter((member) => member.role === "Developer").length
-    );
-    const [eventRef, eventCount] = useCountUp(6);
+  return (
+    <div className="w-full pt-28 sm:pt-32 pb-24 bg-[#0d141d] bg-circuit-grid min-h-screen text-[#dce3f0]">
+      <div className="flex flex-col w-full max-w-7xl mx-auto px-6 lg:px-12">
+        
+        {/* ==================================================================== */}
+        {/* TOP SECTION HEADER                                                  */}
+        {/* ==================================================================== */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 sm:mb-16 pb-8 border-b border-[#3b494c]/30">
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2 font-mono text-xs sm:text-sm text-[#00daf3] tracking-wider">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#00e5ff] animate-ping" />
+              <span> TEAM</span>
+            </div>
+            <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold text-[#dce3f0] tracking-tight">
+              Our Team
+            </h1>
+            <p className="font-sans text-base sm:text-lg text-[#bac9cc] max-w-2xl leading-relaxed mt-1">
+              Meet the leadership and engineering core driving Srijan 2026. Dedicated minds orchestrating national technical excellence.
+            </p>
+          </div>
+        </div>
 
+        {/* ==================================================================== */}
+        {/* FILTER CONTROLS (OPTIONAL QUICK SWITCH)                              */}
+        {/* ==================================================================== */}
+        <div className="flex flex-wrap items-center gap-2 mb-12">
+          {[
+            { id: 'all', label: 'ALL MEMBERS' },
+            { id: 'convenors', label: 'CONVENORS' },
+            { id: 'developers', label: 'DEVELOPERS' },
+            // { id: 'core', label: 'OPERATIONS' },
+          ].map((tab) => {
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setActiveTab(tab.id)}
+                className={`font-mono text-xs font-semibold uppercase px-4 py-2 rounded-lg border transition-all duration-200 ${
+                  isActive
+                    ? 'bg-[#00e5ff]/15 text-[#00e5ff] border-[#00e5ff] shadow-[0_0_14px_rgba(0,229,255,0.25)]'
+                    : 'bg-[#151c26] text-[#bac9cc] border-[#3b494c]/30 hover:border-[#00daf3]/50 hover:text-white'
+                }`}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
 
-    const groupedMembers = useMemo(() => {
-        const sorted = [...TEAM].sort(
-            (a, b) => ROLE_ORDER.indexOf(a.role) - ROLE_ORDER.indexOf(b.role)
-        );
+        {/* ==================================================================== */}
+        {/* SECTION 1: CONVENORS                                                 */}
+        {/* ==================================================================== */}
+        {(activeTab === 'all' || activeTab === 'convenors') && (
+          <div className="mb-16 sm:mb-20">
+            <div className="flex items-center gap-3 mb-8">
+              <Users className="w-6 h-6 text-[#00daf3]" />
+              <h2 className="font-display text-2xl sm:text-3xl font-bold text-[#dce3f0]">Convenors</h2>
 
-
-        return {
-            convenor: sorted.filter((member) => member.role === "Convenor"),
-            coConvenor: sorted.filter((member) => member.role === "Co-Convenor"),
-            developers: sorted.filter((member) => member.role === "Developer"),
-            coreMembers: sorted.filter((member) => member.role === "Core Member"),
-        };
-    }, []);
-
-
-    const featuredMembers = [
-        ...groupedMembers.convenor,
-        ...groupedMembers.coConvenor,
-    ];
-
-
-    const showConvenors =
-        activeFilter === "all" || activeFilter === "convenors";
-    const showDevelopers =
-        activeFilter === "all" || activeFilter === "developers";
-    const showCoreMembers = activeFilter === "all" || activeFilter === "core";
-
-
-    return (
-        <main className="relative min-h-screen overflow-hidden bg-[linear-gradient(135deg,#05080f_0%,#07101f_46%,#0a1226_100%)] text-white">
-            <style>{`
-        @import url("https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800;900&display=swap");
-
-
-        @keyframes glitch-reveal {
-          0% {
-            opacity: 0;
-            clip-path: inset(0 100% 0 0);
-            transform: translateX(-28px) skewX(-12deg);
-          }
-
-
-          50% {
-            opacity: 1;
-            clip-path: inset(0 0 0 0);
-            transform: translateX(5px) skewX(-12deg);
-          }
-
-
-          65% {
-            transform: translateX(-4px) skewX(-12deg);
-          }
-
-
-          100% {
-            opacity: 1;
-            clip-path: inset(0 0 0 0);
-            transform: translateX(0) skewX(-12deg);
-          }
-        }
-
-
-        @keyframes marquee {
-          from {
-            transform: translateX(0);
-          }
-
-
-          to {
-            transform: translateX(-50%);
-          }
-        }
-
-
-        @keyframes shine-sweep {
-          0% {
-            transform: translateX(-150%) skewX(-24deg);
-          }
-
-
-          60%,
-          100% {
-            transform: translateX(250%) skewX(-24deg);
-          }
-        }
-
-
-        @keyframes slide-in-left {
-          from {
-            opacity: 0;
-            transform: translateX(-42px);
-          }
-
-
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
-
-
-        @keyframes slide-in-right {
-          from {
-            opacity: 0;
-            transform: translateX(42px);
-          }
-
-
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
-
-
-        .glitch-title {
-          animation: glitch-reveal 950ms cubic-bezier(0.16, 1, 0.3, 1) both;
-        }
-
-
-        .marquee-track {
-          animation: marquee 27s linear infinite;
-        }
-
-
-        .team-card-left {
-          animation: slide-in-left 650ms cubic-bezier(0.16, 1, 0.3, 1) both;
-        }
-
-
-        .team-card-right {
-          animation: slide-in-right 650ms cubic-bezier(0.16, 1, 0.3, 1) both;
-        }
-
-
-        @media (prefers-reduced-motion: reduce) {
-          *,
-          *::before,
-          *::after {
-            animation-duration: 0.01ms !important;
-            animation-iteration-count: 1 !important;
-            transition-duration: 0.01ms !important;
-            scroll-behavior: auto !important;
-          }
-        }
-      `}</style>
-
-
-            {/* Background grid, subtle noise, diagonal stripe texture */}
-            <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
-                <div className="absolute inset-0 bg-[linear-gradient(rgba(125,211,252,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(125,211,252,0.035)_1px,transparent_1px)] bg-[size:42px_42px]" />
-
-
-                <div className="absolute inset-0 opacity-[0.05] [background-image:repeating-linear-gradient(-35deg,transparent_0,transparent_13px,#7dd3fc_14px,transparent_15px,transparent_30px)]" />
-
-
-                <div className="absolute inset-0 opacity-[0.07] [background-image:radial-gradient(rgba(255,255,255,0.85)_0.5px,transparent_0.7px)] [background-size:5px_5px]" />
-
-
-                <div className="absolute -left-56 top-20 h-[36rem] w-[36rem] rounded-full bg-sky-500/15 blur-[145px]" />
-
-
-                <div className="absolute -right-60 top-[28rem] h-[38rem] w-[38rem] rounded-full bg-orange-500/15 blur-[150px]" />
-
-
-                <div className="absolute right-[8%] top-40 h-px w-80 rotate-[-20deg] bg-gradient-to-r from-transparent via-sky-300/70 to-transparent shadow-[0_0_20px_rgba(56,189,248,0.7)]" />
-
-
-                <div className="absolute left-[6%] top-[62rem] h-px w-72 rotate-[18deg] bg-gradient-to-r from-transparent via-amber-300/70 to-transparent shadow-[0_0_20px_rgba(245,158,11,0.6)]" />
             </div>
 
+            <div className="grid grid-cols-2 md:grid-cols-2 gap-3 sm:gap-6 md:gap-8 max-w-4xl mx-auto">
+              {CONVENORS.slice(0, 2).map((member) => (
+                <div
+                  key={member.name}
+                  className="group relative bg-[#151c26] card-clip border border-[#ffd799]/40 hover:border-[#ffd799] transition-all duration-300 hover:shadow-[0_0_30px_rgba(255,215,153,0.2)] overflow-hidden flex flex-col"
+                >
+                  {/* Angled corner accent */}
+                  <div className="absolute top-0 right-0 w-5 h-5 sm:w-8 sm:h-8 bg-[#ffd799]/20 pointer-events-none" />
 
-            {/* Hero */}
-            <section className="relative mx-auto max-w-7xl px-5 pb-10 pt-20 sm:px-8 sm:pt-28 lg:px-10">
-                <div className="max-w-5xl">
-                    <div className="inline-flex items-center gap-2 border border-sky-300/30 bg-sky-300/[0.07] px-3 py-2 text-[10px] font-black uppercase tracking-[0.18em] text-sky-200 [clip-path:polygon(7%_0,100%_0,93%_100%,0_100%)] sm:text-xs">
-                        <span className="h-2 w-2 bg-sky-300 shadow-[0_0_10px_rgba(56,189,248,1)]" />
-                        Srijan 2026 // Official Roster
+                  {/* Member Photo */}
+                  <div className="relative w-full h-44 sm:h-72 md:h-80 lg:h-96 overflow-hidden bg-[#0d141d]">
+                    <div className="absolute top-2 left-2 sm:top-4 sm:left-4 z-10 flex items-center gap-1 bg-[#0d141d]/85 backdrop-blur-md px-2 py-0.5 sm:px-3 sm:py-1 rounded border border-[#ffd799]/40 text-[#ffd799] font-mono text-[9px] sm:text-xs font-bold tracking-wider shadow-md">
+                      <span>★</span> <span>{member.badge}</span>
                     </div>
 
+                    <SafeImage
+                      src={member.img}
+                      fallback={member.fallbackImg}
+                      alt={member.name}
+                      className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                    />
 
-                    <p className="mt-8 text-xs font-black uppercase tracking-[0.24em] text-orange-300">
-                        Tournament lineup
-                    </p>
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#151c26] via-[#151c26]/40 to-transparent" />
+                  </div>
 
-
-                    <h1 className="glitch-title mt-3 font-['Anton',Impact,sans-serif] text-6xl uppercase italic leading-[0.82] tracking-tight sm:text-8xl md:text-9xl">
-                        <span className="block text-white">Meet the</span>
-                        <span className="block bg-gradient-to-r from-sky-300 via-sky-100 to-amber-300 bg-clip-text text-transparent">
-                            Squad
-                        </span>
-                    </h1>
-
-
-                    <div className="mt-7 flex max-w-2xl gap-4">
-                        <span className="h-14 w-1 shrink-0 bg-gradient-to-b from-sky-300 via-amber-300 to-orange-400" />
-
-
-                        <p className="text-base font-medium leading-7 text-slate-300 sm:text-lg sm:leading-8">
-                            The crew behind every event. Built different. Playing to win.
-                        </p>
-                    </div>
-                </div>
-
-
-                {/* Stats */}
-                <div className="mt-12 grid max-w-3xl grid-cols-3 border border-white/10 bg-[#091221]/80 shadow-2xl shadow-black/30 backdrop-blur-xl [clip-path:polygon(0_0,98%_0,100%_13%,100%_100%,2%_100%,0_87%)]">
-                    <div ref={membersRef} className="relative px-3 py-5 text-center sm:px-8">
-                        <p className="font-['Anton',Impact,sans-serif] text-4xl italic leading-none text-sky-200 sm:text-5xl">
-                            {memberCount}+
-                        </p>
-                        <p className="mt-2 text-[9px] font-black uppercase tracking-[0.13em] text-slate-400 sm:text-[10px]">
-                            Total Members
-                        </p>
-                        <span className="absolute right-0 top-1/2 hidden h-10 w-px -translate-y-1/2 bg-gradient-to-b from-transparent via-amber-300 to-transparent sm:block" />
+                  {/* Details Overlay */}
+                  <div className="p-3 sm:p-6 md:p-8 flex flex-col gap-1.5 sm:gap-2 flex-1 justify-between -mt-6 sm:-mt-12 relative z-10 bg-gradient-to-t from-[#151c26] via-[#151c26] to-transparent pt-4 sm:pt-6">
+                    <div>
+                      <div className="font-mono text-[9px] sm:text-xs text-[#ffd799] tracking-widest uppercase">
+                        {member.category}
+                      </div>
+                      <h3 className="font-display text-sm sm:text-2xl md:text-3xl italic uppercase text-[#dce3f0] tracking-wide mt-0.5 sm:mt-1 font-bold line-clamp-1 sm:line-clamp-none">
+                        {member.name}
+                      </h3>
+                      <p className="font-display text-xs sm:text-base text-[#ffd799] mt-0.5 sm:mt-1 font-medium">
+                        {member.role}
+                      </p>
+                      <p className="font-sans text-[11px] sm:text-sm text-[#bac9cc] mt-1.5 sm:mt-2.5 leading-normal sm:leading-relaxed line-clamp-2 sm:line-clamp-none">
+                        {member.bio}
+                      </p>
                     </div>
 
+                    {/* Action Bar */}
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 pt-2.5 sm:pt-4 border-t border-[#3b494c]/30 mt-2.5 sm:mt-4">
+                      <button
+                        type="button"
+                        onClick={() => handleContactClick(member.name, member.email)}
+                        className="inline-flex items-center gap-1 font-mono text-[10px] sm:text-xs text-[#c3f5ff] hover:text-[#00daf3] transition-colors"
+                      >
+                        <Mail className="w-3.5 h-3.5 text-[#00daf3]" />
+                        <span>Contact</span>
+                      </button>
 
-                    <div ref={developerRef} className="relative px-3 py-5 text-center sm:px-8">
-                        <p className="font-['Anton',Impact,sans-serif] text-4xl italic leading-none text-amber-300 sm:text-5xl">
-                            {developerCount}
-                        </p>
-                        <p className="mt-2 text-[9px] font-black uppercase tracking-[0.13em] text-slate-400 sm:text-[10px]">
-                            Developers
-                        </p>
-                        <span className="absolute right-0 top-1/2 hidden h-10 w-px -translate-y-1/2 bg-gradient-to-b from-transparent via-sky-300 to-transparent sm:block" />
-                    </div>
-
-
-                    <div ref={eventRef} className="px-3 py-5 text-center sm:px-8">
-                        <p className="font-['Anton',Impact,sans-serif] text-4xl italic leading-none text-orange-300 sm:text-5xl">
-                            {eventCount}
-                        </p>
-                        <p className="mt-2 text-[9px] font-black uppercase tracking-[0.13em] text-slate-400 sm:text-[10px]">
-                            Events
-                        </p>
-                    </div>
-                </div>
-            </section>
-
-
-            {/* Tilted event marquee */}
-            <section className="relative overflow-hidden border-y border-amber-300/30 bg-[#080f1d] py-3 shadow-[0_0_30px_rgba(245,158,11,0.09)]">
-                <div className="-rotate-[1.2deg] scale-105">
-                    <div className="marquee-track flex w-max whitespace-nowrap">
-                        {[...Array(3)]
-                            .flatMap(() => EVENTS.flatMap((event) => [event, "⚡"]))
-                            .map((item, index) => (
-                                <span
-                                    key={`${item}-${index}`}
-                                    className={`mx-4 font-['Anton',Impact,sans-serif] text-2xl uppercase italic tracking-wide sm:text-3xl ${item === "⚡" ? "text-sky-300" : "text-amber-300"
-                                        }`}
-                                >
-                                    {item}
-                                </span>
-                            ))}
-                    </div>
-                </div>
-            </section>
-
-
-            {/* Sticky tournament filters */}
-            <section className="sticky top-0 z-40 border-b border-white/10 bg-[#05080f]/90 shadow-xl shadow-black/30 backdrop-blur-xl">
-                <div className="mx-auto max-w-7xl overflow-x-auto px-5 py-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:px-8 lg:px-10">
-                    <div className="flex min-w-max gap-2">
-                        {FILTERS.map((filter) => {
-                            const isActive = activeFilter === filter.id;
-
-
-                            return (
-                                <button
-                                    key={filter.id}
-                                    type="button"
-                                    onClick={() => setActiveFilter(filter.id)}
-                                    className={`border px-5 py-3 text-xs font-black uppercase tracking-[0.12em] transition-all duration-300 [clip-path:polygon(8%_0,100%_0,92%_100%,0_100%)] ${isActive
-                                        ? "border-amber-100 bg-gradient-to-r from-amber-300 to-orange-400 text-[#05080f] shadow-[0_0_24px_rgba(245,158,11,0.3)]"
-                                        : "border-white/10 bg-white/[0.035] text-slate-300 hover:border-sky-300/60 hover:bg-sky-300/[0.08] hover:text-sky-100"
-                                        }`}
-                                >
-                                    {filter.label}
-                                </button>
-                            );
-                        })}
-                    </div>
-                </div>
-            </section>
-
-
-            {/* Roster content */}
-            <div key={activeFilter} className="relative mx-auto max-w-7xl px-5 py-14 sm:px-8 lg:px-10">
-                {/* Convenor and Co-Convenor */}
-                {showConvenors && (
-                    <section>
-                        <SectionHeading
-                            eyebrow="Leadership bracket // 01"
-                            title="Convenors"
-                            count={featuredMembers.length}
-                        />
-
-
-                        <div className="flex flex-wrap justify-center gap-5">
-                            {featuredMembers.map((member, index) => (
-                                <PlayerCard
-                                    key={member.name}
-                                    member={member}
-                                    index={index}
-                                    cardWidthClass="sm:w-[calc(50%-0.625rem)] lg:w-[calc(33.333%-0.834rem)] xl:w-[calc(25%-0.938rem)]"
-                                />
-                            ))}
-                        </div>
-                    </section>
-                )}
-
-
-                {/* Developers */}
-                {showDevelopers && (
-                    <section className={showConvenors ? "mt-20" : ""}>
-                        <SectionHeading
-                            eyebrow="Technical Team // 02"
-                            title="Developers"
-                            count={groupedMembers.developers.length}
-                        />
-
-
-                        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                            {groupedMembers.developers.map((member, index) => (
-                                <PlayerCard
-                                    key={member.name}
-                                    member={member}
-                                    index={index}
-                                />
-                            ))}
-                        </div>
-                    </section>
-                )}
-
-
-                {/* Core Members */}
-                {showCoreMembers && (
-                    <section
-                        className={showConvenors || showDevelopers ? "mt-20" : ""}
-                    >
-                        <SectionHeading
-                            eyebrow="Operations division // 03"
-                            title="Core Members"
-                            count={groupedMembers.coreMembers.length}
-                        />
-
-
-                        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                            {groupedMembers.coreMembers.map((member, index) => (
-                                <PlayerCard
-                                    key={member.name}
-                                    member={member}
-                                    index={index}
-                                />
-                            ))}
-                        </div>
-                    </section>
-                )}
-            </div>
-
-
-            {/* Tournament CTA */}
-            <section className="relative mx-auto max-w-7xl px-5 py-16 sm:px-8 lg:px-10">
-                <div className="relative overflow-hidden border border-amber-300/40 bg-[linear-gradient(120deg,#0b172b_0%,#101a2d_45%,#2b1b08_125%)] px-6 py-12 shadow-[0_0_50px_rgba(245,158,11,0.12)] [clip-path:polygon(0_0,97%_0,100%_14%,100%_100%,3%_100%,0_86%)] sm:px-10 sm:py-16">
-                    <div className="absolute -right-20 -top-28 h-72 w-72 rounded-full bg-orange-400/20 blur-[100px]" />
-                    <div className="absolute -bottom-24 left-8 h-56 w-56 rounded-full bg-sky-400/15 blur-[90px]" />
-
-
-                    <div className="relative max-w-3xl">
-                        <p className="text-xs font-black uppercase tracking-[0.2em] text-sky-300">
-                            Your arena is waiting
-                        </p>
-
-
-                        <h2 className="mt-4 font-['Anton',Impact,sans-serif] text-5xl uppercase italic leading-[0.88] tracking-wide text-white sm:text-7xl">
-                            Join the squad.
-                            <span className="mt-1 block bg-gradient-to-r from-amber-300 to-orange-400 bg-clip-text text-transparent">
-                                Register for Srijan 2026.
-                            </span>
-                        </h2>
-
-
-                        <p className="mt-6 max-w-xl text-sm leading-7 text-slate-300 sm:text-base">
-                            Choose your event, build your team, and compete in the biggest
-                            technical arena of Srijan 2026.
-                        </p>
-
-
+                      {member.linkedin && (
                         <a
-                            href="/events"
-                            className="group relative mt-8 inline-flex overflow-hidden border border-amber-100 bg-gradient-to-r from-amber-300 to-orange-400 px-7 py-4 text-sm font-black uppercase tracking-[0.14em] text-[#05080f] shadow-[0_0_25px_rgba(245,158,11,0.25)] transition hover:scale-[1.03] [clip-path:polygon(7%_0,100%_0,93%_100%,0_100%)]"
+                          href={member.linkedin}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1 font-mono text-[10px] sm:text-xs text-[#bac9cc] hover:text-white transition-colors"
                         >
-                            <span className="relative z-10">Explore Events →</span>
-
-
-                            <span className="absolute inset-y-0 left-0 w-1/3 bg-white/45 animate-[shine-sweep_3s_ease-in-out_infinite]" />
+                          <Share2 className="w-3.5 h-3.5" />
+                          <span>LinkedIn</span>
                         </a>
+                      )}
                     </div>
+                  </div>
                 </div>
-            </section>
+              ))}
+            </div>
 
+            {/* Additional Student Leadership (if present) */}
+            {CONVENORS.length > 2 && (
+              <div className="grid grid-cols-2 md:grid-cols-2 gap-3 sm:gap-6 md:gap-8 max-w-4xl mx-auto mt-6 sm:mt-8">
+                {CONVENORS.slice(2).map((member) => (
+                  <div
+                    key={member.name}
+                    className="group relative bg-[#151c26] card-clip border border-[#ffd799]/30 hover:border-[#ffd799] transition-all duration-300 hover:shadow-[0_0_25px_rgba(255,215,153,0.15)] overflow-hidden flex flex-col"
+                  >
+                    <div className="absolute top-0 right-0 w-5 h-5 sm:w-8 sm:h-8 bg-[#ffd799]/20 pointer-events-none" />
 
-            <footer className="relative border-t border-white/10 px-5 py-8 text-center">
-                <div className="mx-auto mb-4 h-px w-32 bg-gradient-to-r from-transparent via-sky-300 to-transparent" />
+                    <div className="relative w-full h-44 sm:h-72 md:h-80 overflow-hidden bg-[#0d141d]">
+                      <div className="absolute top-2 left-2 sm:top-4 sm:left-4 z-10 flex items-center gap-1 bg-[#0d141d]/85 backdrop-blur-md px-2 py-0.5 sm:px-3 sm:py-1 rounded border border-[#ffd799]/40 text-[#ffd799] font-mono text-[9px] sm:text-xs font-bold tracking-wider">
+                        <span>★</span> <span>{member.badge}</span>
+                      </div>
 
+                      <SafeImage
+                        src={member.img}
+                        fallback={member.fallbackImg}
+                        alt={member.name}
+                        className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                      />
 
-                <p className="font-['Anton',Impact,sans-serif] text-lg uppercase italic tracking-[0.12em] text-slate-400">
-                    Srijan 2026 // Build. Compete. Create.
-                </p>
-            </footer>
-        </main>
-    );
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#151c26] via-[#151c26]/40 to-transparent" />
+                    </div>
+
+                    <div className="p-3 sm:p-6 flex flex-col gap-1.5 sm:gap-2 flex-1 justify-between -mt-6 sm:-mt-10 relative z-10 bg-gradient-to-t from-[#151c26] via-[#151c26] to-transparent pt-4 sm:pt-6">
+                      <div>
+                        <div className="font-mono text-[9px] sm:text-xs text-[#ffd799] tracking-widest uppercase">
+                          {member.category}
+                        </div>
+                        <h3 className="font-display text-sm sm:text-xl md:text-2xl italic uppercase text-[#dce3f0] tracking-wide mt-0.5 sm:mt-1 font-bold line-clamp-1 sm:line-clamp-none">
+                          {member.name}
+                        </h3>
+                        <p className="font-display text-xs sm:text-sm text-[#ffd799] mt-0.5 sm:mt-1 font-medium">
+                          {member.role}
+                        </p>
+                        <p className="font-sans text-[11px] sm:text-sm text-[#bac9cc] mt-1.5 sm:mt-2 leading-normal sm:leading-relaxed line-clamp-2 sm:line-clamp-none">
+                          {member.bio}
+                        </p>
+                      </div>
+
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 pt-2.5 sm:pt-4 border-t border-[#3b494c]/30 mt-2.5 sm:mt-3">
+                        <button
+                          type="button"
+                          onClick={() => handleContactClick(member.name, member.email)}
+                          className="inline-flex items-center gap-1 font-mono text-[10px] sm:text-xs text-[#c3f5ff] hover:text-[#00daf3] transition-colors"
+                        >
+                          <Mail className="w-3.5 h-3.5 text-[#00daf3]" />
+                          <span>Contact</span>
+                        </button>
+                        {member.linkedin && (
+                          <a
+                            href={member.linkedin}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex items-center gap-1 font-mono text-[10px] sm:text-xs text-[#bac9cc] hover:text-white transition-colors"
+                          >
+                            <Share2 className="w-3.5 h-3.5" />
+                            <span>LinkedIn</span>
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ==================================================================== */}
+        {/* SECTION 2: ENGINEERING & DEVELOPMENT                                */}
+        {/* ==================================================================== */}
+        {(activeTab === 'all' || activeTab === 'developers') && (
+          <div className="mb-16 sm:mb-20">
+            <div className="flex items-center gap-3 mb-8">
+              <Code2 className="w-6 h-6 text-[#00daf3]" />
+              <h2 className="font-display text-2xl sm:text-3xl font-bold text-[#dce3f0]">Engineering & Development</h2>
+
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-2 gap-3 sm:gap-6 md:gap-8 max-w-4xl mx-auto">
+              {DEVELOPERS.map((dev) => (
+                <div
+                  key={dev.name}
+                  className="group relative bg-[#151c26] card-clip border border-[#00e5ff]/40 hover:border-[#00e5ff] transition-all duration-300 hover:shadow-[0_0_30px_rgba(0,229,255,0.22)] overflow-hidden flex flex-col"
+                >
+                  {/* Top-right cyber block */}
+                  <div className="absolute top-0 right-0 w-5 h-5 sm:w-8 sm:h-8 bg-[#00e5ff]/20 pointer-events-none" />
+
+                  {/* Dev Photo */}
+                  <div className="relative w-full h-44 sm:h-72 md:h-80 lg:h-96 overflow-hidden bg-[#0d141d]">
+                    <div className="absolute top-2 left-2 sm:top-4 sm:left-4 z-10 flex items-center gap-1 bg-[#0d141d]/85 backdrop-blur-md px-2 py-0.5 sm:px-3 sm:py-1 rounded border border-[#00e5ff]/40 text-[#00e5ff] font-mono text-[9px] sm:text-xs font-bold tracking-wider shadow-md">
+                      <span>★</span> <span>{dev.badge}</span>
+                    </div>
+
+                    <SafeImage
+                      src={dev.img}
+                      fallback={dev.fallbackImg}
+                      alt={dev.name}
+                      className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                    />
+
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#151c26] via-[#151c26]/40 to-transparent" />
+                  </div>
+
+                  {/* Dev Content Area */}
+                  <div className="p-3 sm:p-6 md:p-8 flex flex-col gap-1.5 sm:gap-2 flex-1 justify-between -mt-6 sm:-mt-12 relative z-10 bg-gradient-to-t from-[#151c26] via-[#151c26] to-transparent pt-4 sm:pt-6">
+                    <div>
+                      <div className="font-mono text-[9px] sm:text-xs text-[#00daf3] tracking-widest uppercase">
+                        {dev.category}
+                      </div>
+                      <h3 className="font-display text-sm sm:text-2xl md:text-3xl italic uppercase text-[#dce3f0] tracking-wide mt-0.5 sm:mt-1 font-bold line-clamp-1 sm:line-clamp-none">
+                        {dev.name}
+                      </h3>
+                      <p className="font-display text-xs sm:text-base text-[#00daf3] mt-0.5 sm:mt-1 font-medium">
+                        {dev.role}
+                      </p>
+                      <p className="font-sans text-[11px] sm:text-sm text-[#bac9cc] mt-1.5 sm:mt-2.5 leading-normal sm:leading-relaxed line-clamp-2 sm:line-clamp-none">
+                        {dev.bio}
+                      </p>
+
+                      {/* Tech stack chips */}
+                      {dev.skills && dev.skills.length > 0 && (
+                        <div className="flex flex-wrap items-center gap-1 sm:gap-2 my-2 sm:my-3.5">
+                          {dev.skills.map((skill) => (
+                            <span
+                              key={skill}
+                              className="font-mono text-[9px] sm:text-xs px-1.5 sm:px-2.5 py-0.5 rounded bg-[#19202a] text-[#c3f5ff] border border-[#3b494c]/40 font-medium"
+                            >
+                              {skill}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Action Bar */}
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 pt-2.5 sm:pt-4 border-t border-[#3b494c]/30 mt-2.5 sm:mt-4">
+                      {dev.github && (
+                        <a
+                          href={dev.github}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1 font-mono text-[10px] sm:text-xs text-[#00daf3] hover:text-white transition-colors"
+                        >
+                          <Terminal className="w-3.5 h-3.5" />
+                          <span>GitHub</span>
+                        </a>
+                      )}
+                      {dev.linkedin && (
+                        <a
+                          href={dev.linkedin}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1 font-mono text-[10px] sm:text-xs text-[#bac9cc] hover:text-white transition-colors"
+                        >
+                          <Share2 className="w-3.5 h-3.5" />
+                          <span>LinkedIn</span>
+                        </a>
+                      )}
+                      {dev.email && (
+                        <button
+                          type="button"
+                          onClick={() => handleContactClick(dev.name, dev.email)}
+                          className="inline-flex items-center gap-1 font-mono text-[10px] sm:text-xs text-[#bac9cc] hover:text-[#00daf3] transition-colors sm:ml-auto"
+                        >
+                          <Mail className="w-3.5 h-3.5" />
+                          <span>Contact</span>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ==================================================================== */}
+        {/* SECTION 3: OPERATIONS & CORE COMMITTEE                               */}
+        {/* ==================================================================== */}
+        {(activeTab === 'all' || activeTab === 'core') && (
+          <div className="mb-16 sm:mb-20">
+            <div className="flex items-center gap-3 mb-8">
+              <Layers className="w-6 h-6 text-[#00daf3]" />
+              <h2 className="font-display text-2xl sm:text-3xl font-bold text-[#dce3f0]">Operations & Coordination</h2>
+              <span className="font-mono text-xs text-[#ffd799] px-2.5 py-1 rounded bg-[#19202a] border border-[#ffd799]/20">
+                [SECTION_OPERATIONS]
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+              {CORE_MEMBERS.map((member) => (
+                <div
+                  key={member.name}
+                  className="bg-[#151c26]/90 rounded-2xl border border-[#3b494c]/30 hover:border-[#00daf3]/50 p-3.5 sm:p-6 flex flex-col justify-between transition-all duration-300 hover:shadow-[0_0_20px_rgba(0,229,255,0.12)]"
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-2 sm:mb-3">
+                      <span className="font-mono text-[9px] sm:text-[11px] text-[#ffba38] bg-[#19202a] px-1.5 sm:px-2 py-0.5 rounded border border-[#ffba38]/20 truncate max-w-[85%]">
+                        {member.badge}
+                      </span>
+                      <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#00e5ff] shrink-0" />
+                    </div>
+
+                    <h4 className="font-display font-bold text-sm sm:text-lg text-white line-clamp-1 sm:line-clamp-none">
+                      {member.name}
+                    </h4>
+                    <p className="font-mono text-[10px] sm:text-xs text-[#00daf3] mt-0.5 truncate">
+                      {member.role}
+                    </p>
+                    <p className="font-sans text-[11px] sm:text-xs text-[#bac9cc] mt-1.5 sm:mt-2.5 leading-normal sm:leading-relaxed line-clamp-2 sm:line-clamp-none">
+                      {member.bio}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-2.5 sm:pt-4 border-t border-[#3b494c]/20 mt-2.5 sm:mt-4">
+                    <button
+                      type="button"
+                      onClick={() => handleContactClick(member.name, member.email)}
+                      className="font-mono text-[10px] sm:text-xs text-[#00daf3] hover:underline flex items-center gap-1"
+                    >
+                      <Mail className="w-3 sm:w-3.5 h-3 sm:h-3.5" />
+                      <span>Contact</span>
+                    </button>
+                    {member.linkedin && (
+                      <a
+                        href={member.linkedin}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-slate-400 hover:text-white transition-colors p-1"
+                      >
+                        <Share2 className="w-3 sm:w-3.5 h-3 sm:h-3.5" />
+                      </a>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ==================================================================== */}
+        {/* BOTTOM BANNER / SUPPORT INFO                                         */}
+        {/* ==================================================================== */}
+        <div className="bg-[#19202a] rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 border border-[#3b494c]/30 shadow-xl">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-[#242a34] flex items-center justify-center text-[#00e5ff] shrink-0 border border-[#3b494c]/40 shadow-inner">
+              <Headphones className="w-6 h-6" />
+            </div>
+            <div>
+              <h4 className="font-display font-semibold text-lg text-[#dce3f0]">
+                Need assistance or technical support?
+              </h4>
+              <p className="font-sans text-sm text-[#bac9cc] mt-1">
+                Our team is available through the official ETAS helpdesk console.
+              </p>
+            </div>
+          </div>
+          <a
+            href="mailto:srijan@college.edu?subject=Srijan%202026%20Support%20Request"
+            className="inline-flex items-center justify-center px-6 py-3 rounded-lg font-mono text-xs uppercase text-[#00363d] bg-[#00e5ff] shadow-[0_0_16px_rgba(0,229,255,0.4)] hover:bg-[#00daf3] transition-all font-bold tracking-wider shrink-0"
+          >
+            <Zap className="w-4 h-4 mr-1.5 fill-current" />
+            Contact Support
+          </a>
+        </div>
+
+      </div>
+    </div>
+  );
 }
