@@ -7,6 +7,7 @@
  */
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { saveAs } from 'file-saver';
 import sMarkImg from '../assets/srijan-s-mark.png';
 
 // ─── Design Tokens ───────────────────────────────────────────────────────────
@@ -89,7 +90,11 @@ function addHeader(doc, logo, reportTitle, reportSubtitle) {
   const y0 = 10;
 
   if (logo) {
-    doc.addImage(logo, 'PNG', MARGIN, y0, 17, 17);
+    try {
+      doc.addImage(logo, 'PNG', MARGIN, y0, 17, 17);
+    } catch {
+      // Ignore logo render failure and continue PDF generation
+    }
   }
 
   const textX = logo ? MARGIN + 21 : MARGIN;
@@ -238,9 +243,9 @@ function addInsightsSection(doc, logo, reportTitle, subtitle, insights = []) {
 }
 
 // ─── Shared AutoTable Options ─────────────────────────────────────────────────
-function makeTableOptions(logo, reportTitle, subtitle, startY, columns, body, columnStyles, extra = {}) {
+function makeTableOptions(doc, logo, reportTitle, subtitle, startY, columns, body, columnStyles, extra = {}) {
   return {
-    startY,
+    startY: typeof startY === 'number' && isFinite(startY) ? startY : HEADER_BOTTOM + 4,
     columns,
     body,
     columnStyles,
@@ -858,32 +863,82 @@ export async function generatePdf(reportType, { registrations = [], attendance =
 
   const meta = reportMeta[reportType] || reportMeta.registration;
 
-  switch (reportType) {
-    case 'registration':
-      buildRegistrationReport(doc, logo, registrations, filters);
-      break;
-    case 'participant':
-      buildParticipantReport(doc, logo, registrations, filters);
-      break;
-    case 'event':
-      buildEventWiseReport(doc, logo, registrations, filters);
-      break;
-    case 'team':
-      buildTeamReport(doc, logo, registrations, filters);
-      break;
-    case 'attendance':
-      buildAttendanceReport(doc, logo, attendance, registrations, filters);
-      break;
-    case 'certificate':
-      buildCertificateReport(doc, logo, registrations, attendance, filters);
-      break;
-    default:
-      buildRegistrationReport(doc, logo, registrations, filters);
+  try {
+    switch (reportType) {
+      case 'registration':
+        buildRegistrationReport(doc, logo, registrations, filters);
+        break;
+      case 'participant':
+        buildParticipantReport(doc, logo, registrations, filters);
+        break;
+      case 'event':
+        buildEventWiseReport(doc, logo, registrations, filters);
+        break;
+      case 'team':
+        buildTeamReport(doc, logo, registrations, filters);
+        break;
+      case 'attendance':
+        buildAttendanceReport(doc, logo, attendance, registrations, filters);
+        break;
+      case 'certificate':
+        buildCertificateReport(doc, logo, registrations, attendance, filters);
+        break;
+      default:
+        buildRegistrationReport(doc, logo, registrations, filters);
+    }
+
+    addFooters(doc, meta.name);
+  } catch (buildErr) {
+    console.error('[PDF] Report build error:', buildErr);
+    // Fallback: add a minimal error page so we still produce a valid PDF
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(12);
+    doc.setTextColor(30, 58, 95);
+    doc.text(`Srijan 2026 — ${meta.name}`, 15, 20);
+    doc.setFontSize(9);
+    doc.setTextColor(100, 116, 139);
+    doc.text(`An error occurred while building this report: ${buildErr?.message || 'Unknown error'}`, 15, 35);
+    doc.text('Please contact the technical team.', 15, 42);
   }
 
-  addFooters(doc, meta.name);
-
   const filename = `Srijan2026_${meta.name.replace(/\s+/g, '_')}_${Date.now()}.pdf`;
-  doc.save(filename);
+
+  // Try multiple download strategies
+  let downloaded = false;
+
+  // Strategy 1: file-saver (most reliable cross-browser)
+  try {
+    const pdfBlob = doc.output('blob');
+    saveAs(pdfBlob, filename);
+    downloaded = true;
+  } catch (e1) {
+    console.warn('[PDF] saveAs failed, trying URL.createObjectURL:', e1);
+  }
+
+  // Strategy 2: URL.createObjectURL + hidden anchor
+  if (!downloaded) {
+    try {
+      const pdfBlob = doc.output('blob');
+      const url = URL.createObjectURL(pdfBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, 200);
+      downloaded = true;
+    } catch (e2) {
+      console.warn('[PDF] createObjectURL failed, trying doc.save:', e2);
+    }
+  }
+
+  // Strategy 3: jsPDF native save
+  if (!downloaded) {
+    doc.save(filename);
+  }
+
   return filename;
 }
