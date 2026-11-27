@@ -2,12 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Zap, ArrowRight, Layers, Cpu } from 'lucide-react';
 import Reveal from './Reveal';
-import { useCms } from '../contexts/CmsContext';
 
 export default function CTASection() {
-  const { cms } = useCms();
-  const hp = cms?.homepage || {};
-
   return (
     <section id="register-cta" className="py-10 sm:py-14 px-4 sm:px-6 lg:px-10 relative overflow-hidden">
       <Reveal>
@@ -33,19 +29,15 @@ export default function CTASection() {
 
               {/* Headline */}
               <h2 className="font-display text-xl sm:text-2xl md:text-3xl font-extrabold text-[#dce3f0] tracking-tight leading-tight">
-                {hp.ctaSectionTitle || (
-                  <>
-                    Ready to{' '}
-                    <span className="bg-gradient-to-r from-[#00e5ff] via-[#c3f5ff] to-[#ffd799] bg-clip-text text-transparent">
-                      Build, Break & Ship?
-                    </span>
-                  </>
-                )}
+                Ready to{' '}
+                <span className="bg-gradient-to-r from-[#00e5ff] via-[#c3f5ff] to-[#ffd799] bg-clip-text text-transparent">
+                  Build, Break & Ship?
+                </span>
               </h2>
 
               {/* Sub-copy */}
               <p className="font-sans text-xs sm:text-sm text-[#bac9cc] leading-relaxed max-w-lg">
-                {hp.ctaSectionSubtitle || "Central India's premier tech fest. Compete, build, and connect with top engineering talent."}
+                Central India's premier tech fest. Compete, build, and connect with top engineering talent.
               </p>
 
               {/* Metrics row */}
@@ -55,7 +47,7 @@ export default function CTASection() {
                     <Layers className="w-3.5 h-3.5" />
                   </div>
                   <div>
-                    <div className="font-mono text-base sm:text-lg font-bold text-[#00daf3] leading-none">{hp.ctaTracksCount || '06+'}</div>
+                    <div className="font-mono text-base sm:text-lg font-bold text-[#00daf3] leading-none">06+</div>
                     <div className="font-mono text-[9px] sm:text-[10px] text-[#bac9cc] uppercase tracking-wider">Tracks</div>
                   </div>
                 </div>
@@ -65,7 +57,7 @@ export default function CTASection() {
                     <Cpu className="w-3.5 h-3.5" />
                   </div>
                   <div>
-                    <div className="font-mono text-base sm:text-lg font-bold text-[#ffd799] leading-none">{hp.ctaPrizePool || '₹2L+'}</div>
+                    <div className="font-mono text-base sm:text-lg font-bold text-[#ffd799] leading-none">₹2L+</div>
                     <div className="font-mono text-[9px] sm:text-[10px] text-[#bac9cc] uppercase tracking-wider">Prize Pool</div>
                   </div>
                 </div>

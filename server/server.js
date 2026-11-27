@@ -1,18 +1,12 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
-import path from 'path';
-import { fileURLToPath } from 'url';
 
 import { connectDB, checkDBConnection } from './config/db.js';
 import eventRoutes from './routes/eventRoutes.js';
 import registrationRoutes from './routes/registrationRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
-import cmsRoutes from './routes/cmsRoutes.js';
 import { notFoundHandler, errorHandler } from './middleware/errorMiddleware.js';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 9000;
@@ -39,11 +33,8 @@ app.use(
   })
 );
 
-// JSON body parser (5mb limit to support CMS image uploads)
-app.use(express.json({ limit: '5mb' }));
-
-// Serve uploaded CMS assets
-app.use('/uploads', express.static(path.resolve(__dirname, 'uploads')));
+// JSON body parser
+app.use(express.json());
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -58,7 +49,6 @@ app.get('/api/health', (req, res) => {
 app.use('/api/events', eventRoutes);
 app.use('/api/registrations', registrationRoutes);
 app.use('/api/admin', adminRoutes);
-app.use('/api/cms', cmsRoutes);
 
 // Error Handling Middlewares
 app.use(notFoundHandler);

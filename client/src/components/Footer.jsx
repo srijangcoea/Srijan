@@ -23,11 +23,8 @@ import {
 } from 'lucide-react';
 import { events, siteConfig } from '../data/events';
 import sMarkImg from '../assets/srijan-s-mark.png';
-import { useCms } from '../contexts/CmsContext';
 
 export default function Footer() {
-  const { cms } = useCms();
-  const footerCms = cms?.footer || {};
   // Newsletter subscription state
   const [email, setEmail] = useState('');
   const [newsletterStatus, setNewsletterStatus] = useState('idle'); // 'idle' | 'loading' | 'success' | 'error'
@@ -179,7 +176,7 @@ export default function Footer() {
               </div>
               <div className="flex flex-col">
                 <span className="font-display font-black tracking-wider text-2xl text-white group-hover:text-[#22e5ff] transition-colors">
-                  {footerCms.brandTitle || `${siteConfig.name} ${siteConfig.edition}`}
+                  {siteConfig.name} {siteConfig.edition}
                 </span>
                 <span className="text-[10px] tracking-[0.2em] uppercase font-mono text-[#22e5ff]">
                   {siteConfig.tagline} • BUILD. BREAK. SHIP.
@@ -189,25 +186,23 @@ export default function Footer() {
 
             {/* Description */}
             <p className="text-sm text-slate-300 leading-relaxed max-w-sm">
-              {footerCms.tagline || "Central India's benchmark technical festival empowering visionary collegiate innovators, builders, and developers through intense hackathons, design sprints, and technical showdowns."}
+              Central India's benchmark technical festival empowering visionary collegiate innovators, builders, and developers through intense hackathons, design sprints, and technical showdowns.
             </p>
 
             {/* Event Key Facts Pill Card */}
             <div className="p-3.5 rounded-xl bg-[#081522]/70 border border-[#22e5ff]/15 space-y-2 text-xs text-slate-300">
               <div className="flex items-center gap-2.5">
                 <Calendar className="w-4 h-4 text-[#22e5ff] shrink-0" />
-                <span className="font-mono">{footerCms.editionText || 'Annual Technical Edition 2026'}</span>
+                <span className="font-mono">Annual Technical Edition 2026</span>
               </div>
               <div className="flex items-center gap-2.5">
                 <MapPin className="w-4 h-4 text-[#22e5ff] shrink-0" />
-                <span>{footerCms.address || 'GCOEA Campus, Amravati, Maharashtra'}</span>
+                <span>GCOEA Campus, Amravati, Maharashtra</span>
               </div>
-              {footerCms.email && (
-                <div className="flex items-center gap-2.5 text-slate-400">
-                  <Mail className="w-4 h-4 text-[#22e5ff]/70 shrink-0" />
-                  <span>{footerCms.email}</span>
-                </div>
-              )}
+              <div className="flex items-center gap-2.5 text-slate-400">
+                <Shield className="w-4 h-4 text-[#22e5ff]/70 shrink-0" />
+                <span>Organized by Government College of Engineering, Amravati</span>
+              </div>
             </div>
           </Reveal>
 

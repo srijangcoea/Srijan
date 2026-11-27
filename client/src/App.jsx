@@ -22,7 +22,6 @@ const SchedulePage = lazy(() => import('./pages/SchedulePage'));
 
 // Lazy loaded Admin imports
 import { AuthProvider } from './contexts/AuthContext';
-import { CmsProvider } from './contexts/CmsContext';
 import ProtectedRoute from './components/admin/ProtectedRoute';
 const AdminLayout = lazy(() => import('./components/admin/AdminLayout'));
 const AdminLogin = lazy(() => import('./pages/admin/AdminLogin'));
@@ -32,7 +31,6 @@ const EventManagementPage = lazy(() => import('./pages/admin/EventManagementPage
 const AttendancePage = lazy(() => import('./pages/admin/AttendancePage'));
 const ExportPage = lazy(() => import('./pages/admin/ExportPage'));
 const ActivityLogPage = lazy(() => import('./pages/admin/ActivityLogPage'));
-const CmsPage = lazy(() => import('./pages/admin/CmsPage'));
 
 function PageLoader() {
   return (
@@ -48,7 +46,6 @@ export default function App() {
 
   return (
     <AuthProvider>
-      <CmsProvider>
       <Toaster
         position="top-right"
         containerClassName="!z-[99999]"
@@ -102,7 +99,6 @@ export default function App() {
                   <Route path="/admin/attendance" element={<AttendancePage />} />
                   <Route path="/admin/export" element={<ExportPage />} />
                   <Route path="/admin/activity" element={<ActivityLogPage />} />
-                  <Route path="/admin/cms" element={<CmsPage />} />
                 </Route>
               </Route>
 
@@ -122,7 +118,6 @@ export default function App() {
           </Suspense>
         )}
       </div>
-      </CmsProvider>
     </AuthProvider>
   );
 }

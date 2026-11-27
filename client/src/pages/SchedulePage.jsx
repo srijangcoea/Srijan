@@ -20,7 +20,6 @@ import {
 import CTASection from '../components/CTASection';
 import PageTransition from '../components/PageTransition';
 import Reveal from '../components/Reveal';
-import { useCms } from '../contexts/CmsContext';
 
 const SCHEDULE_DATA = [
   {
@@ -173,10 +172,6 @@ const DISTRIBUTION_ROWS = [
 
 export default function SchedulePage() {
   const [activeDayIndex, setActiveDayIndex] = useState('all'); // 'all' | 0 | 1
-  const { cms } = useCms();
-  const scheduleCms = cms?.schedule || {};
-  const activeScheduleDays = Array.isArray(scheduleCms.days) && scheduleCms.days.length > 0 ? scheduleCms.days : SCHEDULE_DATA;
-  const activeHackMilestones = Array.isArray(scheduleCms.hackathonMilestones) && scheduleCms.hackathonMilestones.length > 0 ? scheduleCms.hackathonMilestones : HACKATHON_MILESTONES;
 
   return (
     <PageTransition>
@@ -203,15 +198,15 @@ export default function SchedulePage() {
             <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 shrink-0 font-mono text-xs text-[#bac9cc]">
               <div className="bg-[#151c26] px-3.5 py-2 rounded-xl border border-[#ffd799]/30 shadow-sm flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-[#ffd799]" />
-                <span className="text-[#ffd799] font-bold">{scheduleCms.headerDates || '21 – 22 DEC 2026'}</span>
+                <span className="text-[#ffd799] font-bold">21 – 22 DEC 2026</span>
               </div>
               <div className="bg-[#151c26] px-3.5 py-2 rounded-xl border border-[#00e5ff]/30 shadow-sm flex items-center gap-2">
                 <Clock className="w-4 h-4 text-[#00e5ff]" />
-                <span className="text-[#c3f5ff] font-bold">{scheduleCms.headerDuration || '13 HRS + 24HR HACK'}</span>
+                <span className="text-[#c3f5ff] font-bold">13 HRS + 24HR HACK</span>
               </div>
               <div className="bg-[#151c26] px-3.5 py-2 rounded-xl border border-[#3b494c]/40 shadow-sm flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-[#00e5ff]" />
-                <span>{scheduleCms.headerVenue || 'GCOEA CAMPUS'}</span>
+                <span>GCOEA CAMPUS</span>
               </div>
             </div>
           </div>
@@ -220,7 +215,7 @@ export default function SchedulePage() {
           {/* 2. 2-DAY OVERVIEW CARDS                                            */}
           {/* ================================================================== */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-7 mb-12 sm:mb-14">
-            {activeScheduleDays.map((dayItem, index) => {
+            {SCHEDULE_DATA.map((dayItem, index) => {
               const isSelected = activeDayIndex === index;
               const isGold = dayItem.accent === 'gold';
 
@@ -312,7 +307,7 @@ export default function SchedulePage() {
                 >
                   All Days (21–22 Dec)
                 </button>
-                {activeScheduleDays.map((d, idx) => (
+                {SCHEDULE_DATA.map((d, idx) => (
                   <button
                     key={d.day}
                     type="button"
@@ -337,7 +332,7 @@ export default function SchedulePage() {
 
             {/* Timeline Stream */}
             <div className="space-y-12">
-              {activeScheduleDays.filter((_, idx) => activeDayIndex === 'all' || activeDayIndex === idx).map(
+              {SCHEDULE_DATA.filter((_, idx) => activeDayIndex === 'all' || activeDayIndex === idx).map(
                 (dayData) => {
                   const isGold = dayData.accent === 'gold';
                   return (
@@ -513,7 +508,7 @@ export default function SchedulePage() {
 
               {/* 3-Step Progression */}
               <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
-                {activeHackMilestones.map((m) => (
+                {HACKATHON_MILESTONES.map((m) => (
                   <div
                     key={m.step}
                     className="p-5 rounded-2xl bg-[#0d141d]/90 border border-white/10 hover:border-[#00e5ff]/40 transition-colors flex flex-col gap-2"

@@ -14,7 +14,6 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import PageTransition from '../components/PageTransition';
-import { useCms } from '../contexts/CmsContext';
 
 // ==============================================================================
 // SRIJAN 2026 — OUR TEAM ROSTER DATA
@@ -223,7 +222,7 @@ export default function Ourteam() {
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-2 gap-3 sm:gap-5 md:gap-6 max-w-3xl mx-auto">
-              {convenorsList.slice(0, 2).map((member) => (
+              {CONVENORS.slice(0, 2).map((member) => (
                 <div
                   key={member.name}
                   className="group relative bg-[#151c26] card-clip border border-[#ffd799]/40 hover:border-[#ffd799] transition-all duration-300 hover:shadow-[0_0_30px_rgba(255,215,153,0.2)] overflow-hidden flex flex-col"
@@ -238,7 +237,7 @@ export default function Ourteam() {
                     </div>
 
                     <SafeImage
-                      src={resolveAssetUrl(member.img)}
+                      src={member.img}
                       fallback={member.fallbackImg}
                       alt={member.name}
                       className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
@@ -374,7 +373,7 @@ export default function Ourteam() {
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-2 gap-3 sm:gap-5 md:gap-6 max-w-3xl mx-auto">
-              {developersList.map((dev) => (
+              {DEVELOPERS.map((dev) => (
                 <div
                   key={dev.name}
                   className="group relative bg-[#151c26] card-clip border border-[#00e5ff]/40 hover:border-[#00e5ff] transition-all duration-300 hover:shadow-[0_0_30px_rgba(0,229,255,0.22)] overflow-hidden flex flex-col"
@@ -389,7 +388,7 @@ export default function Ourteam() {
                     </div>
 
                     <SafeImage
-                      src={resolveAssetUrl(dev.img)}
+                      src={dev.img}
                       fallback={dev.fallbackImg}
                       alt={dev.name}
                       className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"

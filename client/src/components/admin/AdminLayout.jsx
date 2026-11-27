@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
 import {
   LayoutDashboard, Users, Calendar, ClipboardCheck, Download,
-  Activity, LogOut, Menu, X, ChevronRight, Search, Command, Zap, Globe
+  Activity, LogOut, Menu, X, ChevronRight, Search, Command, Zap
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { notify } from '../../utils/toast';
@@ -11,7 +11,6 @@ const navItems = [
   { path: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { path: '/admin/registrations', label: 'Registrations', icon: Users },
   { path: '/admin/events', label: 'Event Management', icon: Calendar },
-  { path: '/admin/cms', label: 'Website CMS', icon: Globe },
   { path: '/admin/attendance', label: 'Attendance', icon: ClipboardCheck },
   { path: '/admin/export', label: 'Export Data', icon: Download },
   { path: '/admin/activity', label: 'Activity Log', icon: Activity },
