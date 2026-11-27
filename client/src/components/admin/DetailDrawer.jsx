@@ -47,11 +47,11 @@ export default function DetailDrawer({ registration, onClose }) {
       <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40" onClick={onClose} />
 
       {/* Drawer */}
-      <div className="fixed right-0 top-0 h-full w-full max-w-md bg-slate-950 border-l border-white/[0.06] z-50 overflow-y-auto shadow-2xl animate-slide-in-right">
+      <div className="fixed right-0 top-0 h-full w-full max-w-md bg-space-900 border-l border-amber-500/20 z-50 overflow-y-auto shadow-2xl animate-slide-in-right">
         {/* Header */}
-        <div className="sticky top-0 bg-slate-950/95 backdrop-blur-sm border-b border-white/[0.06] p-4 flex items-center justify-between z-10">
+        <div className="sticky top-0 bg-space-900/95 backdrop-blur-md border-b border-white/[0.07] p-4 flex items-center justify-between z-10">
           <div>
-            <h2 className="text-lg font-bold text-white">{reg.registrationId}</h2>
+            <h2 className="font-display text-lg font-bold text-gold-metallic">{reg.registrationId}</h2>
             <p className="text-sm text-slate-400">{reg.eventName}</p>
           </div>
           <button onClick={onClose} className="p-2 rounded-lg hover:bg-white/5 text-slate-400 hover:text-white transition-colors">

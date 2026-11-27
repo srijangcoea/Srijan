@@ -69,7 +69,7 @@ export default function DataTable({
   return (
     <div className="space-y-4">
       {/* Table Toolbar */}
-      <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 bg-slate-900/60 p-3 rounded-xl border border-white/[0.06] backdrop-blur-sm">
+      <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 cosmic-glass p-3 rounded-xl">
         {/* Search & Custom Filters */}
         <div className="flex flex-wrap items-center gap-2 flex-1">
           {setGlobalFilter !== undefined && (
@@ -80,7 +80,7 @@ export default function DataTable({
                 value={globalFilter ?? ''}
                 onChange={(e) => setGlobalFilter(e.target.value)}
                 placeholder="Search all records..."
-                className="w-full pl-9 pr-3 py-1.5 rounded-lg bg-white/[0.03] border border-white/[0.08] text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-cyan-500/40"
+                className="w-full pl-9 pr-3 py-1.5 rounded-lg bg-space-950/60 border border-white/[0.08] text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-500/40"
               />
             </div>
           )}

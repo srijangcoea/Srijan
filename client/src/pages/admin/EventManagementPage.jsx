@@ -14,20 +14,21 @@ import {
   X,
   AlertCircle,
 } from 'lucide-react';
-import { getAdminEvents, updateAdminEvent } from '../../services/adminService';
+import { getAdminEvents, updateAdminEvent, getCachedData } from '../../services/adminService';
 import { notify } from '../../utils/toast';
 
 export default function EventManagementPage() {
-  const [eventsList, setEventsList] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const cachedEvents = getCachedData('events')?.data;
+  const [eventsList, setEventsList] = useState(Array.isArray(cachedEvents) ? cachedEvents : []);
+  const [loading, setLoading] = useState(!Array.isArray(cachedEvents));
   const [editingEvent, setEditingEvent] = useState(null);
   const [saveSuccess, setSaveSuccess] = useState('');
   const [saving, setSaving] = useState(false);
 
-  const fetchEvents = async () => {
-    setLoading(true);
+  const fetchEvents = async (force = false) => {
+    if (!eventsList.length) setLoading(true);
     try {
-      const res = await getAdminEvents();
+      const res = await getAdminEvents({ force });
       if (res.success && res.data) {
         setEventsList(res.data);
       }
@@ -39,7 +40,7 @@ export default function EventManagementPage() {
   };
 
   useEffect(() => {
-    fetchEvents();
+    fetchEvents(false);
   }, []);
 
   const handleToggleRegistration = async (event) => {
@@ -95,11 +96,11 @@ export default function EventManagementPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-2 border-b border-white/[0.06]">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-2 border-b border-white/[0.07]">
         <div>
-          <h1 className="text-xl md:text-2xl font-bold text-white tracking-tight flex items-center gap-2">
+          <h1 className="font-display text-xl md:text-2xl font-bold text-white tracking-tight flex items-center gap-2">
             Event Management
-            <span className="text-xs font-mono px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+            <span className="text-xs font-mono px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/25">
               6 CORE COMPETITIONS
             </span>
           </h1>

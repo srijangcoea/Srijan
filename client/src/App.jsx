@@ -30,7 +30,6 @@ const RegistrationsPage = lazy(() => import('./pages/admin/RegistrationsPage'));
 const EventManagementPage = lazy(() => import('./pages/admin/EventManagementPage'));
 const AttendancePage = lazy(() => import('./pages/admin/AttendancePage'));
 const ExportPage = lazy(() => import('./pages/admin/ExportPage'));
-const ActivityLogPage = lazy(() => import('./pages/admin/ActivityLogPage'));
 
 function PageLoader() {
   return (
@@ -98,7 +97,6 @@ export default function App() {
                   <Route path="/admin/events" element={<EventManagementPage />} />
                   <Route path="/admin/attendance" element={<AttendancePage />} />
                   <Route path="/admin/export" element={<ExportPage />} />
-                  <Route path="/admin/activity" element={<ActivityLogPage />} />
                 </Route>
               </Route>
 

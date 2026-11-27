@@ -24,6 +24,7 @@ import {
   getAllRegistrations,
   bulkDeleteRegistrations,
   deleteRegistration,
+  getCachedData,
 } from '../../services/adminService';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
@@ -40,8 +41,9 @@ const EVENT_TABS = [
 ];
 
 export default function RegistrationsPage() {
-  const [registrations, setRegistrations] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const cachedRegs = getCachedData('registrations')?.data;
+  const [registrations, setRegistrations] = useState(Array.isArray(cachedRegs) ? cachedRegs : []);
+  const [loading, setLoading] = useState(!Array.isArray(cachedRegs));
   const [activeTab, setActiveTab] = useState('ALL');
   const [globalFilter, setGlobalFilter] = useState('');
   const [rowSelection, setRowSelection] = useState({});
@@ -62,10 +64,10 @@ export default function RegistrationsPage() {
     onConfirm: () => {},
   });
 
-  const fetchData = async () => {
-    setLoading(true);
+  const fetchData = async (force = false) => {
+    if (!registrations.length) setLoading(true);
     try {
-      const res = await getAllRegistrations();
+      const res = await getAllRegistrations({}, { force });
       if (res.success && Array.isArray(res.data)) {
         setRegistrations(res.data);
       }
@@ -77,7 +79,7 @@ export default function RegistrationsPage() {
   };
 
   useEffect(() => {
-    fetchData();
+    fetchData(false);
   }, []);
 
   // Filtered dataset
@@ -373,11 +375,11 @@ export default function RegistrationsPage() {
   return (
     <div className="space-y-5">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-2 border-b border-white/[0.07]">
         <div>
-          <h1 className="text-xl md:text-2xl font-bold text-white tracking-tight flex items-center gap-2">
+          <h1 className="font-display text-xl md:text-2xl font-bold text-white tracking-tight flex items-center gap-2">
             Registrations Management
-            <span className="text-xs font-mono px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+            <span className="text-xs font-mono px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/25">
               {filteredData.length} records
             </span>
           </h1>
@@ -388,13 +390,13 @@ export default function RegistrationsPage() {
 
         <div className="flex items-center gap-2 flex-wrap">
           {/* Desktop View Toggle */}
-          <div className="hidden md:flex items-center p-0.5 rounded-lg bg-white/[0.03] border border-white/[0.08]">
+          <div className="hidden md:flex items-center p-0.5 rounded-lg bg-space-900/70 border border-white/[0.08]">
             <button
               type="button"
               onClick={() => setDesktopView('table')}
               className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
                 desktopView === 'table'
-                  ? 'bg-cyan-500/20 text-cyan-300'
+                  ? 'bg-amber-500/20 text-amber-300'
                   : 'text-slate-400 hover:text-white'
               }`}
               title="Table View"
@@ -407,7 +409,7 @@ export default function RegistrationsPage() {
               onClick={() => setDesktopView('cards')}
               className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
                 desktopView === 'cards'
-                  ? 'bg-cyan-500/20 text-cyan-300'
+                  ? 'bg-amber-500/20 text-amber-300'
                   : 'text-slate-400 hover:text-white'
               }`}
               title="Cards View"
@@ -418,11 +420,11 @@ export default function RegistrationsPage() {
           </div>
 
           <button
-            onClick={fetchData}
+            onClick={() => fetchData(true)}
             disabled={loading}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.03] border border-white/[0.08] text-xs text-slate-300 hover:text-white hover:bg-white/[0.06] transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-space-900/70 border border-white/[0.08] text-xs text-slate-300 hover:text-amber-300 hover:border-amber-500/30 transition-colors"
           >
-            <RefreshCw size={14} className={loading ? 'animate-spin text-cyan-400' : ''} />
+            <RefreshCw size={14} className={loading ? 'animate-spin text-amber-400' : ''} />
             <span className="hidden sm:inline">Refresh</span>
           </button>
           <button
@@ -436,7 +438,7 @@ export default function RegistrationsPage() {
       </div>
 
       {/* Event Tabs */}
-      <div className="flex items-center gap-1 overflow-x-auto pb-1 scrollbar-none border-b border-white/[0.06]">
+      <div className="flex items-center gap-1 overflow-x-auto pb-1 scrollbar-none border-b border-white/[0.07]">
         {EVENT_TABS.map((tab) => {
           const isActive = activeTab === tab.code;
           return (
@@ -446,9 +448,9 @@ export default function RegistrationsPage() {
                 setActiveTab(tab.code);
                 setRowSelection({});
               }}
-              className={`px-3.5 py-2 rounded-t-lg text-xs font-medium whitespace-nowrap transition-all duration-200 border-b-2 ${
+              className={`px-3.5 py-2 rounded-t-lg text-xs font-medium whitespace-nowrap transition-all duration-150 border-b-2 ${
                 isActive
-                  ? 'border-cyan-400 text-cyan-400 bg-cyan-500/[0.06]'
+                  ? 'border-amber-400 text-amber-400 bg-amber-500/[0.08]'
                   : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-white/[0.02]'
               }`}
             >

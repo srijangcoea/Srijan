@@ -3,9 +3,15 @@ import {
   FileCheck2,
   Database,
   Filter,
+  Users,
+  UserCheck,
+  Trophy,
+  ClipboardCheck,
+  Award,
+  Layers,
+  RotateCcw,
 } from 'lucide-react';
-import { getAllRegistrations, getAttendance } from '../../services/adminService';
-import { saveAs } from 'file-saver';
+import { getAllRegistrations, getAttendance, getCachedData } from '../../services/adminService';
 import { notify } from '../../utils/toast';
 import { generatePdf } from '../../utils/pdfExport';
 
@@ -20,23 +26,24 @@ const EVENTS = [
 ];
 
 const REPORT_TYPES = [
-  { value: 'registration', label: 'Registration Report' },
-  { value: 'participant', label: 'Participant Report' },
-  { value: 'event', label: 'Event-wise Report' },
-  { value: 'team', label: 'Team Report' },
-  { value: 'attendance', label: 'Attendance Report' },
-  { value: 'certificate', label: 'Certificate Eligibility Report' },
+  { value: 'registration', label: 'Registrations', desc: 'All entries & leaders', icon: Layers },
+  { value: 'participant', label: 'Participants', desc: 'Full attendee directory', icon: Users },
+  { value: 'event', label: 'Event-wise', desc: 'Breakdown per event', icon: Trophy },
+  { value: 'team', label: 'Teams', desc: 'Team rosters & sizes', icon: UserCheck },
+  { value: 'attendance', label: 'Attendance', desc: 'Desk check-in log', icon: ClipboardCheck },
+  { value: 'certificate', label: 'Certificates', desc: 'Eligibility roster', icon: Award },
 ];
 
 export default function ExportPage() {
-  const [registrations, setRegistrations] = useState([]);
-  const [attendance, setAttendance] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const cachedRegs = getCachedData('registrations')?.data;
+  const cachedAtt = getCachedData('attendance')?.data;
+  const [registrations, setRegistrations] = useState(Array.isArray(cachedRegs) ? cachedRegs : []);
+  const [attendance, setAttendance] = useState(Array.isArray(cachedAtt) ? cachedAtt : []);
+  const [loading, setLoading] = useState(!(Array.isArray(cachedRegs) && Array.isArray(cachedAtt)));
   const [selectedEvent, setSelectedEvent] = useState('ALL');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [reportType, setReportType] = useState('registration');
-  const [exporting, setExporting] = useState(false);
   const [pdfGenerating, setPdfGenerating] = useState(false);
 
   useEffect(() => {
@@ -112,122 +119,170 @@ export default function ExportPage() {
     }
   };
 
+  const activeCount = reportType === 'attendance' ? filteredAttendance.length : filtered.length;
+  const activeReport = REPORT_TYPES.find((rt) => rt.value === reportType);
+  const hasFilters = selectedEvent !== 'ALL' || startDate || endDate;
+
   return (
-    <div className="space-y-6 max-w-4xl">
+    <div className="space-y-4 max-w-3xl">
       {/* Header */}
-      <div className="pb-2 border-b border-white/[0.06]">
-        <h1 className="text-xl md:text-2xl font-bold text-white tracking-tight flex items-center gap-2">
-          Data Export Center
-          <span className="text-xs font-mono px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
-            PDF
-          </span>
-        </h1>
-        <p className="text-xs text-slate-400 mt-1">
-          Generate official printable PDF reports for desk rosters, attendance, and certificates.
-        </p>
+      <div className="pb-2 border-b border-white/[0.07] flex items-center justify-between gap-2">
+        <div>
+          <h1 className="font-display text-lg md:text-xl font-bold text-white tracking-tight flex items-center gap-2">
+            Data Export Center
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/25">
+              PDF
+            </span>
+          </h1>
+          <p className="text-[11px] text-slate-400 mt-0.5">
+            Official A4 printable PDF reports for desk rosters, attendance &amp; certificates.
+          </p>
+        </div>
+
+        {hasFilters && (
+          <button
+            type="button"
+            onClick={() => {
+              setSelectedEvent('ALL');
+              setStartDate('');
+              setEndDate('');
+            }}
+            className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white/[0.04] border border-white/[0.08] text-[11px] text-slate-300 hover:text-amber-300 hover:border-amber-500/30 transition-colors shrink-0"
+          >
+            <RotateCcw size={11} />
+            <span>Reset</span>
+          </button>
+        )}
       </div>
 
       {/* Export Config Card */}
-      <div className="rounded-xl border border-white/[0.08] bg-slate-900/40 backdrop-blur-sm p-6 space-y-6 shadow-xl">
-        <h2 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-          <Filter size={16} className="text-cyan-400" />
-          Export Parameters
-        </h2>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          {/* Event Picker */}
-          <div>
-            <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
-              Select Competition
+      <div className="rounded-xl cosmic-glass p-4 sm:p-5 space-y-4 shadow-xl">
+        {/* Report Type Selector Grid */}
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <label className="font-display text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
+              <Filter size={13} className="text-amber-400" />
+              1. Choose Report Format
             </label>
-            <select
-              value={selectedEvent}
-              onChange={(e) => setSelectedEvent(e.target.value)}
-              className="w-full px-3 py-2.5 rounded-lg bg-white/[0.04] border border-white/[0.08] text-sm text-white outline-none focus:border-cyan-500/50"
-            >
-              {EVENTS.map((ev) => (
-                <option key={ev.code} value={ev.code} className="bg-slate-900 text-white">
-                  {ev.name} ({ev.code})
-                </option>
-              ))}
-            </select>
+            <span className="text-[10px] font-mono text-slate-500">A4 Printable</span>
           </div>
 
-          {/* PDF Report Type Picker */}
-          <div>
-            <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
-              Report Type
-            </label>
-            <select
-              value={reportType}
-              onChange={(e) => setReportType(e.target.value)}
-              className="w-full px-3 py-2.5 rounded-lg bg-white/[0.04] border border-white/[0.08] text-sm text-white outline-none focus:border-cyan-500/50"
-            >
-              {REPORT_TYPES.map((rt) => (
-                <option key={rt.value} value={rt.value} className="bg-slate-900 text-white">
-                  {rt.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Date Range Filters */}
-          <div>
-            <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
-              From Date (Optional)
-            </label>
-            <input
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              className="w-full px-3 py-2.5 rounded-lg bg-white/[0.04] border border-white/[0.08] text-sm text-white outline-none focus:border-cyan-500/50"
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
-              To Date (Optional)
-            </label>
-            <input
-              type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              className="w-full px-3 py-2.5 rounded-lg bg-white/[0.04] border border-white/[0.08] text-sm text-white outline-none focus:border-cyan-500/50"
-            />
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            {REPORT_TYPES.map((rt) => {
+              const Icon = rt.icon;
+              const active = reportType === rt.value;
+              return (
+                <button
+                  key={rt.value}
+                  type="button"
+                  onClick={() => setReportType(rt.value)}
+                  className={`text-left p-2.5 rounded-lg border transition-all flex items-start gap-2.5 ${
+                    active
+                      ? 'bg-gradient-to-br from-amber-500/15 to-orange-500/5 border-amber-500/40 shadow-[0_0_14px_-4px_rgba(245,158,11,0.3)]'
+                      : 'bg-space-950/50 border-white/[0.06] hover:border-white/[0.14] hover:bg-white/[0.03]'
+                  }`}
+                >
+                  <div
+                    className={`p-1.5 rounded-md shrink-0 mt-0.5 ${
+                      active ? 'bg-amber-500/20 text-amber-400' : 'bg-white/[0.04] text-slate-400'
+                    }`}
+                  >
+                    <Icon size={13} />
+                  </div>
+                  <div className="min-w-0">
+                    <p className={`text-xs font-semibold leading-tight truncate ${active ? 'text-amber-300' : 'text-slate-200'}`}>
+                      {rt.label}
+                    </p>
+                    <p className="text-[10px] text-slate-500 leading-tight mt-0.5 truncate">
+                      {rt.desc}
+                    </p>
+                  </div>
+                </button>
+              );
+            })}
           </div>
         </div>
 
-        {/* Summary Box */}
-        <div className="p-4 rounded-xl bg-cyan-500/[0.04] border border-cyan-500/20 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Database size={20} className="text-cyan-400" />
+        {/* Filters Row: Competition + Date Range */}
+        <div className="pt-3 border-t border-white/[0.06]">
+          <label className="block font-display text-xs font-bold text-white uppercase tracking-wider mb-2">
+            2. Scope &amp; Date Filters
+          </label>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
             <div>
-              <p className="text-xs text-slate-400">Total Records to Export</p>
-              <p className="text-lg font-bold text-white">
+              <label className="block text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1">
+                Competition
+              </label>
+              <select
+                value={selectedEvent}
+                onChange={(e) => setSelectedEvent(e.target.value)}
+                className="w-full px-2.5 py-2 rounded-lg bg-space-950/70 border border-white/[0.08] text-xs text-white outline-none focus:border-amber-500/50"
+              >
+                {EVENTS.map((ev) => (
+                  <option key={ev.code} value={ev.code} className="bg-space-900 text-white">
+                    {ev.name} ({ev.code})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1">
+                From Date
+              </label>
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="w-full px-2.5 py-2 rounded-lg bg-space-950/70 border border-white/[0.08] text-xs text-white outline-none focus:border-amber-500/50"
+              />
+            </div>
+
+            <div>
+              <label className="block text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1">
+                To Date
+              </label>
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="w-full px-2.5 py-2 rounded-lg bg-space-950/70 border border-white/[0.08] text-xs text-white outline-none focus:border-amber-500/50"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Compact Summary Bar */}
+        <div className="p-3 rounded-lg bg-amber-500/[0.05] border border-amber-500/20 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="p-1.5 rounded-md bg-amber-500/15 text-amber-400 shrink-0">
+              <Database size={15} />
+            </div>
+            <div className="min-w-0">
+              <p className="text-[10px] text-slate-400 uppercase tracking-wider">Ready to Export</p>
+              <p className="text-sm font-bold text-white truncate">
                 {loading
                   ? 'Calculating...'
-                  : reportType === 'attendance'
-                    ? `${filteredAttendance.length} Attendance Records`
-                    : `${filtered.length} Registrations`}
+                  : `${activeCount} ${reportType === 'attendance' ? 'Attendance Records' : 'Registrations'}`}
               </p>
             </div>
           </div>
-          <span className="text-xs font-mono text-cyan-300">
-            Target: {selectedEvent}
-          </span>
+
+          <div className="text-right shrink-0">
+            <span className="inline-block text-[10px] font-mono px-2 py-0.5 rounded bg-space-950/70 border border-amber-500/20 text-amber-300">
+              {activeReport?.label} · {selectedEvent}
+            </span>
+          </div>
         </div>
 
         {/* Action Button — PDF only */}
         <button
           onClick={handleExportPDF}
-          disabled={
-            loading ||
-            pdfGenerating ||
-            (reportType === 'attendance' ? filteredAttendance.length === 0 : filtered.length === 0)
-          }
-          className="w-full flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl bg-gradient-to-r from-indigo-500 to-blue-600 text-white font-bold text-sm shadow-lg shadow-indigo-500/20 hover:from-indigo-400 hover:to-blue-500 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+          disabled={loading || pdfGenerating || activeCount === 0}
+          className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg bg-gradient-to-r from-amber-500 to-orange-600 text-space-950 font-bold text-xs shadow-lg shadow-amber-500/20 hover:from-amber-400 hover:to-orange-500 active:scale-[0.99] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
         >
-          <FileCheck2 size={18} />
-          <span>{pdfGenerating ? 'Generating PDF...' : 'Download PDF Report (.pdf)'}</span>
+          <FileCheck2 size={15} />
+          <span>{pdfGenerating ? 'Generating PDF...' : `Download ${activeReport?.label || 'PDF'} Report (.pdf)`}</span>
         </button>
       </div>
     </div>
