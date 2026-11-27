@@ -13,6 +13,7 @@ import {
   Layers
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import PageTransition from '../components/PageTransition';
 
 // ==============================================================================
 // SRIJAN 2026 — OUR TEAM ROSTER DATA
@@ -159,6 +160,7 @@ export default function Ourteam() {
   };
 
   return (
+    <PageTransition>
     <div className="w-full pt-28 sm:pt-32 pb-24 bg-[#0d141d] bg-circuit-grid min-h-screen text-[#dce3f0]">
       <div className="flex flex-col w-full max-w-7xl mx-auto px-6 lg:px-12">
         
@@ -560,5 +562,6 @@ export default function Ourteam() {
 
       </div>
     </div>
+    </PageTransition>
   );
 }

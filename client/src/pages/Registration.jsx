@@ -1,6 +1,7 @@
 import React from 'react';
 import { events } from '../data/events';
 import RegistrationForm from '../components/RegistrationForm';
+import PageTransition from '../components/PageTransition';
 
 /**
  * Registration Page
@@ -8,6 +9,7 @@ import RegistrationForm from '../components/RegistrationForm';
  */
 export default function Registration() {
   return (
+    <PageTransition>
     <div className="pt-24 sm:pt-28 pb-20 min-h-screen bg-[#030a14] selection:bg-[#22e5ff]/25 selection:text-[#22e5ff] relative overflow-hidden">
       {/* Background Ambient Grid & Radial Lighting */}
       <div 
@@ -27,5 +29,6 @@ export default function Registration() {
         <RegistrationForm eventsList={events} />
       </div>
     </div>
+    </PageTransition>
   );
 }

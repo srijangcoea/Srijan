@@ -2,9 +2,11 @@ import React from 'react';
 import EventGrid from '../components/EventGrid';
 import CTASection from '../components/CTASection';
 import { events } from '../data/events';
+import PageTransition from '../components/PageTransition';
 
 export default function EventsPage() {
   return (
+    <PageTransition>
     <div className="pt-28 sm:pt-32 pb-20 min-h-screen text-[#dce3f0]">
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
         
@@ -29,5 +31,6 @@ export default function EventsPage() {
         <CTASection />
       </div>
     </div>
+    </PageTransition>
   );
 }

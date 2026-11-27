@@ -1,6 +1,8 @@
 import React, { lazy, Suspense } from 'react';
 import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
+import MobileBottomNav from './components/MobileBottomNav';
+import ScrollProgress from './components/ScrollProgress';
 import StarfieldCanvas from './components/StarfieldCanvas';
 import ScrollToTop from './components/ScrollToTop';
 import { Toaster } from 'react-hot-toast';
@@ -63,11 +65,14 @@ export default function App() {
         {/* Auto scroll-to-top on route navigation */}
         <ScrollToTop />
 
+        {/* Cyber Scroll Progress Indicator (public pages only) */}
+        {!isAdminRoute && <ScrollProgress />}
+
         {/* Persistent Navigation Bar (public pages only) */}
         {!isAdminRoute && <Navbar />}
 
-        {/* Main Viewport Content */}
-        <main className={`flex-grow relative ${isAdminRoute ? 'z-20' : 'z-10'}`}>
+        {/* Main Viewport Content — extra bottom padding on mobile for bottom nav */}
+        <main className={`flex-grow relative ${isAdminRoute ? 'z-20' : 'z-10'} ${!isAdminRoute ? 'pb-20 md:pb-0' : ''}`}>
           <Suspense fallback={<PageLoader />}>
             <Routes>
               {/* Public Festival Pages */}
@@ -102,6 +107,9 @@ export default function App() {
             </Routes>
           </Suspense>
         </main>
+
+        {/* Mobile Bottom Navigation (public pages only) */}
+        {!isAdminRoute && <MobileBottomNav />}
 
         {/* Persistent Brand Footer (public pages only) */}
         {!isAdminRoute && (

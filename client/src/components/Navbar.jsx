@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Zap, User } from 'lucide-react';
+import { User } from 'lucide-react';
 import sMarkImg from '../assets/srijan-s-mark.png';
 
 /**
@@ -9,14 +9,11 @@ import sMarkImg from '../assets/srijan-s-mark.png';
  * Features:
  * - Geometric S emblem in glowing corner-dot badge
  * - "SRIJAN v26.0" title with "ETAS • E&TC DEPT" subtext
- * - Cleaned nav links (sponsors and telemetry status tab removed)
- * - Active pill indicator for current route
- * - Electric cyan "⚡ REGISTER NOW" action button
- * - Circular profile/admin user action
- * - Fully responsive with animated mobile drawer
+ * - Desktop nav links (mobile navigation handled by MobileBottomNav)
+ * - Active underline indicator for current route
+ * - Circular Admin Portal profile action on all screen sizes
  */
 export default function Navbar() {
-  const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
 
@@ -35,10 +32,6 @@ export default function Navbar() {
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  useEffect(() => {
-    setIsOpen(false);
-  }, [location]);
 
   const navLinks = [
     { name: 'Home', path: '/' },
@@ -98,7 +91,7 @@ export default function Navbar() {
             </div>
           </Link>
 
-          {/* CENTER: Navigation Links */}
+          {/* CENTER: Navigation Links (Desktop) */}
           <nav className="hidden md:flex items-center gap-5 lg:gap-7" aria-label="Main Navigation">
             {navLinks.map((link) => {
               const active = isActive(link.path);
@@ -118,92 +111,18 @@ export default function Navbar() {
             })}
           </nav>
 
-          {/* RIGHT: REGISTER NOW Button + User Profile Icon */}
-          <div className="hidden sm:flex items-center gap-3">
-            {/* Electric Cyan CTA Button */}
-            <Link
-              to="/register"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-mono font-bold text-xs sm:text-sm text-[#00131c] bg-[#22e5ff] hover:bg-[#52eeff] shadow-[0_0_24px_rgba(34,229,255,0.6)] hover:shadow-[0_0_35px_rgba(34,229,255,0.85)] transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0 tracking-wider focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#22e5ff]"
-            >
-              <Zap className="w-4 h-4 fill-current" />
-              <span>REGISTER NOW</span>
-            </Link>
-
-            {/* Circular Profile Icon Button (links to admin/profile) */}
+          {/* RIGHT: Admin Portal Icon Button (All screen sizes) */}
+          <div className="flex items-center">
             <Link
               to="/admin"
-              aria-label="Admin / User Profile"
-              className="w-10 h-10 rounded-full bg-[#0a1c2b] border border-[#22e5ff]/40 text-[#22e5ff] hover:text-white hover:border-[#22e5ff] hover:bg-[#0e273d] hover:shadow-[0_0_15px_rgba(34,229,255,0.35)] flex items-center justify-center transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#22e5ff]"
-              title="Admin & Dashboard"
-            >
-              <User className="w-4 h-4" />
-            </Link>
-          </div>
-
-          {/* MOBILE: Hamburger Menu Button */}
-          <div className="flex md:hidden items-center gap-2">
-            <Link
-              to="/register"
-              className="px-3 py-1.5 rounded-lg font-mono font-bold text-xs text-[#00131c] bg-[#22e5ff] shadow-[0_0_12px_rgba(34,229,255,0.5)] flex items-center gap-1 sm:hidden"
-            >
-              <Zap className="w-3.5 h-3.5 fill-current" />
-              <span>REGISTER</span>
-            </Link>
-
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="p-2 rounded-xl text-[#22e5ff] hover:text-white bg-[#0a1c2b] border border-[#22e5ff]/30 focus:outline-none focus:ring-2 focus:ring-[#22e5ff]"
-              aria-label={isOpen ? 'Close menu' : 'Open menu'}
-              aria-expanded={isOpen}
-            >
-              {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
-          </div>
-
-        </div>
-      </div>
-
-      {/* MOBILE DRAWER MENU */}
-      <div
-        className={`md:hidden transition-all duration-300 ease-in-out overflow-hidden ${
-          isOpen ? 'max-h-96 opacity-100 border-b border-[#22e5ff]/30 bg-[#030a14]/98 backdrop-blur-2xl' : 'max-h-0 opacity-0'
-        }`}
-      >
-        <div className="px-5 pt-3 pb-6 space-y-2">
-          {navLinks.map((link) => {
-            const active = isActive(link.path);
-            return (
-              <Link
-                key={link.name}
-                to={link.path}
-                className={`block px-4 py-2.5 rounded-lg text-sm font-medium tracking-wide transition-colors ${
-                  active
-                    ? 'text-[#22e5ff] bg-[#0d2335] border-l-2 border-[#22e5ff]'
-                    : 'text-[#93a4b8] hover:text-white hover:bg-[#0c1d2c]/60'
-                }`}
-              >
-                {link.name}
-              </Link>
-            );
-          })}
-
-          <div className="pt-2 flex items-center gap-3">
-            <Link
-              to="/register"
-              className="flex-1 inline-flex items-center justify-center gap-2 py-3 rounded-xl font-mono font-bold text-xs text-[#00131c] bg-[#22e5ff] shadow-[0_0_20px_rgba(34,229,255,0.5)] tracking-wider"
-            >
-              <Zap className="w-4 h-4 fill-current" />
-              <span>REGISTER NOW</span>
-            </Link>
-
-            <Link
-              to="/admin"
-              className="p-3 rounded-xl bg-[#0a1c2b] border border-[#22e5ff]/40 text-[#22e5ff] hover:text-white flex items-center justify-center"
               aria-label="Admin Portal"
+              className="w-10 h-10 rounded-full bg-[#0a1c2b] border border-[#22e5ff]/40 text-[#22e5ff] hover:text-white hover:border-[#22e5ff] hover:bg-[#0e273d] hover:shadow-[0_0_15px_rgba(34,229,255,0.35)] flex items-center justify-center transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#22e5ff]"
+              title="Admin Portal"
             >
               <User className="w-4 h-4" />
             </Link>
           </div>
+
         </div>
       </div>
     </header>

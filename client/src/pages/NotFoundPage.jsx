@@ -2,9 +2,11 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Home } from 'lucide-react';
 import sMarkImg from '../assets/srijan-s-mark.png';
+import PageTransition from '../components/PageTransition';
 
 export default function NotFoundPage() {
   return (
+    <PageTransition>
     <div className="min-h-[70vh] flex items-center justify-center pt-28 pb-16 px-4">
       <div className="max-w-md w-full text-center p-8 rounded-3xl bg-space-900/80 border border-white/10 backdrop-blur-xl shadow-2xl">
         <div className="w-16 h-16 mx-auto mb-6 rounded-2xl overflow-hidden border border-amber-500/40 bg-space-950 p-1">
@@ -24,5 +26,6 @@ export default function NotFoundPage() {
         </Link>
       </div>
     </div>
+    </PageTransition>
   );
 }

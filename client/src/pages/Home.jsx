@@ -4,12 +4,14 @@ import EventGrid from '../components/EventGrid';
 import CTASection from '../components/CTASection';
 import EngineeringTimeline from '../components/EngineeringTimeline';
 import Reveal from '../components/Reveal';
+import PageTransition from '../components/PageTransition';
 import { events } from '../data/events';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 
 export default function Home() {
   return (
+    <PageTransition>
     <div className="relative min-h-screen text-[#dce3f0]">
       {/* 1. Hero Section */}
       <Hero />
@@ -91,5 +93,6 @@ export default function Home() {
         <CTASection />
       </div>
     </div>
+    </PageTransition>
   );
 }
