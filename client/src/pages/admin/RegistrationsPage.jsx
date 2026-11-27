@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import {
   Users,
-  CheckCircle,
-  XCircle,
   Trash2,
   Download,
   Filter,
@@ -11,15 +9,19 @@ import {
   Calendar,
   Layers,
   ChevronDown,
+  Search,
+  Mail,
+  Phone,
+  Building2,
+  GraduationCap,
+  LayoutGrid,
+  Table2,
 } from 'lucide-react';
 import DataTable from '../../components/admin/DataTable';
-import StatusBadge from '../../components/admin/StatusBadge';
 import DetailDrawer from '../../components/admin/DetailDrawer';
 import ConfirmDialog from '../../components/admin/ConfirmDialog';
 import {
   getAllRegistrations,
-  updateRegistrationStatus,
-  bulkUpdateStatus,
   bulkDeleteRegistrations,
   deleteRegistration,
 } from '../../services/adminService';
@@ -44,9 +46,9 @@ export default function RegistrationsPage() {
   const [globalFilter, setGlobalFilter] = useState('');
   const [rowSelection, setRowSelection] = useState({});
   const [selectedReg, setSelectedReg] = useState(null);
+  const [desktopView, setDesktopView] = useState('table'); // 'table' | 'cards'
 
   // Filters
-  const [statusFilter, setStatusFilter] = useState('ALL');
   const [yearFilter, setYearFilter] = useState('ALL');
   const [deptFilter, setDeptFilter] = useState('ALL');
   const [dateRange, setDateRange] = useState({ start: '', end: '' });
@@ -58,11 +60,6 @@ export default function RegistrationsPage() {
     message: '',
     variant: 'danger',
     onConfirm: () => {},
-  });
-  const [rejectReasonPrompt, setRejectReasonPrompt] = useState({
-    open: false,
-    ids: [],
-    reason: '',
   });
 
   const fetchData = async () => {
@@ -101,11 +98,6 @@ export default function RegistrationsPage() {
           (activeTab === 'BRG' && (eventCode.includes('BRG') || reg.eventId === 'event-5')) ||
           (activeTab === 'CIRCUIT' && (eventCode.includes('CIRCUIT') || reg.eventId === 'event-6'));
         if (!tabMatch) return false;
-      }
-
-      // Status filter
-      if (statusFilter !== 'ALL' && reg.status !== statusFilter) {
-        return false;
       }
 
       // Year filter
@@ -154,88 +146,12 @@ export default function RegistrationsPage() {
 
       return true;
     });
-  }, [registrations, activeTab, statusFilter, yearFilter, deptFilter, dateRange, globalFilter]);
-
-  // Status Change Handler
-  const handleStatusChange = async (id, newStatus, reason = '') => {
-    try {
-      await updateRegistrationStatus(id, newStatus, reason);
-      setRegistrations((prev) =>
-        prev.map((r) =>
-          (r._id === id || r.id === id) ? { ...r, status: newStatus, rejectionReason: reason } : r
-        )
-      );
-      if (selectedReg && (selectedReg._id === id || selectedReg.id === id)) {
-        setSelectedReg((prev) => ({ ...prev, status: newStatus, rejectionReason: reason }));
-      }
-      if (newStatus === 'confirmed') {
-        notify.success('Status Confirmed', 'Registration has been officially verified');
-      } else if (newStatus === 'rejected') {
-        notify.warning('Status Rejected', reason || 'Registration marked as rejected');
-      } else {
-        notify.info('Status Updated', `Registration marked as ${newStatus}`);
-      }
-    } catch (err) {
-      notify.error('Update Failed', err.message || 'Could not update registration status');
-    }
-  };
-
-  // Inline Quick Status Toggle
-  const handleQuickStatusCycle = (e, row) => {
-    e.stopPropagation();
-    const current = row.status || 'pending';
-    const nextStatus = current === 'pending' ? 'confirmed' : current === 'confirmed' ? 'rejected' : 'confirmed';
-    if (nextStatus === 'rejected') {
-      setRejectReasonPrompt({
-        open: true,
-        ids: [row._id || row.id],
-        reason: 'Eligibility or documentation criteria not met',
-      });
-    } else {
-      handleStatusChange(row._id || row.id, nextStatus);
-    }
-  };
+  }, [registrations, activeTab, yearFilter, deptFilter, dateRange, globalFilter]);
 
   // Bulk Actions
   const selectedRowsList = useMemo(() => {
     return Object.keys(rowSelection).map((index) => filteredData[Number(index)]).filter(Boolean);
   }, [rowSelection, filteredData]);
-
-  const handleBulkConfirm = async () => {
-    const ids = selectedRowsList.map((r) => r._id || r.id);
-    if (ids.length === 0) return;
-    try {
-      await bulkUpdateStatus(ids, 'confirmed');
-      setRowSelection({});
-      fetchData();
-      notify.success('Batch Confirmed', `Successfully confirmed ${ids.length} registration(s)`);
-    } catch (err) {
-      notify.error('Bulk Action Failed', err.message || 'Failed to update selected registrations');
-    }
-  };
-
-  const handleBulkRejectPrompt = () => {
-    const ids = selectedRowsList.map((r) => r._id || r.id);
-    if (ids.length === 0) return;
-    setRejectReasonPrompt({
-      open: true,
-      ids,
-      reason: 'Batch review rejected by admin',
-    });
-  };
-
-  const executeBulkReject = async () => {
-    try {
-      await bulkUpdateStatus(rejectReasonPrompt.ids, 'rejected', rejectReasonPrompt.reason);
-      const count = rejectReasonPrompt.ids.length;
-      setRejectReasonPrompt({ open: false, ids: [], reason: '' });
-      setRowSelection({});
-      fetchData();
-      notify.warning('Batch Rejected', `Marked ${count} registration(s) as rejected`);
-    } catch (err) {
-      notify.error('Bulk Action Failed', err.message || 'Failed to reject selected registrations');
-    }
-  };
 
   const handleBulkDelete = () => {
     const ids = selectedRowsList.map((r) => r._id || r.id);
@@ -279,8 +195,6 @@ export default function RegistrationsPage() {
         Department: lead?.department || lead?.branch || r.department || '',
         Year: lead?.year || r.year || '',
         College: lead?.college || r.college || '',
-        Status: r.status || 'pending',
-        'Rejection Reason': r.rejectionReason || '',
         'Date Submitted': r.createdAt ? new Date(r.createdAt).toLocaleString() : '',
       };
     });
@@ -324,7 +238,7 @@ export default function RegistrationsPage() {
         accessorKey: 'registrationId',
         header: 'Reg ID',
         cell: ({ row }) => (
-          <span className="font-mono font-bold text-cyan-400">
+          <span className="font-mono font-bold text-cyan-400 whitespace-nowrap">
             {row.original.registrationId || row.original.registration_id || row.original._id?.slice(-6)}
           </span>
         ),
@@ -333,8 +247,8 @@ export default function RegistrationsPage() {
         accessorKey: 'eventCode',
         header: 'Event',
         cell: ({ row }) => (
-          <span className="px-2 py-0.5 rounded bg-white/[0.05] border border-white/[0.08] text-slate-200 font-semibold text-[11px]">
-            {row.original.eventCode || row.original.event_code || row.original.eventId}
+          <span className="px-2.5 py-1 rounded-md bg-white/[0.05] border border-white/[0.08] text-slate-200 font-semibold text-xs whitespace-nowrap inline-block">
+            {row.original.eventName || row.original.eventCode || row.original.event_code || row.original.eventId}
           </span>
         ),
       },
@@ -346,18 +260,20 @@ export default function RegistrationsPage() {
           const lead = r.teamLeader || r.participant || r.leader;
           const isTeam = r.registrationType === 'team' || r.teamName || (r.members && r.members.length > 0);
           return (
-            <div>
-              <div className="font-medium text-white flex items-center gap-1.5">
-                <span>{r.teamName || r.team_name || lead?.name || r.name}</span>
-                {isTeam && (
-                  <span className="text-[10px] px-1.5 py-0.2 rounded bg-cyan-500/10 text-cyan-300 font-mono">
-                    Team ({(r.members?.length || 0) + 1})
-                  </span>
-                )}
+            <div className="min-w-[160px]">
+              <div className="font-semibold text-white text-xs flex items-center gap-1.5 flex-wrap">
+                <span>{r.teamName || r.team_name || lead?.name || r.name || 'Participant'}</span>
+                <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono ${
+                  isTeam
+                    ? 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/20'
+                    : 'bg-slate-800 text-slate-400 border border-white/10'
+                }`}>
+                  {isTeam ? `Team (${(r.members?.length || 0) + 1})` : 'Solo'}
+                </span>
               </div>
               {isTeam && (
-                <div className="text-[10px] text-slate-500">
-                  Lead: {lead?.name || r.name}
+                <div className="text-[11px] text-slate-400 mt-0.5">
+                  Lead: <span className="text-slate-300">{lead?.name || r.name || '—'}</span>
                 </div>
               )}
             </div>
@@ -371,39 +287,34 @@ export default function RegistrationsPage() {
           const r = row.original;
           const lead = r.teamLeader || r.participant || r.leader;
           return (
-            <div className="text-[11px]">
-              <div className="text-slate-300">{lead?.email || r.email || '—'}</div>
-              <div className="text-slate-500 font-mono">{lead?.phone || lead?.mobile || r.phone || '—'}</div>
+            <div className="text-xs space-y-0.5 min-w-[170px]">
+              <div className="text-slate-200 truncate max-w-[200px]" title={lead?.email || r.email}>
+                {lead?.email || r.email || '—'}
+              </div>
+              <div className="text-slate-400 font-mono text-[11px]">
+                {lead?.phone || lead?.mobile || r.phone || '—'}
+              </div>
             </div>
           );
         },
       },
       {
         id: 'deptYear',
-        header: 'Dept & Year',
+        header: 'College & Dept',
         cell: ({ row }) => {
           const r = row.original;
           const lead = r.teamLeader || r.participant || r.leader;
+          const dept = lead?.department || lead?.branch || r.department || '—';
+          const year = lead?.year || r.year || '—';
+          const college = lead?.college || r.college || '';
           return (
-            <div className="text-[11px] text-slate-400">
-              <span>{lead?.department || lead?.branch || r.department || '—'}</span>
-              <span className="mx-1 text-slate-600">/</span>
-              <span>{lead?.year || r.year || '—'}</span>
-            </div>
-          );
-        },
-      },
-      {
-        accessorKey: 'status',
-        header: 'Status',
-        cell: ({ row }) => {
-          const r = row.original;
-          return (
-            <div
-              title="Click to cycle status: Pending -> Confirmed -> Rejected"
-              onClick={(e) => handleQuickStatusCycle(e, r)}
-            >
-              <StatusBadge status={r.status || 'pending'} onClick={(e) => handleQuickStatusCycle(e, r)} />
+            <div className="text-xs min-w-[150px]">
+              <div className="text-slate-200 font-medium truncate max-w-[180px]" title={college || `${dept} / ${year}`}>
+                {college || `${dept} • ${year}`}
+              </div>
+              <div className="text-[11px] text-slate-400">
+                {dept} <span className="text-slate-600">/</span> {year}
+              </div>
             </div>
           );
         },
@@ -414,8 +325,8 @@ export default function RegistrationsPage() {
         cell: ({ row }) => {
           const d = row.original.createdAt;
           return (
-            <span className="text-[11px] text-slate-500 font-mono">
-              {d ? new Date(d).toLocaleDateString() : '—'}
+            <span className="text-xs text-slate-400 font-mono whitespace-nowrap">
+              {d ? new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'}
             </span>
           );
         },
@@ -471,11 +382,41 @@ export default function RegistrationsPage() {
             </span>
           </h1>
           <p className="text-xs text-slate-400 mt-1">
-            Filter, inspect leader and team compositions, cycle approval status, and batch export.
+            Filter, inspect leader and team compositions, and batch export.
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Desktop View Toggle */}
+          <div className="hidden md:flex items-center p-0.5 rounded-lg bg-white/[0.03] border border-white/[0.08]">
+            <button
+              type="button"
+              onClick={() => setDesktopView('table')}
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
+                desktopView === 'table'
+                  ? 'bg-cyan-500/20 text-cyan-300'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+              title="Table View"
+            >
+              <Table2 size={13} />
+              <span>Table</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setDesktopView('cards')}
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
+                desktopView === 'cards'
+                  ? 'bg-cyan-500/20 text-cyan-300'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+              title="Cards View"
+            >
+              <LayoutGrid size={13} />
+              <span>Cards</span>
+            </button>
+          </div>
+
           <button
             onClick={fetchData}
             disabled={loading}
@@ -521,130 +462,264 @@ export default function RegistrationsPage() {
       {selectedRowsList.length > 0 && (
         <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl bg-cyan-500/10 border border-cyan-500/30 backdrop-blur-md animate-fadeIn">
           <div className="flex items-center gap-2 text-xs text-cyan-300">
-            <CheckCircle size={15} />
+            <Users size={15} />
             <span>
               <strong>{selectedRowsList.length}</strong> registration(s) selected
             </span>
           </div>
           <div className="flex items-center gap-2">
             <button
-              onClick={handleBulkConfirm}
-              className="flex items-center gap-1 px-2.5 py-1 rounded bg-emerald-500 text-slate-950 font-semibold text-xs hover:bg-emerald-400 transition-colors shadow-sm"
-            >
-              <CheckCircle size={13} />
-              <span>Confirm</span>
-            </button>
-            <button
-              onClick={handleBulkRejectPrompt}
-              className="flex items-center gap-1 px-2.5 py-1 rounded bg-amber-500 text-slate-950 font-semibold text-xs hover:bg-amber-400 transition-colors shadow-sm"
-            >
-              <XCircle size={13} />
-              <span>Reject</span>
-            </button>
-            <button
               onClick={handleBulkDelete}
               className="flex items-center gap-1 px-2.5 py-1 rounded bg-red-500 text-white font-semibold text-xs hover:bg-red-400 transition-colors shadow-sm"
             >
               <Trash2 size={13} />
-              <span>Delete</span>
+              <span>Delete Selected</span>
             </button>
           </div>
         </div>
       )}
 
-      {/* Filter Controls Row */}
-      <div className="flex flex-wrap items-center gap-2 pt-1">
-        {/* Status Filter */}
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          className="bg-white/[0.04] border border-white/[0.08] text-slate-300 rounded-lg px-2.5 py-1.5 text-xs outline-none focus:border-cyan-500/40"
-        >
-          <option value="ALL" className="bg-slate-900">All Statuses</option>
-          <option value="confirmed" className="bg-slate-900">Confirmed</option>
-          <option value="pending" className="bg-slate-900">Pending</option>
-          <option value="rejected" className="bg-slate-900">Rejected</option>
-        </select>
-
-        {/* Year Filter */}
-        <select
-          value={yearFilter}
-          onChange={(e) => setYearFilter(e.target.value)}
-          className="bg-white/[0.04] border border-white/[0.08] text-slate-300 rounded-lg px-2.5 py-1.5 text-xs outline-none focus:border-cyan-500/40"
-        >
-          <option value="ALL" className="bg-slate-900">All Years</option>
-          <option value="1st" className="bg-slate-900">1st Year</option>
-          <option value="2nd" className="bg-slate-900">2nd Year</option>
-          <option value="3rd" className="bg-slate-900">3rd Year</option>
-          <option value="4th" className="bg-slate-900">4th Year</option>
-        </select>
-
-        {/* Department Filter */}
-        <select
-          value={deptFilter}
-          onChange={(e) => setDeptFilter(e.target.value)}
-          className="bg-white/[0.04] border border-white/[0.08] text-slate-300 rounded-lg px-2.5 py-1.5 text-xs outline-none focus:border-cyan-500/40"
-        >
-          <option value="ALL" className="bg-slate-900">All Departments</option>
-          <option value="CSE" className="bg-slate-900">Computer Science</option>
-          <option value="IT" className="bg-slate-900">Information Technology</option>
-          <option value="ENTC" className="bg-slate-900">Electronics & Telecomm</option>
-          <option value="MECH" className="bg-slate-900">Mechanical</option>
-          <option value="CIVIL" className="bg-slate-900">Civil</option>
-          <option value="ELECT" className="bg-slate-900">Electrical</option>
-        </select>
-
-        {/* Date Range Inputs */}
-        <div className="flex items-center gap-1 text-xs text-slate-400">
-          <span>From:</span>
+      {/* Filter Controls Bar */}
+      <div className="bg-slate-900/50 border border-white/[0.06] rounded-xl p-3 space-y-2.5">
+        {/* Search bar for mobile & cards view */}
+        <div className={`${desktopView === 'cards' ? 'block' : 'block md:hidden'} relative`}>
+          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
           <input
-            type="date"
-            value={dateRange.start}
-            onChange={(e) => setDateRange((prev) => ({ ...prev, start: e.target.value }))}
-            className="bg-white/[0.04] border border-white/[0.08] text-slate-300 rounded-lg px-2 py-1 text-xs outline-none"
-          />
-          <span>To:</span>
-          <input
-            type="date"
-            value={dateRange.end}
-            onChange={(e) => setDateRange((prev) => ({ ...prev, end: e.target.value }))}
-            className="bg-white/[0.04] border border-white/[0.08] text-slate-300 rounded-lg px-2 py-1 text-xs outline-none"
+            type="text"
+            value={globalFilter}
+            onChange={(e) => setGlobalFilter(e.target.value)}
+            placeholder="Search by Reg ID, name, team, email, phone, or college..."
+            className="w-full pl-9 pr-3 py-2 rounded-lg bg-white/[0.04] border border-white/[0.08] text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-cyan-500/40"
           />
         </div>
 
-        {(statusFilter !== 'ALL' || yearFilter !== 'ALL' || deptFilter !== 'ALL' || dateRange.start || dateRange.end) && (
-          <button
-            onClick={() => {
-              setStatusFilter('ALL');
-              setYearFilter('ALL');
-              setDeptFilter('ALL');
-              setDateRange({ start: '', end: '' });
-            }}
-            className="text-[11px] text-cyan-400 hover:underline px-2"
+        <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2">
+          {/* Year Filter */}
+          <select
+            value={yearFilter}
+            onChange={(e) => setYearFilter(e.target.value)}
+            className="bg-white/[0.04] border border-white/[0.08] text-slate-300 rounded-lg px-2.5 py-1.5 text-xs outline-none focus:border-cyan-500/40"
           >
-            Clear Filters
-          </button>
+            <option value="ALL" className="bg-slate-900">All Years</option>
+            <option value="1st" className="bg-slate-900">1st Year</option>
+            <option value="2nd" className="bg-slate-900">2nd Year</option>
+            <option value="3rd" className="bg-slate-900">3rd Year</option>
+            <option value="4th" className="bg-slate-900">4th Year</option>
+          </select>
+
+          {/* Department Filter */}
+          <select
+            value={deptFilter}
+            onChange={(e) => setDeptFilter(e.target.value)}
+            className="col-span-2 sm:col-span-1 bg-white/[0.04] border border-white/[0.08] text-slate-300 rounded-lg px-2.5 py-1.5 text-xs outline-none focus:border-cyan-500/40"
+          >
+            <option value="ALL" className="bg-slate-900">All Departments</option>
+            <option value="CSE" className="bg-slate-900">Computer Science</option>
+            <option value="IT" className="bg-slate-900">Information Technology</option>
+            <option value="ENTC" className="bg-slate-900">Electronics & Telecomm</option>
+            <option value="MECH" className="bg-slate-900">Mechanical</option>
+            <option value="CIVIL" className="bg-slate-900">Civil</option>
+            <option value="ELECT" className="bg-slate-900">Electrical</option>
+          </select>
+
+          {/* Date Range Inputs */}
+          <div className="col-span-2 sm:col-span-1 flex items-center gap-1.5 text-xs text-slate-400">
+            <span className="shrink-0">From:</span>
+            <input
+              type="date"
+              value={dateRange.start}
+              onChange={(e) => setDateRange((prev) => ({ ...prev, start: e.target.value }))}
+              className="flex-1 sm:flex-none bg-white/[0.04] border border-white/[0.08] text-slate-300 rounded-lg px-2 py-1 text-xs outline-none"
+            />
+            <span className="shrink-0">To:</span>
+            <input
+              type="date"
+              value={dateRange.end}
+              onChange={(e) => setDateRange((prev) => ({ ...prev, end: e.target.value }))}
+              className="flex-1 sm:flex-none bg-white/[0.04] border border-white/[0.08] text-slate-300 rounded-lg px-2 py-1 text-xs outline-none"
+            />
+          </div>
+
+          {(yearFilter !== 'ALL' || deptFilter !== 'ALL' || dateRange.start || dateRange.end || globalFilter) && (
+            <button
+              onClick={() => {
+                setYearFilter('ALL');
+                setDeptFilter('ALL');
+                setDateRange({ start: '', end: '' });
+                setGlobalFilter('');
+              }}
+              className="text-xs text-cyan-400 hover:underline px-2 justify-self-start"
+            >
+              Clear All
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Structured Cards View (Always on mobile < md, optional on desktop) */}
+      <div className={desktopView === 'cards' ? 'block' : 'block md:hidden'}>
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="h-44 rounded-xl bg-slate-900/50 border border-white/[0.06] animate-pulse p-4" />
+            ))}
+          </div>
+        ) : filteredData.length === 0 ? (
+          <div className="rounded-xl border border-white/[0.08] bg-slate-900/40 p-10 text-center text-slate-400 text-xs">
+            No matching registrations found. Try adjusting your filters or search query.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+            {filteredData.map((r, idx) => {
+              const lead = r.teamLeader || r.participant || r.leader;
+              const isTeam = r.registrationType === 'team' || r.teamName || (r.members && r.members.length > 0);
+              const regId = r.registrationId || r.registration_id || r._id?.slice(-6);
+              const eventLabel = r.eventName || r.eventCode || r.event_code || r.eventId;
+              const dept = lead?.department || lead?.branch || r.department || '—';
+              const year = lead?.year || r.year || '—';
+              const college = lead?.college || r.college || '—';
+              const email = lead?.email || r.email || '—';
+              const phone = lead?.phone || lead?.mobile || r.phone || '—';
+              const isSelected = Boolean(rowSelection[idx]);
+
+              return (
+                <div
+                  key={r._id || r.id || idx}
+                  onClick={() => setSelectedReg(r)}
+                  className={`rounded-xl border p-4 transition-all cursor-pointer space-y-3 ${
+                    isSelected
+                      ? 'bg-cyan-500/10 border-cyan-500/40'
+                      : 'bg-slate-900/60 border-white/[0.08] hover:border-cyan-500/35'
+                  }`}
+                >
+                  {/* Top Row: Checkbox + Reg ID + Event + Team/Solo Badge */}
+                  <div className="flex items-center justify-between gap-2 pb-2.5 border-b border-white/[0.06]">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onClick={(e) => e.stopPropagation()}
+                        onChange={(e) =>
+                          setRowSelection((prev) => {
+                            const next = { ...prev };
+                            if (e.target.checked) next[idx] = true;
+                            else delete next[idx];
+                            return next;
+                          })
+                        }
+                        className="rounded border-white/20 bg-slate-800 text-cyan-500 focus:ring-0 cursor-pointer shrink-0"
+                      />
+                      <span className="font-mono text-xs font-bold text-cyan-400 shrink-0">
+                        {regId}
+                      </span>
+                      <span className="px-2 py-0.5 rounded bg-white/[0.06] border border-white/[0.08] text-slate-200 font-semibold text-[11px] truncate">
+                        {eventLabel}
+                      </span>
+                    </div>
+
+                    <span className={`text-[10px] px-2 py-0.5 rounded font-mono shrink-0 ${
+                      isTeam
+                        ? 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/25'
+                        : 'bg-slate-800 text-slate-400 border border-white/10'
+                    }`}>
+                      {isTeam ? `Team (${(r.members?.length || 0) + 1})` : 'Solo'}
+                    </span>
+                  </div>
+
+                  {/* Participant / Team Title */}
+                  <div>
+                    <h3 className="font-semibold text-sm text-white truncate">
+                      {r.teamName || r.team_name || lead?.name || r.name || 'Participant'}
+                    </h3>
+                    {isTeam && (
+                      <p className="text-xs text-slate-400 mt-0.5">
+                        Leader: <span className="text-slate-200 font-medium">{lead?.name || r.name || '—'}</span>
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Clean Details Grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs bg-black/20 rounded-lg p-2.5 border border-white/[0.04]">
+                    <div className="flex items-center gap-2 text-slate-300 min-w-0">
+                      <Mail size={13} className="text-cyan-400 shrink-0" />
+                      <span className="truncate">{email}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-slate-300 font-mono">
+                      <Phone size={13} className="text-cyan-400 shrink-0" />
+                      <span>{phone}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-slate-300 min-w-0">
+                      <GraduationCap size={13} className="text-amber-400 shrink-0" />
+                      <span className="truncate">{dept} / {year}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-slate-300 min-w-0">
+                      <Building2 size={13} className="text-amber-400 shrink-0" />
+                      <span className="truncate">{college}</span>
+                    </div>
+                  </div>
+
+                  {/* Bottom Footer: Date + Actions */}
+                  <div className="flex items-center justify-between pt-1 text-[11px] text-slate-400">
+                    <span className="font-mono">
+                      {r.createdAt ? new Date(r.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'}
+                    </span>
+                    <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                      <button
+                        type="button"
+                        onClick={() => setSelectedReg(r)}
+                        className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-cyan-500/10 border border-cyan-500/25 text-cyan-300 hover:bg-cyan-500/20 font-medium transition-colors"
+                      >
+                        <Eye size={13} />
+                        <span>View</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setConfirmDialog({
+                            open: true,
+                            title: 'Delete Registration',
+                            message: `Permanently delete registration for "${r.teamName || lead?.name || 'this participant'}"?`,
+                            variant: 'danger',
+                            onConfirm: async () => {
+                              await deleteRegistration(r._id || r.id);
+                              setConfirmDialog((prev) => ({ ...prev, open: false }));
+                              fetchData();
+                            },
+                          });
+                        }}
+                        className="p-1.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition-colors"
+                        title="Delete"
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         )}
       </div>
 
-      {/* Main TanStack Table */}
-      <DataTable
-        data={filteredData}
-        columns={columns}
-        loading={loading}
-        globalFilter={globalFilter}
-        setGlobalFilter={setGlobalFilter}
-        rowSelection={rowSelection}
-        setRowSelection={setRowSelection}
-        onRowClick={(row) => setSelectedReg(row)}
-        initialPageSize={25}
-      />
+      {/* Main TanStack Table (Desktop when desktopView === 'table') */}
+      <div className={desktopView === 'table' ? 'hidden md:block' : 'hidden'}>
+        <DataTable
+          data={filteredData}
+          columns={columns}
+          loading={loading}
+          globalFilter={globalFilter}
+          setGlobalFilter={setGlobalFilter}
+          rowSelection={rowSelection}
+          setRowSelection={setRowSelection}
+          onRowClick={(row) => setSelectedReg(row)}
+          initialPageSize={25}
+        />
+      </div>
 
       {/* Detail Drawer */}
       <DetailDrawer
         registration={selectedReg}
         onClose={() => setSelectedReg(null)}
-        onStatusChange={handleStatusChange}
       />
 
       {/* Confirm Dialog */}
@@ -656,45 +731,6 @@ export default function RegistrationsPage() {
         onConfirm={confirmDialog.onConfirm}
         onCancel={() => setConfirmDialog((prev) => ({ ...prev, open: false }))}
       />
-
-      {/* Rejection Reason Modal */}
-      {rejectReasonPrompt.open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm"
-            onClick={() => setRejectReasonPrompt({ open: false, ids: [], reason: '' })}
-          />
-          <div className="relative w-full max-w-md bg-slate-900 border border-white/[0.08] rounded-xl p-5 shadow-2xl space-y-4">
-            <h3 className="text-base font-bold text-white">Provide Rejection Reason</h3>
-            <p className="text-xs text-slate-400">
-              This note will be recorded in the participant log and audit trail.
-            </p>
-            <textarea
-              value={rejectReasonPrompt.reason}
-              onChange={(e) =>
-                setRejectReasonPrompt((prev) => ({ ...prev, reason: e.target.value }))
-              }
-              rows={3}
-              placeholder="e.g. Duplicate registration, incomplete details, invalid ID"
-              className="w-full px-3 py-2 rounded-lg bg-white/[0.04] border border-white/[0.08] text-xs text-white placeholder:text-slate-500 outline-none focus:border-red-500/50"
-            />
-            <div className="flex items-center justify-end gap-2">
-              <button
-                onClick={() => setRejectReasonPrompt({ open: false, ids: [], reason: '' })}
-                className="px-3 py-1.5 rounded-lg border border-white/[0.08] text-xs text-slate-400 hover:text-white"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={executeBulkReject}
-                className="px-3 py-1.5 rounded-lg bg-red-500 text-white text-xs font-semibold hover:bg-red-400"
-              >
-                Confirm Rejection
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

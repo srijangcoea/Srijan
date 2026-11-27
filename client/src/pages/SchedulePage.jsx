@@ -20,12 +20,13 @@ import {
 import CTASection from '../components/CTASection';
 import PageTransition from '../components/PageTransition';
 import Reveal from '../components/Reveal';
+import { useCms } from '../contexts/CmsContext';
 
 const SCHEDULE_DATA = [
   {
     day: 'Day 01',
-    shortLabel: 'DAY 01 (DEC 21)',
-    date: 'DECEMBER 21, 2026',
+    shortLabel: 'DAY 01 (21 DEC)',
+    date: '21 DECEMBER 2026',
     window: '11:00 AM – 05:00 PM',
     duration: '6 Hours',
     competitionsCount: '3 Competitions',
@@ -89,8 +90,8 @@ const SCHEDULE_DATA = [
   },
   {
     day: 'Day 02',
-    shortLabel: 'DAY 02 (DEC 22)',
-    date: 'DECEMBER 22, 2026',
+    shortLabel: 'DAY 02 (22 DEC)',
+    date: '22 DECEMBER 2026',
     window: '10:00 AM – 05:00 PM',
     duration: '7 Hours',
     competitionsCount: '3 Competitions',
@@ -136,7 +137,7 @@ const SCHEDULE_DATA = [
         title: 'Hackathon – Development Sprint',
         venue: 'IT Computing Labs',
         category: '24HR HACK',
-        desc: 'Dedicated afternoon development sprint & mentor checkpoints (part of the continuous 24-hour Hackathon running Dec 22, 10 AM – Dec 23, 10 AM).',
+        desc: 'Dedicated afternoon development sprint & mentor checkpoints (part of the continuous 24-hour Hackathon running 22 Dec, 10 AM – 23 Dec, 10 AM).',
         eventId: 'event-1',
         badge: '24HR SPRINT',
       },
@@ -147,31 +148,35 @@ const SCHEDULE_DATA = [
 const HACKATHON_MILESTONES = [
   {
     step: '01',
-    time: 'DEC 22 · 10:00 AM',
+    time: '22 DEC 2026 · 10:00 AM',
     label: 'Hackathon Kickoff',
     detail: 'Problem statements live. Runs in parallel with PCB & CAD in a separate lab.',
   },
   {
     step: '02',
-    time: 'DEC 22, 10 AM – DEC 23, 10 AM',
+    time: '22 DEC, 10 AM – 23 DEC, 10 AM',
     label: 'Continuous 24-Hour Sprint',
     detail: 'Non-stop coding, prototyping, mentor reviews, and afternoon sprint block (3–5 PM).',
   },
   {
     step: '03',
-    time: 'DEC 23 · 10:00 AM',
+    time: '23 DEC 2026 · 10:00 AM',
     label: 'Final Submission & Evaluation',
     detail: 'Code freeze, live jury demos, and final evaluation of working prototypes.',
   },
 ];
 
 const DISTRIBUTION_ROWS = [
-  { day: 'December 21', focus: 'Physical Engineering Battles', events: '3 competitions', duration: '6 hours' },
-  { day: 'December 22', focus: 'Digital Design & Innovation', events: '3 competitions', duration: '7 hours' },
+  { day: '21 December 2026', focus: 'Physical Engineering Battles', events: '3 competitions', duration: '6 hours' },
+  { day: '22 December 2026', focus: 'Digital Design & Innovation', events: '3 competitions', duration: '7 hours' },
 ];
 
 export default function SchedulePage() {
   const [activeDayIndex, setActiveDayIndex] = useState('all'); // 'all' | 0 | 1
+  const { cms } = useCms();
+  const scheduleCms = cms?.schedule || {};
+  const activeScheduleDays = Array.isArray(scheduleCms.days) && scheduleCms.days.length > 0 ? scheduleCms.days : SCHEDULE_DATA;
+  const activeHackMilestones = Array.isArray(scheduleCms.hackathonMilestones) && scheduleCms.hackathonMilestones.length > 0 ? scheduleCms.hackathonMilestones : HACKATHON_MILESTONES;
 
   return (
     <PageTransition>
@@ -198,15 +203,15 @@ export default function SchedulePage() {
             <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 shrink-0 font-mono text-xs text-[#bac9cc]">
               <div className="bg-[#151c26] px-3.5 py-2 rounded-xl border border-[#ffd799]/30 shadow-sm flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-[#ffd799]" />
-                <span className="text-[#ffd799] font-bold">DEC 21 – 22, 2026</span>
+                <span className="text-[#ffd799] font-bold">{scheduleCms.headerDates || '21 – 22 DEC 2026'}</span>
               </div>
               <div className="bg-[#151c26] px-3.5 py-2 rounded-xl border border-[#00e5ff]/30 shadow-sm flex items-center gap-2">
                 <Clock className="w-4 h-4 text-[#00e5ff]" />
-                <span className="text-[#c3f5ff] font-bold">13 HRS + 24HR HACK</span>
+                <span className="text-[#c3f5ff] font-bold">{scheduleCms.headerDuration || '13 HRS + 24HR HACK'}</span>
               </div>
               <div className="bg-[#151c26] px-3.5 py-2 rounded-xl border border-[#3b494c]/40 shadow-sm flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-[#00e5ff]" />
-                <span>GCOEA CAMPUS</span>
+                <span>{scheduleCms.headerVenue || 'GCOEA CAMPUS'}</span>
               </div>
             </div>
           </div>
@@ -215,7 +220,7 @@ export default function SchedulePage() {
           {/* 2. 2-DAY OVERVIEW CARDS                                            */}
           {/* ================================================================== */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-7 mb-12 sm:mb-14">
-            {SCHEDULE_DATA.map((dayItem, index) => {
+            {activeScheduleDays.map((dayItem, index) => {
               const isSelected = activeDayIndex === index;
               const isGold = dayItem.accent === 'gold';
 
@@ -305,9 +310,9 @@ export default function SchedulePage() {
                       : 'bg-[#151c26] text-[#bac9cc] border-[#3b494c]/30 hover:border-[#00daf3]/40 hover:text-white'
                   }`}
                 >
-                  All Days (Dec 21–22)
+                  All Days (21–22 Dec)
                 </button>
-                {SCHEDULE_DATA.map((d, idx) => (
+                {activeScheduleDays.map((d, idx) => (
                   <button
                     key={d.day}
                     type="button"
@@ -332,7 +337,7 @@ export default function SchedulePage() {
 
             {/* Timeline Stream */}
             <div className="space-y-12">
-              {SCHEDULE_DATA.filter((_, idx) => activeDayIndex === 'all' || activeDayIndex === idx).map(
+              {activeScheduleDays.filter((_, idx) => activeDayIndex === 'all' || activeDayIndex === idx).map(
                 (dayData) => {
                   const isGold = dayData.accent === 'gold';
                   return (
@@ -508,7 +513,7 @@ export default function SchedulePage() {
 
               {/* 3-Step Progression */}
               <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
-                {HACKATHON_MILESTONES.map((m) => (
+                {activeHackMilestones.map((m) => (
                   <div
                     key={m.step}
                     className="p-5 rounded-2xl bg-[#0d141d]/90 border border-white/10 hover:border-[#00e5ff]/40 transition-colors flex flex-col gap-2"

@@ -1,8 +1,7 @@
 import React from 'react';
-import { X, CheckCircle, XCircle, Clock, User, Mail, Phone, Building, BookOpen, Calendar } from 'lucide-react';
-import StatusBadge from './StatusBadge';
+import { X, User, Mail, Phone, Building, BookOpen, Calendar } from 'lucide-react';
 
-export default function DetailDrawer({ registration, onClose, onStatusChange }) {
+export default function DetailDrawer({ registration, onClose }) {
   if (!registration) return null;
 
   const reg = registration;
@@ -61,22 +60,15 @@ export default function DetailDrawer({ registration, onClose, onStatusChange }) 
         </div>
 
         <div className="p-4 space-y-4">
-          {/* Status & Meta */}
-          <div className="flex items-center justify-between">
-            <StatusBadge status={reg.status} size="md" />
-            <span className="text-xs text-slate-500">
+          {/* Submission Timestamp */}
+          <div className="flex items-center justify-between text-xs text-slate-400">
+            <span className="uppercase tracking-wider font-semibold text-slate-500">Submitted On</span>
+            <span className="font-mono text-slate-300">
               {new Date(reg.createdAt).toLocaleDateString('en-IN', {
                 day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit',
               })}
             </span>
           </div>
-
-          {reg.rejectionReason && (
-            <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3">
-              <p className="text-xs text-red-400 font-medium">Rejection Reason:</p>
-              <p className="text-sm text-red-300 mt-1">{reg.rejectionReason}</p>
-            </div>
-          )}
 
           {/* Team info */}
           {isTeam && (
@@ -96,42 +88,6 @@ export default function DetailDrawer({ registration, onClose, onStatusChange }) 
               {members.map((m, idx) => (
                 <PersonCard key={idx} person={m} label={`Member ${idx + 2}`} />
               ))}
-            </div>
-          )}
-
-          {/* Status Actions */}
-          {onStatusChange && (
-            <div className="border-t border-white/[0.06] pt-4 space-y-2">
-              <p className="text-xs text-slate-500 uppercase tracking-wider font-semibold mb-2">Quick Actions</p>
-              <div className="grid grid-cols-2 gap-2">
-                {reg.status !== 'confirmed' && (
-                  <button
-                    onClick={() => onStatusChange(reg._id, 'confirmed')}
-                    className="flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20 transition-colors text-sm font-medium"
-                  >
-                    <CheckCircle size={16} /> Confirm
-                  </button>
-                )}
-                {reg.status !== 'rejected' && (
-                  <button
-                    onClick={() => {
-                      const reason = prompt('Enter rejection reason:');
-                      if (reason) onStatusChange(reg._id, 'rejected', reason);
-                    }}
-                    className="flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition-colors text-sm font-medium"
-                  >
-                    <XCircle size={16} /> Reject
-                  </button>
-                )}
-                {reg.status !== 'pending' && (
-                  <button
-                    onClick={() => onStatusChange(reg._id, 'pending')}
-                    className="flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 hover:bg-amber-500/20 transition-colors text-sm font-medium"
-                  >
-                    <Clock size={16} /> Pending
-                  </button>
-                )}
-              </div>
             </div>
           )}
         </div>

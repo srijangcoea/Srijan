@@ -28,7 +28,6 @@ export default function ExportPage() {
   const [registrations, setRegistrations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedEvent, setSelectedEvent] = useState('ALL');
-  const [selectedStatus, setSelectedStatus] = useState('ALL');
   const [includeMembers, setIncludeMembers] = useState(true);
   const [exporting, setExporting] = useState(false);
 
@@ -46,10 +45,9 @@ export default function ExportPage() {
     return registrations.filter((r) => {
       const code = (r.eventCode || r.event_code || r.eventId || '').toUpperCase();
       if (selectedEvent !== 'ALL' && !code.includes(selectedEvent)) return false;
-      if (selectedStatus !== 'ALL' && r.status !== selectedStatus) return false;
       return true;
     });
-  }, [registrations, selectedEvent, selectedStatus]);
+  }, [registrations, selectedEvent]);
 
   const generateDataRows = () => {
     return filtered.map((r, idx) => {
@@ -71,8 +69,6 @@ export default function ExportPage() {
         Department: lead?.department || lead?.branch || r.department || '',
         Year: lead?.year || r.year || '',
         College: lead?.college || r.college || 'Government College of Engineering, Amravati',
-        Status: r.status || 'pending',
-        'Rejection Reason': r.rejectionReason || '',
         'Submission Timestamp': r.createdAt ? new Date(r.createdAt).toLocaleString() : '',
       };
 
@@ -99,7 +95,7 @@ export default function ExportPage() {
       // Generate buffer and trigger download
       const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
       const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
-      saveAs(blob, `Srijan2026_${selectedEvent}_${selectedStatus}_${Date.now()}.xlsx`);
+      saveAs(blob, `Srijan2026_${selectedEvent}_${Date.now()}.xlsx`);
       notify.success('Excel Generated', `Exported ${dataRows.length} records successfully`);
     } catch (err) {
       notify.error('Export Failed', err.message || 'Could not export Excel file');
@@ -119,7 +115,7 @@ export default function ExportPage() {
       const worksheet = XLSX.utils.json_to_sheet(dataRows);
       const csvOutput = XLSX.utils.sheet_to_csv(worksheet);
       const blob = new Blob([csvOutput], { type: 'text/csv;charset=utf-8;' });
-      saveAs(blob, `Srijan2026_${selectedEvent}_${selectedStatus}_${Date.now()}.csv`);
+      saveAs(blob, `Srijan2026_${selectedEvent}_${Date.now()}.csv`);
       notify.success('CSV Generated', `Exported ${dataRows.length} records successfully`);
     } catch (err) {
       notify.error('Export Failed', err.message || 'Could not export CSV file');
@@ -150,7 +146,7 @@ export default function ExportPage() {
           Export Parameters
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 gap-5">
           {/* Event Picker */}
           <div>
             <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
@@ -166,23 +162,6 @@ export default function ExportPage() {
                   {ev.name} ({ev.code})
                 </option>
               ))}
-            </select>
-          </div>
-
-          {/* Status Picker */}
-          <div>
-            <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
-              Filter by Registration Status
-            </label>
-            <select
-              value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value)}
-              className="w-full px-3 py-2.5 rounded-lg bg-white/[0.04] border border-white/[0.08] text-sm text-white outline-none focus:border-cyan-500/50"
-            >
-              <option value="ALL" className="bg-slate-900">All Statuses (Confirmed, Pending, Rejected)</option>
-              <option value="confirmed" className="bg-slate-900">Confirmed Only</option>
-              <option value="pending" className="bg-slate-900">Pending Review Only</option>
-              <option value="rejected" className="bg-slate-900">Rejected Only</option>
             </select>
           </div>
         </div>
@@ -212,7 +191,7 @@ export default function ExportPage() {
             </div>
           </div>
           <span className="text-xs font-mono text-cyan-300">
-            Target: {selectedEvent} | Status: {selectedStatus}
+            Target: {selectedEvent}
           </span>
         </div>
 

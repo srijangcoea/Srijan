@@ -3,15 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import {
   Users,
   UserCheck,
-  Clock,
-  CheckCircle,
-  XCircle,
   Calendar,
   TrendingUp,
   RefreshCw,
   ExternalLink,
   ChevronRight,
   ShieldCheck,
+  Layers,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -19,26 +17,15 @@ import {
   Bar,
   LineChart,
   Line,
-  PieChart,
-  Pie,
-  Cell,
   XAxis,
   YAxis,
   Tooltip,
-  Legend,
 } from 'recharts';
 import StatCard from '../../components/admin/StatCard';
 import ChartCard from '../../components/admin/ChartCard';
-import StatusBadge from '../../components/admin/StatusBadge';
 import DetailDrawer from '../../components/admin/DetailDrawer';
-import { getDashboardStats, updateRegistrationStatus } from '../../services/adminService';
+import { getDashboardStats } from '../../services/adminService';
 import { notify } from '../../utils/toast';
-
-const STATUS_COLORS = {
-  confirmed: '#10b981', // emerald-500
-  pending: '#f59e0b',   // amber-500
-  rejected: '#ef4444',  // red-500
-};
 
 export default function DashboardPage() {
   const [data, setData] = useState(null);
@@ -74,47 +61,16 @@ export default function DashboardPage() {
     notify.info('Dashboard Refreshed', 'Latest metrics and data loaded');
   };
 
-  const handleStatusChange = async (id, newStatus, reason) => {
-    try {
-      await updateRegistrationStatus(id, newStatus, reason);
-      // Update local state if selected registration is open
-      if (selectedReg && (selectedReg._id === id || selectedReg.id === id)) {
-        setSelectedReg((prev) => ({ ...prev, status: newStatus, rejectionReason: reason }));
-      }
-      fetchStats();
-      if (newStatus === 'confirmed') {
-        notify.success('Status Confirmed', 'Registration officially approved');
-      } else if (newStatus === 'rejected') {
-        notify.warning('Status Rejected', reason || 'Registration marked as rejected');
-      } else {
-        notify.info('Status Updated', `Registration marked as ${newStatus}`);
-      }
-    } catch (err) {
-      notify.error('Update Failed', err.message || 'Could not update registration status');
-    }
-  };
-
   const kpi = data?.kpi || {
     totalRegistrations: 0,
     totalParticipants: 0,
-    confirmed: 0,
-    pending: 0,
-    rejected: 0,
     registrationsToday: 0,
   };
-
-  // Status donut data
-  const statusPieData = [
-    { name: 'Confirmed', value: kpi.confirmed || 0, color: STATUS_COLORS.confirmed },
-    { name: 'Pending', value: kpi.pending || 0, color: STATUS_COLORS.pending },
-    { name: 'Rejected', value: kpi.rejected || 0, color: STATUS_COLORS.rejected },
-  ].filter((item) => item.value > 0);
 
   // Bar chart data (Event Registrations)
   const eventBarData = (data?.eventStats || []).map((e) => ({
     name: e._id || e.eventName || 'Unknown',
     registrations: e.count || 0,
-    confirmed: e.confirmed || 0,
   }));
 
   // Timeline line chart data
@@ -164,8 +120,8 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* KPI Cards Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+      {/* KPI Cards Row — 4 boxes in a single row on mobile & desktop */}
+      <div className="grid grid-cols-4 gap-2 sm:gap-4">
         <StatCard
           icon={Users}
           label="Total Registrations"
@@ -179,22 +135,10 @@ export default function DashboardPage() {
           color="blue"
         />
         <StatCard
-          icon={CheckCircle}
-          label="Confirmed"
-          value={loading ? '...' : kpi.confirmed}
-          color="emerald"
-        />
-        <StatCard
-          icon={Clock}
-          label="Pending Review"
-          value={loading ? '...' : kpi.pending}
+          icon={Layers}
+          label="Active Events"
+          value={loading ? '...' : (data?.eventStats?.length || 6)}
           color="amber"
-        />
-        <StatCard
-          icon={XCircle}
-          label="Rejected"
-          value={loading ? '...' : kpi.rejected}
-          color="red"
         />
         <StatCard
           icon={Calendar}
@@ -204,94 +148,44 @@ export default function DashboardPage() {
         />
       </div>
 
-      {/* Charts Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Bar Chart: Registrations Per Event */}
-        <div className="lg:col-span-2">
-          <ChartCard
-            title="Registrations per Event"
-            subtitle="Breakdown of total registrations across technical competitions"
-          >
-            <div className="h-64 sm:h-72 w-full pt-4">
-              {eventBarData.length > 0 ? (
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={eventBarData} margin={{ top: 10, right: 10, left: -20, bottom: 20 }}>
-                    <XAxis
-                      dataKey="name"
-                      stroke="#64748b"
-                      fontSize={11}
-                      tickLine={false}
-                      angle={-20}
-                      textAnchor="end"
-                    />
-                    <YAxis stroke="#64748b" fontSize={11} tickLine={false} />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: '#0f172a',
-                        borderColor: 'rgba(255,255,255,0.1)',
-                        borderRadius: '0.75rem',
-                        fontSize: '12px',
-                        color: '#fff',
-                      }}
-                    />
-                    <Bar dataKey="registrations" name="Total Regs" fill="#06b6d4" radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="confirmed" name="Confirmed" fill="#10b981" radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              ) : (
-                <div className="h-full flex items-center justify-center text-xs text-slate-500">
-                  No event registration data available yet.
-                </div>
-              )}
-            </div>
-          </ChartCard>
-        </div>
-
-        {/* Donut Chart: Status Split */}
-        <div>
-          <ChartCard
-            title="Approval Status Split"
-            subtitle="Proportion of confirmed, pending, and rejected registrations"
-          >
-            <div className="h-64 sm:h-72 w-full flex flex-col items-center justify-center">
-              {statusPieData.length > 0 ? (
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={statusPieData}
-                      cx="50%"
-                      cy="45%"
-                      innerRadius={60}
-                      outerRadius={85}
-                      paddingAngle={5}
-                      dataKey="value"
-                    >
-                      {statusPieData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: '#0f172a',
-                        borderColor: 'rgba(255,255,255,0.1)',
-                        borderRadius: '0.75rem',
-                        fontSize: '12px',
-                        color: '#fff',
-                      }}
-                    />
-                    <Legend
-                      verticalAlign="bottom"
-                      height={36}
-                      formatter={(val) => <span className="text-xs text-slate-300">{val}</span>}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
-              ) : (
-                <div className="text-xs text-slate-500">No status metrics recorded yet.</div>
-              )}
-            </div>
-          </ChartCard>
-        </div>
+      {/* Bar Chart: Registrations Per Event */}
+      <div>
+        <ChartCard
+          title="Registrations per Event"
+          subtitle="Breakdown of total registrations across technical competitions"
+        >
+          <div className="h-64 sm:h-72 w-full pt-4">
+            {eventBarData.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={eventBarData} margin={{ top: 10, right: 10, left: -20, bottom: 20 }}>
+                  <XAxis
+                    dataKey="name"
+                    stroke="#64748b"
+                    fontSize={11}
+                    tickLine={false}
+                    angle={-20}
+                    textAnchor="end"
+                  />
+                  <YAxis stroke="#64748b" fontSize={11} tickLine={false} />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: '#0f172a',
+                      borderColor: 'rgba(255,255,255,0.1)',
+                      borderRadius: '0.75rem',
+                      fontSize: '12px',
+                      color: '#fff',
+                    }}
+                  />
+                  <Bar dataKey="registrations" name="Total Regs" fill="#06b6d4" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="h-full flex items-center justify-center text-xs text-slate-500">
+                No event registration data available yet.
+              </div>
+            )}
+          </div>
+        </ChartCard>
       </div>
 
       {/* Row 3: Registrations over Time & Event Progress */}
@@ -403,7 +297,6 @@ export default function DashboardPage() {
                 <th className="py-2.5 px-3">Event</th>
                 <th className="py-2.5 px-3">Team / Leader</th>
                 <th className="py-2.5 px-3">Contact</th>
-                <th className="py-2.5 px-3">Status</th>
                 <th className="py-2.5 px-3 text-right">Time</th>
               </tr>
             </thead>
@@ -443,17 +336,14 @@ export default function DashboardPage() {
                       return lead?.email || reg.email || '—';
                     })()}
                   </td>
-                  <td className="py-2.5 px-3">
-                    <StatusBadge status={reg.status || 'pending'} />
-                  </td>
                   <td className="py-2.5 px-3 text-right text-slate-500 font-mono text-[11px]">
-                    {reg.createdAt ? new Date(reg.createdAt).toLocaleDateString() : '—'}
+                    {reg.createdAt ? new Date(reg.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'}
                   </td>
                 </tr>
               ))}
               {(!data?.recentRegistrations || data.recentRegistrations.length === 0) && (
                 <tr>
-                  <td colSpan={6} className="py-8 text-center text-xs text-slate-500">
+                  <td colSpan={5} className="py-8 text-center text-xs text-slate-500">
                     No recent registrations submitted yet.
                   </td>
                 </tr>
@@ -467,7 +357,6 @@ export default function DashboardPage() {
       <DetailDrawer
         registration={selectedReg}
         onClose={() => setSelectedReg(null)}
-        onStatusChange={handleStatusChange}
       />
     </div>
   );

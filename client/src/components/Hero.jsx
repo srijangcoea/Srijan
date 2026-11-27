@@ -6,15 +6,21 @@ import {
   Zap,
   Radio,
   ArrowRight,
-  UserCheck
+  UserCheck,
+  Megaphone
 } from 'lucide-react';
+import { useCms } from '../contexts/CmsContext';
 
 /**
  * Modern High-Impact Hero Section for SRIJAN '26
  * Engineered precisely to the cyber-command telemetry design specification.
  */
 export default function Hero() {
-  // Live Countdown targeting Dec 20, 2026 09:00:00 IST
+  const { cms, resolveAssetUrl } = useCms();
+  const hp = cms?.homepage || {};
+  const notices = cms?.notices;
+
+  // Live Countdown targeting 21 Dec 2026 11:00:00 IST (or CMS target)
   const [timeLeft, setTimeLeft] = useState({
     days: '00',
     hours: '00',
@@ -23,7 +29,7 @@ export default function Hero() {
   });
 
   useEffect(() => {
-    const targetDate = new Date('2026-12-20T09:00:00+05:30').getTime();
+    const targetDate = new Date(hp.countdownTarget || '2026-12-21T11:00:00+05:30').getTime();
 
     const padZero = (num) => (num < 10 ? `0${num}` : `${num}`);
 
@@ -52,7 +58,7 @@ export default function Hero() {
     updateCountdown();
     const interval = setInterval(updateCountdown, 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, [hp.countdownTarget]);
 
   return (
     <div className="flex flex-col w-full relative overflow-hidden bg-[#030a14] text-[#dfe2ee]">
@@ -155,6 +161,18 @@ export default function Hero() {
       {/* Primary Centered Hero Module Stack */}
       <div className="relative z-10 w-full min-h-screen flex flex-col justify-between items-center px-4 sm:px-6 lg:px-8 pt-24 sm:pt-28 md:pt-32 pb-0">
         <div className="w-full max-w-[1200px] mx-auto my-auto flex flex-col items-center text-center">
+
+          {/* Optional CMS Live Notice Banner */}
+          {notices?.enabled && Array.isArray(notices.items) && notices.items.filter((n) => n.visible !== false).length > 0 && (
+            <Link
+              to={notices.items[0].link || '/events'}
+              className="mb-4 inline-flex items-center gap-2 px-4 py-1.5 rounded-xl bg-amber-500/15 border border-amber-400/40 text-amber-200 text-xs font-mono hover:bg-amber-500/25 transition-colors"
+            >
+              <Megaphone className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+              <span>{notices.items[0].title}</span>
+              <ArrowRight className="w-3 h-3 text-amber-400" />
+            </Link>
+          )}
           
           {/* Item 1: Status Pill Badge */}
           <div className="fade-seq-1 mb-4 inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-[#081522]/85 border border-[#22e5ff]/30 backdrop-blur-xl shadow-[0_0_20px_rgba(0,0,0,0.5)] hover:border-[#22e5ff]/60 transition-all duration-300">
@@ -163,17 +181,17 @@ export default function Hero() {
               <span className="relative inline-flex rounded-full h-2 w-2 bg-[#22e5ff]" />
             </span>
             <span className="font-mono text-xs sm:text-[13px] text-slate-200 uppercase tracking-wider font-semibold">
-              ETAS Presents · 1st Edition
+              {hp.badge || 'ETAS Presents · 1st Edition'}
             </span>
             <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-[#22e5ff]/10 border border-[#22e5ff]/30 text-[#22e5ff] uppercase font-bold tracking-widest">
-              2026
+              {hp.edition || '2026'}
             </span>
           </div>
 
           {/* Item 2: Small Letter-Spaced Etymology Label */}
           <div className="fade-seq-2 mb-2">
             <p className="font-mono text-xs text-[#22e5ff] uppercase tracking-[0.28em] font-semibold">
-              SANSKRIT FOR 'CREATION'
+              {hp.subtitle || "SANSKRIT FOR 'CREATION'"}
             </p>
           </div>
 
@@ -182,12 +200,12 @@ export default function Hero() {
             <div className="flex flex-col items-center justify-center gap-1">
               <h1 className="font-display text-[3.25rem] sm:text-[4.75rem] lg:text-[5.5rem] font-bold tracking-tight uppercase leading-[1.02] text-white">
                 <span className="bg-gradient-to-r from-[#38bdf8] via-[#22e5ff] to-[#bdc2ff] bg-clip-text text-transparent drop-shadow-[0_0_35px_rgba(34,229,255,0.35)]">
-                  SRIJAN
+                  {hp.title || 'SRIJAN'}
                 </span>{' '}
-                <span className="text-[#22e5ff]">'26</span>
+                <span className="text-[#22e5ff]">'{(hp.edition || '2026').slice(-2)}</span>
               </h1>
               <h2 className="font-display text-xl sm:text-2xl lg:text-3xl font-medium text-slate-300 tracking-wide mt-1">
-                Where Ideas <span className="text-[#22e5ff] font-semibold">Take Shape</span>
+                {hp.tagline || <>Where Ideas <span className="text-[#22e5ff] font-semibold">Take Shape</span></>}
               </h2>
             </div>
           </div>
@@ -195,25 +213,32 @@ export default function Hero() {
           {/* Item 4: Centered Contextual Lead Paragraph */}
           <div className="fade-seq-4 max-w-[700px] mx-auto mb-6">
             <p className="font-sans text-sm sm:text-base text-slate-300 font-normal leading-relaxed">
-              A multi-disciplinary technical fest bringing together coders, designers, and builders through 6 hands-on competitions. Organized by Electronics &amp; Telecommunication Academic Society at Government College of Engineering, Amravati (GCOEA).
+              {hp.description || 'A multi-disciplinary technical fest bringing together coders, designers, and builders through 6 hands-on competitions. Organized by Electronics & Telecommunication Academic Society at Government College of Engineering, Amravati (GCOEA).'}
             </p>
           </div>
+
+          {/* Optional CMS Hero Banner Image */}
+          {hp.bannerImage && (
+            <div className="w-full max-w-2xl mx-auto mb-6 rounded-2xl overflow-hidden border border-[#22e5ff]/30 shadow-xl">
+              <img src={resolveAssetUrl(hp.bannerImage)} alt="Srijan Banner" className="w-full max-h-60 object-cover" />
+            </div>
+          )}
 
           {/* Item 5: Row of 3 Translucent Info Chips */}
           <div className="fade-seq-5 flex flex-wrap items-center justify-center gap-2.5 sm:gap-4 mb-8 w-full">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#081522]/75 border border-[#22e5ff]/25 backdrop-blur-md shadow-sm hover:border-[#22e5ff]/50 transition-colors">
               <Calendar className="w-4 h-4 text-[#22e5ff]" />
-              <span className="font-sans text-xs sm:text-sm text-slate-200 font-medium">20–21 Dec 2026</span>
+              <span className="font-sans text-xs sm:text-sm text-slate-200 font-medium">{hp.eventDateText || '21–22 Dec 2026'}</span>
             </div>
 
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#081522]/75 border border-[#22e5ff]/25 backdrop-blur-md shadow-sm hover:border-[#22e5ff]/50 transition-colors">
               <MapPin className="w-4 h-4 text-[#38bdf8]" />
-              <span className="font-sans text-xs sm:text-sm text-slate-200 font-medium">GCOEA Campus, Amravati</span>
+              <span className="font-sans text-xs sm:text-sm text-slate-200 font-medium">{hp.venueText || 'GCOEA Campus, Amravati'}</span>
             </div>
 
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#081522]/75 border border-[#22e5ff]/25 backdrop-blur-md shadow-sm hover:border-[#22e5ff]/50 transition-colors">
               <Zap className="w-4 h-4 text-[#22e5ff]" />
-              <span className="font-sans text-xs sm:text-sm text-slate-200 font-medium">6 Technical Events</span>
+              <span className="font-sans text-xs sm:text-sm text-slate-200 font-medium">{hp.eventsCountText || '6 Technical Events'}</span>
             </div>
           </div>
 
@@ -224,7 +249,7 @@ export default function Hero() {
               <div className="flex items-center gap-2">
                 <Radio className="w-4 h-4 text-[#22e5ff] animate-pulse" />
                 <span className="font-mono text-[10px] sm:text-xs text-slate-300 uppercase tracking-widest">
-                  COUNTDOWN TO SRIJAN · 20–21 DEC 2026
+                  {hp.countdownTitle || 'COUNTDOWN TO SRIJAN · 21–22 DEC 2026'}
                 </span>
               </div>
               <span className="font-mono text-[10px] text-[#22e5ff] bg-[#22e5ff]/10 border border-[#22e5ff]/30 px-2 py-0.5 rounded-full uppercase tracking-wider font-bold">

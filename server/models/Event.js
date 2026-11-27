@@ -74,6 +74,35 @@ const eventSchema = new mongoose.Schema(
       type: String,
       default: 'To be announced',
     },
+    rules: {
+      type: [String],
+      default: [],
+    },
+    prizePool: {
+      type: String,
+      default: '₹20,000',
+    },
+    image: {
+      type: String,
+      default: '',
+    },
+    registrationLink: {
+      type: String,
+      default: '',
+    },
+    status: {
+      type: String,
+      enum: ['published', 'draft'],
+      default: 'published',
+    },
+    visible: {
+      type: Boolean,
+      default: true,
+    },
+    order: {
+      type: Number,
+      default: 0,
+    },
   },
   {
     timestamps: true,

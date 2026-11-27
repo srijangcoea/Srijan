@@ -1,10 +1,11 @@
 import React from 'react';
 import EventGrid from '../components/EventGrid';
 import CTASection from '../components/CTASection';
-import { events } from '../data/events';
+import { useCms } from '../contexts/CmsContext';
 import PageTransition from '../components/PageTransition';
 
 export default function EventsPage() {
+  const { events } = useCms();
   return (
     <PageTransition>
     <div className="pt-28 sm:pt-32 pb-20 min-h-screen text-[#dce3f0]">

@@ -40,7 +40,7 @@ export default function DataTable({
   const [sorting, setSorting] = useState([]);
   const [columnVisibility, setColumnVisibility] = useState({});
   const [showColMenu, setShowColMenu] = useState(false);
-  const [dense, setDense] = useState(true);
+  const [dense, setDense] = useState(false);
 
   const table = useReactTable({
     data,

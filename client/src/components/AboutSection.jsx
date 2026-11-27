@@ -14,13 +14,14 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import sMarkImg from '../assets/srijan-s-mark.png';
+import { useCms } from '../contexts/CmsContext';
 
 /**
  * AboutSection Component
- * Recreates the Cybernetic Telemetry / Engineering Blueprint layout precisely
- * from the specification image, styled to Srijan 2026's dark navy & cyan theme.
  */
 export default function AboutSection() {
+  const { cms } = useCms();
+  const aboutCms = cms?.about || {};
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -76,10 +77,10 @@ export default function AboutSection() {
               />
             </div>
             <h1 className="font-mono font-black text-4xl sm:text-5xl md:text-6xl text-white tracking-tight uppercase">
-              ABOUT <span className="bg-gradient-to-r from-white via-[#e8f1f8] to-[#22e5ff] bg-clip-text text-transparent">SRIJAN</span>
+              {aboutCms.heading || <>ABOUT <span className="bg-gradient-to-r from-white via-[#e8f1f8] to-[#22e5ff] bg-clip-text text-transparent">SRIJAN</span></>}
             </h1>
             <span className="px-2.5 py-1 rounded-md bg-[#0a1d2c] border border-[#22e5ff]/40 text-[#ffb400] text-xs font-mono font-bold tracking-wider shadow-[0_0_12px_rgba(255,180,0,0.2)]">
-              EDITION 2026
+              {aboutCms.badge || 'EDITION 2026'}
             </span>
           </div>
 
@@ -121,8 +122,25 @@ export default function AboutSection() {
 
           {/* Content Statement */}
           <p className="text-slate-200 text-sm sm:text-base md:text-lg leading-relaxed font-sans max-w-5xl">
-            Srijan 2026 is an engineering symposium uniting ambitious student builders, thinkers, and innovators across six flagship technical arenas to collaborate, engineer real-world prototypes, and shape tomorrow's technological frontier together.
+            {aboutCms.description || "Srijan 2026 is an engineering symposium uniting ambitious student builders, thinkers, and innovators across six flagship technical arenas to collaborate, engineer real-world prototypes, and shape tomorrow's technological frontier together."}
           </p>
+
+          {(aboutCms.visionText || aboutCms.missionText) && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6 pt-5 border-t border-[#22e5ff]/15">
+              {aboutCms.visionText && (
+                <div className="p-4 rounded-xl bg-[#081522]/70 border border-[#22e5ff]/20">
+                  <div className="font-mono text-xs font-bold text-[#22e5ff] uppercase mb-1">{aboutCms.visionTitle || 'Our Vision'}</div>
+                  <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">{aboutCms.visionText}</p>
+                </div>
+              )}
+              {aboutCms.missionText && (
+                <div className="p-4 rounded-xl bg-[#081522]/70 border border-[#ffb400]/20">
+                  <div className="font-mono text-xs font-bold text-[#ffb400] uppercase mb-1">{aboutCms.missionTitle || 'Our Mission'}</div>
+                  <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">{aboutCms.missionText}</p>
+                </div>
+              )}
+            </div>
+          )}
         </motion.div>
 
         {/* 3. TWO-COLUMN GRID: CHRONICLE TRACE & SCHEMATIC CAD-FRAME */}

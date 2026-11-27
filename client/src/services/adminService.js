@@ -156,7 +156,7 @@ export const getActivityLog = async (page = 1, limit = 50) => {
 // ─── Event Management ──────────────────────────────────
 export const getAdminEvents = async () => {
   try {
-    const res = await fetch(`${API_BASE}/events`, {
+    const res = await fetch(`${API_BASE}/events?includeDrafts=true`, {
       headers: getAuthHeaders(),
     });
     return await handleResponse(res);
@@ -165,11 +165,96 @@ export const getAdminEvents = async () => {
   }
 };
 
+export const createAdminEvent = async (data) => {
+  const res = await fetch(`${API_BASE}/events`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  return handleResponse(res);
+};
+
 export const updateAdminEvent = async (id, data) => {
   const res = await fetch(`${API_BASE}/events/${id}`, {
     method: 'PATCH',
     headers: getAuthHeaders(),
     body: JSON.stringify(data),
+  });
+  return handleResponse(res);
+};
+
+export const deleteAdminEvent = async (id) => {
+  const res = await fetch(`${API_BASE}/events/${id}`, {
+    method: 'DELETE',
+    headers: getAuthHeaders(),
+  });
+  return handleResponse(res);
+};
+
+// ─── Website CMS ───────────────────────────────────────
+export const resolveAssetUrl = (url) => {
+  if (!url) return '';
+  if (url.startsWith('http') || url.startsWith('data:') || url.startsWith('/team/') || url.startsWith('/brochures/')) {
+    return url;
+  }
+  if (url.startsWith('/uploads/')) {
+    const origin = API_BASE.replace(/\/api$/, '');
+    return origin ? `${origin}${url}` : url;
+  }
+  return url;
+};
+
+export const getPublicCms = async (preview = false) => {
+  const res = await fetch(`${API_BASE}/cms/public${preview ? '?preview=1' : ''}`);
+  return handleResponse(res);
+};
+
+export const getAdminCms = async () => {
+  const res = await fetch(`${API_BASE}/cms/admin`, {
+    headers: getAuthHeaders(),
+  });
+  return handleResponse(res);
+};
+
+export const saveCmsDraft = async (section, data) => {
+  const res = await fetch(`${API_BASE}/cms/admin/${section}/draft`, {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ data }),
+  });
+  return handleResponse(res);
+};
+
+export const publishCmsSection = async (section, data) => {
+  const res = await fetch(`${API_BASE}/cms/admin/${section}/publish`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data ? { data } : {}),
+  });
+  return handleResponse(res);
+};
+
+export const unpublishCmsSection = async (section) => {
+  const res = await fetch(`${API_BASE}/cms/admin/${section}/unpublish`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+  });
+  return handleResponse(res);
+};
+
+export const resetCmsDraft = async (section) => {
+  const res = await fetch(`${API_BASE}/cms/admin/${section}/reset`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+  });
+  return handleResponse(res);
+};
+
+export const uploadCmsImage = async (filename, dataUrl) => {
+  const res = await fetch(`${API_BASE}/cms/upload`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ filename, dataUrl }),
   });
   return handleResponse(res);
 };
